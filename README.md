@@ -1,3 +1,0 @@
-# bluetoothPrinter
-
-owen  ble  demo
