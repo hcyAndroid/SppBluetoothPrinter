@@ -1,0 +1,15 @@
+
+Ü	java:S112E"FDefine and throw a dedicated exception instead of using a generic one.(ïπ´”˛ˇˇˇˇJ$26d8b990-88c0-4863-8e9d-d209a4552b15
+Å	java:S112Z"FDefine and throw a dedicated exception instead of using a generic one.(⁄“Í‡J$91bb52e9-1584-44bd-afa2-eccfb542eab9
+ì	java:S127"XRefactor the code in order to not assign to this loop counter from within the loop body.(Ûó˜ØJ$3ae29636-a375-4ba8-a022-d753309196e1
+ò	java:S127"XRefactor the code in order to not assign to this loop counter from within the loop body.(ŸÚê¶¸ˇˇˇˇJ$e011db23-65e6-45ee-b5a9-90116df6f816
+ì	java:S127M"XRefactor the code in order to not assign to this loop counter from within the loop body.(Ø¿⁄ËJ$3778f148-32b5-4567-bdd6-88450ba2f86c
+ì	java:S127O"XRefactor the code in order to not assign to this loop counter from within the loop body.(Ø¿⁄ËJ$641f094a-7764-4ffa-824c-13cdf818e0da
+y
+java:S3034l">Prevent "int" promotion by adding "& 0xff" to this expression.(πûÑtJ$cabf2fe5-69b0-4b04-8dae-6319f53292c4
+v
+java:S1118":Add a private constructor to hide the implicit public one.(∂÷‰ÁJ$bae66e82-c95e-4762-b6a6-ee74222a33f6
+b
+java:S1168"&Return an empty array instead of null.(•πÔçJ$2086c7b8-f8f4-413a-8406-5154f66912d3
+b
+java:S1168c"&Return an empty array instead of null.(•πÔçJ$aa7c48e5-cced-4aec-91c5-2db649e7b391

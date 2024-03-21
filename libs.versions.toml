@@ -30,6 +30,8 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 
 [libraries]
+protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version = "0.8.8" }
+
 lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.7.0" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version = "2.7.7" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version = "2.7.7" }
@@ -124,6 +126,14 @@ recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version
 
 
 
+protoc = { group = "com.google.protobuf", name = "protoc", version = "3.8.0" }
+protobuf-java = { group = "com.google.protobuf", name = "protobuf-java", version = "3.21.7" }
+
+protobuf-javalite = { group = "com.google.protobuf", name = "protobuf-javalite", version = "3.21.7" }
+protobuf-java-util = { group = "com.google.protobuf", name = "protobuf-java-util", version = "4.26.0" }
+
+
+
 [bundles]
 androidx = ["lifecycle", "navigation-fragment-ktx", "navigation-ui-ktx", "page-runtime", "kotlin-std-lib", "swiperefreshlayout", "palette"]
 compose = ["compose-ui", "compose-ui-graphics", "compose-ui-preview", "compose-material3"]
@@ -136,3 +146,4 @@ exoplayer = ["exoplayer-core", "exoplayer-dash", "exoplayer-ui"]
 aspectj = ["aspectjtools", "aspectjweaver"]
 room = ["room-runtime", "room-ktx"]
 work-manager = ["work-runtime-ktx", "work-gcm", "work-testing", "work-multiprocess"]
+proto3=["protobuf-java"]

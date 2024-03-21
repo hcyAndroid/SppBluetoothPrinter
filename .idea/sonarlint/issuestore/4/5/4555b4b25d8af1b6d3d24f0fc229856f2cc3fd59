@@ -1,0 +1,54 @@
+
+›
+java:S1192“"^Define a constant instead of duplicating this literal "This device is not connected!" 3 times.(í½û¾J$cef930ee-b16a-46c5-be4c-b08824a6bf86
+›
+java:S1192§"YDefine a constant instead of duplicating this literal "This device not connect!" 3 times.(Äà©³øÿÿÿÿJ$aa908967-3bcb-4026-ba4e-87cf8827bc29
+“
+java:S1192§"VDefine a constant instead of duplicating this literal "Bluetooth not enable!" 4 times.(‚ïÅ¢J$b554cb31-06b8-4bc5-9af8-2bb35a4cce22
+q
+java:S1066ÿ"/Merge this if statement with the enclosing one.(¯ßÀüÿÿÿÿJ$fe392618-a39d-43c3-8a86-e109166d0d85
+l
+java:S1066"/Merge this if statement with the enclosing one.(§è¼³J$70d461b2-09c5-492b-a310-511ed20b12fc
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$a703f4e9-4cb1-4cbc-abae-526f318ddc8b
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŒéŞ¨øÿÿÿÿJ$3469295b-f62c-49dd-8131-b80dd943e67c
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$6e554dfd-ee1d-4c5f-a059-08ea75a1c4c5
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŒéŞ¨øÿÿÿÿJ$12ddf982-b9b8-400b-ad96-e19473825605
+’	java:S117¸"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$d05ff7d2-5c0c-4e08-a06a-25c6eca69760
+’	java:S117¹"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ËƒİíüÿÿÿÿJ$8db35a7e-9e61-44ad-af16-c68c613646c1
+’	java:S117È"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$960b0b5e-b845-4569-b6d9-f924b68e6d1f
+’	java:S117É"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ËƒİíüÿÿÿÿJ$bc8d3324-5ba3-4728-af2b-b44e63f0ff5b
+’	java:S117ã"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$30de388a-890c-442d-8820-1a3bcb3c7975
+’	java:S117ä"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×áÈÖùÿÿÿÿJ$7ca1717f-f977-41ad-a7ce-17eb118397dc
+’	java:S117ò"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$c74cd401-ce9b-4997-9993-a05974fbd1aa
+’	java:S117ó"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŒéŞ¨øÿÿÿÿJ$c9b05c33-0ac2-4104-a735-c630fb60f5ce
+’	java:S117‹"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$264331d2-3162-4c2f-b7ca-09cef5260cb2
+	java:S117Œ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•¤¯ J$4ccc5acd-8adf-4f5c-95a0-83450ef0e5b4
+’	java:S117š"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$68a847fa-a618-468c-8014-ceb459d46bac
+’	java:S117›"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ËƒİíüÿÿÿÿJ$ca86a1a9-b8b2-4e00-88da-961438a61372
+’	java:S117´"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$9832e798-1450-46a0-bb82-e365ab0aac95
+’	java:S117µ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…‘¼ÜşÿÿÿÿJ$7e78da23-1e13-4f0d-9a77-d1053546f1b0
+’	java:S117Æ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$bf064755-9294-47bc-9e5e-ab18c98d3313
+’	java:S117Ç"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…‘¼ÜşÿÿÿÿJ$8eb528ff-4311-4fa3-b4be-f34f56b992c1
+’	java:S117Ü"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$4779b463-2d04-41f4-8530-7516638f8aa5
+’	java:S117İ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…‘¼ÜşÿÿÿÿJ$dd225160-a9d2-4529-80d6-460d75c1acf0
+’	java:S117Š"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$a6ecb07f-b0af-4f83-9f9d-16a4984ede6d
+’	java:S117‹"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äç¢ÿÿÿÿÿJ$a4d906cd-cf8c-411a-8fbf-b6e4836d358d
+’	java:S117Í"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òˆÜ£ÿÿÿÿÿJ$86fd0d0b-d55a-4c29-9e06-b16583031916
+’	java:S117Ó"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(î³Ó¿üÿÿÿÿJ$9e2f8ffb-a5f3-4aea-a60d-5344e31bae42
+	java:S117Ù"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(††ÑJ$2acb0926-4222-4cc6-aa84-d5287173a406
+’	java:S117ß"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş’ó¿øÿÿÿÿJ$880ff8b5-2a1f-4db2-a199-492df6d2c9ca
+x	java:S107Û"<Method has 8 parameters, which is greater than 7 authorized.(×âÎ²J$503bd6a5-e0cb-45a4-8586-2c0d45decb98
+Ú
+java:S6548*"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.(À—‡°üÿÿÿÿJ$34f3ee94-27a4-4e21-9502-191f88d2e8d2
+z
+java:S1874Q"9Remove this use of "getDefaultAdapter"; it is deprecated.(øêıøÿÿÿÿJ$70299ec6-124b-4314-911a-ee0a89aa83e7
+r
+java:S2696˜"6Make the enclosing method "static" or remove this set.(Íµ¸J$24a039a1-fe8c-4418-828f-65bbd6590c88
+j
+java:S1874ö".Remove this use of "enable"; it is deprecated.(ßà‘J$81e8fb7f-095a-4c8b-ac80-eea176798739
+q
+java:S1874€"/Remove this use of "disable"; it is deprecated.(ıçá†ùÿÿÿÿJ$9ce4e68d-d0c5-4527-bc9d-f2ea605c1587
+h
+java:S1168´"+Return an empty collection instead of null.(¥¹ïJ$4722800e-e463-455e-ae90-50a377f71ff8
+h
+java:S1168ñ"+Return an empty collection instead of null.(¥¹ïJ$304cd601-767a-4c86-a70a-6842f26e736d

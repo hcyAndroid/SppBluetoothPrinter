@@ -1,11 +1,12 @@
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
 }
-
 android {
     namespace = "com.issyzone.blelibs"
     compileSdk = libs.versions.compileSdk.get().toInt()
+
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
@@ -33,15 +34,21 @@ android {
     viewBinding {
         enable=true
     }
-}
 
+}
 dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
     api(libs.logger)
-
+    implementation(libs.bundles.proto3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
+
+
+
+
+
+

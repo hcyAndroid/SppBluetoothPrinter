@@ -1,0 +1,107 @@
+
+syntax = "proto3";
+
+// 事件类型
+enum EventType {
+    DEFAULT = 0;          // 默认
+    DEVICEINFO = 1;       // 获取设备设备详情
+    SELFTEST = 2;         // 打印自检页
+    CLOSETIME = 3;        // 设置关机时间
+    DEVICEPRINT = 4;      // 内容打印
+    CANCELPRINTING = 5;   // 取消打印
+    DEVICEREPORT = 6;     // 设备状况主动上报
+    FIRMWAREUPGRADE = 7;  // 固件升级
+    PRINTINGSPEED = 8;    // 设置打印速度
+    PRINTINCONCENTRATION = 9;  // 设置打印浓度
+}
+
+
+/**
+ 发送的数据模型
+ eventType: 事件类型
+ eventTag: 事件标识
+ sendInt: 发送int内容
+ sendStr: 发送string内容
+ sendData: 发送bytes内容
+ */
+message MPSendMsg {
+  EventType eventType = 1;
+  string eventTag = 2;
+  sint32 sendInt = 4;
+  string sendStr = 3;
+  bytes sendData = 5;
+}
+
+/**
+ 响应的数据模型
+ EventType: 事件类型
+ code: 200:成功
+ error: 报错信息 error.code : 错误码  error.msg: 错误信息
+ respondData:  响应内容
+ */
+message MPRespondMsg {
+  EventType eventType = 1;
+  int32 code = 2;
+  bytes respondData = 3;
+  MPCodeMsg error =4;
+}
+
+/**
+ 响应码数据模型
+ code:  根据实际事件填充, 如果是错误码信息使用那么
+ info: code详情
+ */
+message MPCodeMsg {
+  int32 code = 1;
+  string info = 2;
+}
+
+/**
+ 设备详细信息
+ mac : mac地址
+ sn: sn序列号
+ firmwareVer: 固件版本
+ paperStatus: 纸张状态
+ elec: 电量
+ concentration: 设置浓度 1-8
+ speed: 设置速度 1- 4
+ */
+message MPDeviceInfoMsg {
+  string mac = 1;
+  string sn = 2;
+  string firmwareVer = 3;
+  int32 paperStatus = 4;
+  int32 elec = 5;
+  int32 concentration = 6;
+  int32 speed = 7;
+}
+
+/**
+  打印信息设置
+ page: 打印页数
+ dataLength: data总长度
+ data: 图片data
+ */
+message MPPrintMsg {
+  int32 page = 1;
+  bytes imgData = 2;
+  sint32 dataLength = 3;
+  int32 totalPackage = 4;
+  int32 indexPackage = 5;
+}
+
+/**
+  固件升级
+ crcCode:总包crc校验码
+ number: 分包序列号
+ dataLength: data的长度
+ data: bindata数据, 这个是会分包,每个小包的data数据
+ */
+message MPFirmwareMsg {
+  int32 crcCode = 1;
+  sint32 dataLength = 2;
+  bytes binData = 3;
+  int32 totalPackage = 4;
+  int32 indexPackage = 5;
+}
+

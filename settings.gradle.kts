@@ -1,7 +1,6 @@
 pluginManagement {
     repositories {
         google()
-
         mavenCentral()
         gradlePluginPortal()
     }
@@ -19,6 +18,7 @@ dependencyResolutionManagement {
         }
     }
 }
+
 
 rootProject.name = "bluetoothPrinter"
 include(":app")

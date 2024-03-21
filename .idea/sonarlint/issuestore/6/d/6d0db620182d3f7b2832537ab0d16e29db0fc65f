@@ -1,0 +1,245 @@
+
+
+java:S2293§"YReplace the type specification in this constructor call with the diamond operator ("<>").(€¡Œ8Ş¼§Íå1J$4a283187-9fd4-46e6-9f00-671e3660710d
+q
+java:S1066è"/Merge this if statement with the enclosing one.(²ü’ÚùÿÿÿÿJ$4d48e34c-3428-455e-a334-b7dc5d9a01e0
+	java:S117ü"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$d0cb7023-abbf-47cf-98b7-d473a51fe934
+	java:S117¡"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$a7fba126-04d0-4838-aa1e-6dc4ec51cfd5
+’	java:S117«"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹¤¢öøÿÿÿÿJ$cee8565b-7b75-45c9-9bed-dbc666cb0be3
+	java:S117³"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$f151a917-4566-4558-bc7d-0a61afbc4122
+	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$63d3341f-5d67-4864-a26c-7696e15f1612
+	java:S117ó!"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$99bc7eb0-e7a9-4d55-88aa-bcf28a76f76b
+	java:S117ƒ("QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÆÓ¡€J$62d67110-cda2-4c3a-81f4-047db7cffb6d
+l
+java:S1604ğ"(Make this anonymous inner class a lambda(ìÒÀ8ï¼§Íå1J$880226b5-70b0-48da-9768-831059ff7a40
+›
+java:S1488«"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$bf691751-0926-4ae1-924c-2948cbd7ae08
+›
+java:S1488È"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$f4ad29bc-ff8f-4e84-9618-6d05e3327d51
+›
+java:S1488è"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$c2f71596-f953-4881-88b1-1303b46538a0
+›
+java:S1488¬"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$395798af-7c3d-476b-9280-18eb408c4fa4
+›
+java:S1488¤!"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$c67e37d8-cf65-4481-95fe-df4b4263671d
+›
+java:S1488³'"_Immediately return this expression instead of assigning it to the temporary variable "builder".(«‰Ÿ~J$05107c72-9a2e-41c6-a5d6-4e952a28c8d3
+•	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(’ŞÕïJ$22cc0e65-0897-46a6-90a8-f87956cba48d
+Â
+java:S1186	"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(ñ¤¼ßıÿÿÿÿJ$7ebf92f5-1fdb-4514-93af-52cd6b704055
+p
+java:S1172	"/Remove this unused method parameter "registry".(ñ¤¼ßıÿÿÿÿJ$b7770cec-b586-4075-add3-d6d3f2546d9e
+r
+java:S1133É"5Do not forget to remove this deprecated code someday.(º¦åØJ$bafadad1-0645-401b-98c6-e7832429a779
+‘	java:S116…"URename this field "eventType_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş®í¬J$e77c9bf8-cd04-4c4c-8724-e780fa5e5838
+	java:S116"TRename this field "eventTag_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆì¶J$a066346f-e2f9-4647-ac77-c642fcfe0f8a
+	java:S116Ä"SRename this field "sendInt_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(úÔ¹J$b91aaf47-91b0-456d-8ea1-530603cf94ff
+	java:S116Ò"SRename this field "sendStr_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òõÄÜJ$0e4ab77a-2783-446c-bde2-6eb5b9480cc3
+•	java:S116ø"TRename this field "sendData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(İ¯Ø®ÿÿÿÿÿJ$f4ba4081-a558-4bb9-8637-1f98c4250ebc
+¡
+java:S4144ï	"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 1232.(‰Ï ¾J$3b9b602f-d286-4ed3-adcc-11fddbe837f8
+o
+java:S1948"+Make "eventTag_" transient or serializable.(ˆì¶8»Ë§Íå1J$8b96c972-4905-4e77-ab98-33910842f32f
+n
+java:S1948Ò"*Make "sendStr_" transient or serializable.(òõÄÜ8¼Ë§Íå1J$14d1a4d4-f2b8-45bf-b5b4-9d8a508b1c5c
+”
+java:S3077"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(ˆì¶J$611e6ac6-1781-43dd-80de-0a8816f4fd6b
+”
+java:S3077Ò"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(òõÄÜJ$47c58029-aab6-4bac-8fa3-0cd070d28e72
+}
+java:S1126Í"AReplace this if-then-else statement by a single return statement.(ûÿ½%J$9a37f771-af0b-4013-8da1-bc6ec5746179
+‘	java:S116‹"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$b1db482c-a1a6-4b36-94ae-053e6fdef470
+‘	java:S116"URename this field "eventType_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş®í¬J$28fb118e-7dff-48d1-bab1-2e4249f80d37
+•	java:S116Í"TRename this field "eventTag_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¬¤ïÕúÿÿÿÿJ$78e995cf-2e05-4b8d-8f33-2be409512d30
+	java:S116"SRename this field "sendInt_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ì¼êãJ$d0a5fe43-9dff-4c15-a6c5-b15ae0b78fc5
+	java:S116Ã"SRename this field "sendStr_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¡†‰ÎJ$48b08026-a86c-41d9-ad51-14d146ae69b4
+•	java:S116“	"TRename this field "sendData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(İ¯Ø®ÿÿÿÿÿJ$96c76fef-6505-418b-ad2a-704170db132c
+•
+java:S2975"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$df9098d8-0345-4eb6-8b3d-9b34602e9ade
+q
+java:S1185"(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8ÜË§Íå1J$33cb600a-7c11-4aad-8c75-22222fb88244
+q
+java:S1185”"(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8İË§Íå1J$6edd9d16-4a79-4fab-8f2a-12b47a2b96c0
+l
+java:S1185™"(Remove this method to simply inherit it.(ú„Íä8ŞË§Íå1J$4aeefc7e-a6a3-442d-a0c6-8895fb04f0bd
+q
+java:S1185"(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8ßË§Íå1J$0b106ce8-b18b-4b19-9752-a53e55f36d94
+l
+java:S1185£"(Remove this method to simply inherit it.(˜Ô¡8àË§Íå1J$16e66dfa-50a5-495c-9aaa-f9cd6c529c25
+q
+java:S1185¨"(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8àË§Íå1J$d2fd009a-fd76-48cb-a8bb-466777dba446
+}	java:S125"<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$d1e8419e-8121-4ce6-a1e6-be28855c468e
+x	java:S125‚"<This block of commented-out lines of code should be removed.(¯Ë¶‡J$ac8d226e-daf5-4900-865c-fd763df21037
+‘	java:S116Ó
+"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$ef9187a1-0920-450e-af14-b3f48a632680
+‘	java:S116Õ
+"URename this field "eventType_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş®í¬J$71147a2b-bd9b-4931-8b5a-32229a275c86
+‘	java:S116í
+"PRename this field "code_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(í®•…şÿÿÿÿJ$65d91b94-1b18-4403-a15d-f2b1964f4116
+˜	java:S116ú
+"WRename this field "respondData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²‰ÖçúÿÿÿÿJ$97bad61f-1e3c-450d-917a-cdbc13d85f4f
+	java:S116‡"QRename this field "error_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÜÄûñJ$d8078386-4ce3-496b-bb6f-5893276481c8
+¦
+java:S4144á"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 2114.(ÇçÆóúÿÿÿÿJ$53b55cfb-87ec-49e5-9f98-5903be5b6a11
+}
+java:S1126ê"AReplace this if-then-else statement by a single return statement.(ûÿ½%J$fe1e0541-d0a9-4178-b3ab-33043d2f4b8d
+‘	java:S116¤"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$c074b4ca-8955-4ead-b404-422827b6edc6
+‘	java:S116¦"URename this field "eventType_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş®í¬J$0eb75621-1e80-423a-aa5f-00f1d0b0540e
+‘	java:S116æ"PRename this field "code_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œÚÊùÿÿÿÿJ$f2f51649-6444-4136-b45f-ef6d500311c1
+˜	java:S116Œ"WRename this field "respondData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²‰ÖçúÿÿÿÿJ$36b82087-a7ac-471e-a60d-0ba0555ffee5
+	java:S116´"QRename this field "error_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÜÄûñJ$d222869b-467e-4108-95a1-ecda4ad3db1f
+™	java:S116µ"XRename this field "errorBuilder_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Æ‘’ôûÿÿÿÿJ$75963235-dbd4-49c9-b13a-02302f813dc8
+•
+java:S2975´"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$eb2c3273-73df-45a5-a215-a64bbbfb2fd3
+q
+java:S1185´"(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8”Ì§Íå1J$15e3de3b-bf80-4076-92de-0c52053e10fe
+q
+java:S1185¹"(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8•Ì§Íå1J$f8c49e53-1eac-4dd8-8679-d4ca26d5587f
+l
+java:S1185¾"(Remove this method to simply inherit it.(ú„Íä8–Ì§Íå1J$866b88d3-e94b-4442-aa9c-836c2cca96a0
+q
+java:S1185Ã"(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8–Ì§Íå1J$ca96acef-3e2e-4521-be55-22fb5b25c3cf
+l
+java:S1185È"(Remove this method to simply inherit it.(˜Ô¡8—Ì§Íå1J$25a1aa2e-7394-46a8-81bf-3e3a9b91179a
+q
+java:S1185Í"(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8˜Ì§Íå1J$754cd6e6-6874-40d1-a61c-a814281f3139
+}	java:S125š"<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$3606f83d-5adf-46d0-a84d-e455bd154bb1
+x	java:S125›"<This block of commented-out lines of code should be removed.(¯Ë¶‡J$370f0ce1-d539-4244-9254-98e24affb191
+‘	java:S116©"PRename this field "code_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(í®•…şÿÿÿÿJ$33a55d17-005d-42db-b56e-1ea0e59e0791
+‘	java:S116·"PRename this field "info_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ãç”¦ûÿÿÿÿJ$0ffddb76-6911-4050-af6c-3330e4033668
+¦
+java:S4144Ë"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 2732.(¨ˆÈåıÿÿÿÿJ$5e13747c-5a04-4749-a95f-f3ddd3a11f81
+p
+java:S1948·"'Make "info_" transient or serializable.(ãç”¦ûÿÿÿÿ8¨Ì§Íå1J$9a23f2af-9866-4163-be3b-b88c7b392a62
+™
+java:S3077·"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(ãç”¦ûÿÿÿÿJ$b9e5f337-ad55-4237-b55d-a06b82eeb41b
+}
+java:S1126"AReplace this if-then-else statement by a single return statement.(ûÿ½%J$d231aecb-dc7e-407a-a686-f494918a015f
+‘	java:S116Ÿ"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$6dedb546-edee-49ca-9dc8-af5b46184aa9
+‘	java:S116¡"PRename this field "code_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œÚÊùÿÿÿÿJ$03c55cc9-5fb0-40c8-afde-c9c20bc4b28a
+‘	java:S116Ç"PRename this field "info_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(úÇÏ÷üÿÿÿÿJ$9f5b951b-b19f-4b1b-b385-e94ebd30c389
+•
+java:S2975½"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$3c1c06a9-689c-439a-ade8-06eec3e1a11e
+q
+java:S1185½"(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8·Ì§Íå1J$8bcbbe80-1834-42e7-bf5d-d636bb1e55b4
+q
+java:S1185Â"(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8¸Ì§Íå1J$b4c5c6de-9f09-4876-abcb-54be96c575b6
+l
+java:S1185Ç"(Remove this method to simply inherit it.(ú„Íä8¸Ì§Íå1J$43249dfb-19eb-437c-9a8f-78884bacd4b4
+q
+java:S1185Ì"(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8¹Ì§Íå1J$46cb5d13-a4d4-43c7-8908-112a28e1eeb0
+l
+java:S1185Ñ"(Remove this method to simply inherit it.(˜Ô¡8¹Ì§Íå1J$769d367b-4f95-4476-af40-845f04e331e3
+q
+java:S1185Ö"(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8ºÌ§Íå1J$4f356933-713c-4820-a712-5927777043eb
+}	java:S125•"<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$7ee7a794-982c-413b-96d4-aa81262c1523
+x	java:S125–"<This block of commented-out lines of code should be removed.(¯Ë¶‡J$5b81e07f-667d-439f-931f-d9cf523b0acf
+	java:S116Ì"ORename this field "mac_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ùï¨±ıÿÿÿÿJ$cc51c31f-9a07-45b3-8c33-fc6040b8f1c1
+	java:S116ó"NRename this field "sn_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„“ñûşÿÿÿÿJ$6ac07e79-65ed-41d5-9c38-d3297fc76b25
+˜	java:S116š"WRename this field "firmwareVer_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Á±¥İÿÿÿÿÿJ$edcef0ea-1e61-4480-b2eb-5ececaec1c6a
+’	java:S116À"WRename this field "paperStatus_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“Í(J$0703a5a8-55e5-4fa1-8acd-1e97452ce231
+Œ	java:S116Í"PRename this field "elec_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(­Ÿ“„J$827efda3-5d29-4a41-8f61-12b796731ee3
+š	java:S116Ú"YRename this field "concentration_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÌˆÈÃùÿÿÿÿJ$2b2777bf-b1cf-4a09-b08e-b092ad17930b
+	java:S116ç"QRename this field "speed_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²ñÛJ$e483bf65-75bf-4606-8269-bbab53b0ab7f
+¦
+java:S4144æ"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 3911.( À„æıÿÿÿÿJ$4faff382-820d-49f0-8446-58445f22e64a
+o
+java:S1948Ì"&Make "mac_" transient or serializable.(Ùï¨±ıÿÿÿÿ8ÅÌ§Íå1J$94fa54d2-2c5a-47eb-8c05-50b0fd3656a1
+n
+java:S1948ó"%Make "sn_" transient or serializable.(„“ñûşÿÿÿÿ8ÆÌ§Íå1J$542c5aaa-3f1f-4a3a-b81f-a429deab1e2c
+w
+java:S1948š".Make "firmwareVer_" transient or serializable.(Á±¥İÿÿÿÿÿ8ÆÌ§Íå1J$af7516ad-fef0-4494-9aae-87608755c0af
+™
+java:S3077Ì"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(Ùï¨±ıÿÿÿÿJ$17d0261d-024f-4c9c-b274-395a37c3472b
+™
+java:S3077ó"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(„“ñûşÿÿÿÿJ$f6e1a957-4c42-4299-a53d-918f673f9a54
+™
+java:S3077š"WUse a thread-safe type; adding "volatile" is not enough to make this field thread-safe.(Á±¥İÿÿÿÿÿJ$0c23c4e8-0423-4106-af5d-678f19d1e718
+}
+java:S1126Ê"AReplace this if-then-else statement by a single return statement.(ûÿ½%J$be47ba44-eba8-414f-83d7-928b45b2d53c
+‘	java:S116¨"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$38ad9f76-0e62-4a9e-9df3-72aea5e34e61
+	java:S116ª"ORename this field "mac_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ØÂ©¬úÿÿÿÿJ$addeb10a-ea4b-4de6-ae87-ef5ec260ad15
+Š	java:S116ú"NRename this field "sn_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(È˜úçJ$b0f5ff63-57f6-4caa-a1c6-0eda8c2cbd4f
+˜	java:S116Ê"WRename this field "firmwareVer_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.( ˆÇÜûÿÿÿÿJ$d675c121-7940-4871-8da4-740da01769d7
+˜	java:S116š"WRename this field "paperStatus_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(èöçˆşÿÿÿÿJ$aa650806-ea8e-47e1-be10-dd633885a309
+Œ	java:S116À"PRename this field "elec_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(²€ÿJ$fdc248fe-52d3-47aa-99f1-61d7dc7759b5
+”	java:S116æ"YRename this field "concentration_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Ü¸HJ$e7f43618-91e6-4ff7-ad48-bc701465e1bd
+’	java:S116Œ"QRename this field "speed_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚›ŒÓıÿÿÿÿJ$55a67bb0-5054-4fd1-a298-f88e43fb6bf5
+•
+java:S2975š"SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$9c1fefe1-b14a-4ff9-aeba-b5613e3d544e
+q
+java:S1185š"(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8ÙÌ§Íå1J$59b52cc2-972d-47c5-a894-46a73389166d
+q
+java:S1185Ÿ"(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8ÙÌ§Íå1J$23efcccb-badb-45e7-9eea-d4607498eb8f
+l
+java:S1185¤"(Remove this method to simply inherit it.(ú„Íä8ÙÌ§Íå1J$aa2cf12e-6a46-47c3-bbd9-c2ed8e71d5eb
+q
+java:S1185©"(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8ÚÌ§Íå1J$323d0545-03e7-4e3c-8d1b-5ef969367b58
+l
+java:S1185®"(Remove this method to simply inherit it.(˜Ô¡8ÚÌ§Íå1J$0e47ba8d-c289-4cd1-873e-35b9becae20e
+q
+java:S1185³"(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8ÛÌ§Íå1J$eeb3d6a9-0660-47f1-b48b-48d60b5e0255
+}	java:S125"<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$287489ed-e93e-46e7-8cae-52a63df60ca9
+x	java:S125Ÿ"<This block of commented-out lines of code should be removed.(¯Ë¶‡J$2c2a35cb-d2bf-4bc9-9c60-99ec3bdc9662
+‘	java:S116½"PRename this field "page_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ø§ÌùÿÿÿÿJ$6175cdaa-2f73-4e63-a43d-01025fcd75b6
+”	java:S116Ê"SRename this field "imgData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş‚®—øÿÿÿÿJ$c0d6934c-9d16-4758-8850-a553bafa9d65
+’	java:S116×"VRename this field "dataLength_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äª¨ºJ$b1dc4689-67ea-4978-9f9e-536a930e6734
+“	java:S116ä"XRename this field "totalPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(±¦J$9335e490-7c34-46cb-a093-9e654f41aaae
+™	java:S116ñ"XRename this field "indexPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(çÚ¹–øÿÿÿÿJ$8aa81fc4-265d-420e-833a-3bd86ccba407
+¦
+java:S4144ô$"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 4693.(ÒïªƒıÿÿÿÿJ$772d8788-1ffa-430f-83cf-8863df09541b
+}
+java:S1126Æ "AReplace this if-then-else statement by a single return statement.(ûÿ½%J$7d2a6bbe-c497-4f3c-b968-e95089571361
+‘	java:S116ş""URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$05715ae7-2251-462c-9de9-c0e957b3d150
+‘	java:S116€#"PRename this field "page_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(®´ì¹øÿÿÿÿJ$b13fad1d-1497-438c-afc0-5d895c97f95b
+”	java:S116¦#"SRename this field "imgData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ş‚®—øÿÿÿÿJ$11973fca-d705-464d-9b03-5faf9731c009
+—	java:S116Î#"VRename this field "dataLength_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Àƒ«æıÿÿÿÿJ$fcada75a-6c3e-4a84-bc89-0f09bfe7a5c6
+™	java:S116ô#"XRename this field "totalPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ƒê¾—ûÿÿÿÿJ$c7aaf19a-7a9f-435c-959d-5c54c7196f21
+™	java:S116š$"XRename this field "indexPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ıáë©ûÿÿÿÿJ$645e236e-998c-4976-8963-2b5257626874
+•
+java:S2975†""SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$5127afc2-8dd9-47dd-b54a-60e33c0787df
+q
+java:S1185†""(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8úÌ§Íå1J$cc3990a7-494e-4579-9faf-5722e6ad96ae
+q
+java:S1185‹""(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8úÌ§Íå1J$35a8cfb8-2b7e-4ebb-8ca5-41e185b1d466
+l
+java:S1185""(Remove this method to simply inherit it.(ú„Íä8úÌ§Íå1J$13a96dbe-db36-4ef0-9e18-1c54eba3e2df
+q
+java:S1185•""(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8ûÌ§Íå1J$1efbd68b-241f-47f7-938e-a8a851d34aed
+l
+java:S1185š""(Remove this method to simply inherit it.(˜Ô¡8ûÌ§Íå1J$d2356bfe-8952-4a41-8cad-4d98b878f0b6
+q
+java:S1185Ÿ""(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8ûÌ§Íå1J$60ffdf68-032d-4441-899a-287a620de76b
+}	java:S125ô""<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$6cab5eb9-91dd-43d8-9682-ea9a00b96022
+x	java:S125õ""<This block of commented-out lines of code should be removed.(¯Ë¶‡J$193ed037-723a-4093-b2ed-de4305de4aab
+	java:S116Ì%"SRename this field "crcCode_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(©¶ÀÛJ$f8254a40-9ee6-4152-9455-9ade90cad880
+’	java:S116Ù%"VRename this field "dataLength_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äª¨ºJ$02e878f9-42bc-489a-9e49-5fe20ac08c93
+”	java:S116æ%"SRename this field "binData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ê¹·µûÿÿÿÿJ$17908cba-837e-436e-a542-f2cd2be42e04
+“	java:S116ó%"XRename this field "totalPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(±¦J$7dcb368a-8749-42ff-8aa7-d5cdc18f3546
+™	java:S116€&"XRename this field "indexPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(çÚ¹–øÿÿÿÿJ$456f13d1-b4a0-4c52-a07b-0e546d710b35
+¦
+java:S4144„+"dUpdate this method so that its implementation is not identical to "getDefaultInstance" on line 5477.(ÿƒè²ùÿÿÿÿJ$37ee6780-4f8c-4dce-84c3-85d7393d0a28
+}
+java:S1126Õ&"AReplace this if-then-else statement by a single return statement.(ûÿ½%J$3d1d8ff7-9764-4092-8e79-bb6da24b4cb7
+‘	java:S116)"URename this field "bitField0_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ö»³ÄJ$8e3f64a2-9e96-4c17-b090-b08136da1526
+	java:S116)"SRename this field "crcCode_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä²ÙîJ$b79f2803-c9d2-4004-94c4-f2cec70eac26
+—	java:S116¶)"VRename this field "dataLength_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Àƒ«æıÿÿÿÿJ$97ade204-9882-4ba6-a282-e620c8a8b92b
+”	java:S116Ü)"SRename this field "binData_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ê¹·µûÿÿÿÿJ$6635fd13-cf4e-4b44-9503-e927ab35d0b5
+™	java:S116„*"XRename this field "totalPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ƒê¾—ûÿÿÿÿJ$b9c79ade-f3f2-40b6-96d9-b0add8631227
+™	java:S116ª*"XRename this field "indexPackage_" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ıáë©ûÿÿÿÿJ$70082e34-905a-4b85-af90-19ff75b18884
+•
+java:S2975–("SRemove this "clone" implementation; use a copy constructor or copy factory instead.(Îõ¾ÒûÿÿÿÿJ$60e2a646-6a12-4e42-8281-c9e10ece176c
+q
+java:S1185–("(Remove this method to simply inherit it.(Îõ¾Òûÿÿÿÿ8šÍ§Íå1J$78fc712f-c6c6-49e1-b6b8-4a77d68323e2
+q
+java:S1185›("(Remove this method to simply inherit it.(ñı‘×ûÿÿÿÿ8šÍ§Íå1J$ee14c543-4b31-4edd-9661-048740dc1aaa
+l
+java:S1185 ("(Remove this method to simply inherit it.(ú„Íä8šÍ§Íå1J$3500d062-2108-40c5-9220-807638188e51
+q
+java:S1185¥("(Remove this method to simply inherit it.(ÍÕ¶×ıÿÿÿÿ8›Í§Íå1J$988080c8-cdb8-4342-ba71-f642a7c7412b
+l
+java:S1185ª("(Remove this method to simply inherit it.(˜Ô¡8›Í§Íå1J$ade762c9-2f1f-46d2-ae9b-7f01d80c14b7
+q
+java:S1185¯("(Remove this method to simply inherit it.(Üœ÷Ûıÿÿÿÿ8›Í§Íå1J$dcc8c4dd-7d69-4a5d-aa7e-5d0a7a030b4e
+}	java:S125„)"<This block of commented-out lines of code should be removed.(““ùûÿÿÿÿJ$8252cc76-98b3-4d90-b604-4858a6ce026f
+x	java:S125…)"<This block of commented-out lines of code should be removed.(¯Ë¶‡J$d38d2989-0e8c-44bd-b6f5-f0c80a4ab86b

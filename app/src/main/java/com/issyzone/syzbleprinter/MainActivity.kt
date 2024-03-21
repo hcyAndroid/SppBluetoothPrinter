@@ -21,6 +21,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
     private val vm: ActivityMainBinding by invokeViewBinding()
+    companion object{}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
@@ -28,8 +29,9 @@ class MainActivity : ComponentActivity() {
         initRecyclerView()
     }
 
-    val bleScanAdapter = BlueScanAdapter()
+    val bleScanAdapter = BlueScanAdapter(){}
     private fun initRecyclerView() {
+
 
         vm.rvBle.layoutManager = LinearLayoutManager(this@MainActivity)
         vm.rvBle.adapter = bleScanAdapter

@@ -1,0 +1,20 @@
+
+fkotlin:S6615ã" Remove this useless initializer.(Á–ú›8ôÔÓÚå1J$5b1ea729-c0e7-43ff-8ee6-882dec54ed2a
+ikotlin:S125Ø"Remove this commented out code.(üúĞÿÿÿÿÿ8öÔÓÚå1J$02d33c67-f1fa-45cb-a915-a36782ad00a5
+kotlin:S117ª"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(³âĞ¨ıÿÿÿÿ8úÔÓÚå1J$95c15263-434d-4abc-b603-7b27d94464f3
+kotlin:S117š"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¯›Çùÿÿÿÿ8úÔÓÚå1J$5eb882bf-e6f8-433b-9f05-566bd2eb53a4
+˜kotlin:S117¼"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(ùÎòò8úÔÓÚå1J$a29c54f0-22db-4580-a622-917dc5731eef
+bkotlin:S6310¹"Avoid hardcoded dispatchers.(ÏÃâ8úÔÓÚå1J$02b522b9-49bf-467e-9269-db23dd3aeaa0
+akotlin:S6310["Avoid hardcoded dispatchers.(Í¡·Ş8úÔÓÚå1J$2823a48c-98d3-4a62-b507-c6741280a7a1
+bkotlin:S6310À"Avoid hardcoded dispatchers.(Ô¥‚ü8ûÔÓÚå1J$fcd88354-079e-4ba3-9728-290f3755793a
+akotlin:S6310}"Avoid hardcoded dispatchers.(Ô¥‚ü8ûÔÓÚå1J$e4184761-5fab-4758-a8bb-d9d0dfc32568
+akotlin:S6310y"Avoid hardcoded dispatchers.(ùŠö8ûÔÓÚå1J$0a355ef0-195e-47b7-99e2-3b6db3889ef1
+bkotlin:S6310‡"Avoid hardcoded dispatchers.(Í¡·Ş8ûÔÓÚå1J$106e4a76-c742-496d-a41e-e9d187aefa11
+–kotlin:S6311y"QRemove this dispatcher. It is pointless when used with only suspending functions.(ùŠö8ûÔÓÚå1J$b88d42a1-0cf5-4880-acec-f7571483b52c
+qkotlin:S1144¦",Remove this unused private "UpBleUI" method.(íÌàQ8ÿÔÓÚå1J$d03a27b9-32d7-4c0a-a18d-9b42438a51e7
+skotlin:S108ò")Either remove or fill this block of code.(ÍÖ¥ºÿÿÿÿÿ8ƒÕÓÚå1J$8cf20c8e-f632-4521-9447-a643815edaf3
+dkotlin:S1128"Remove this unused import.(¹²…åøÿÿÿÿ8ŒÕÓÚå1J$018d00c6-e253-40ba-bedd-23b75815239a
+dkotlin:S1128&"Remove this unused import.(ûê†¶úÿÿÿÿ8ŒÕÓÚå1J$52e6026a-3ca1-4670-b7a6-6b453f0c681e
+kotlin:S3776¸"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(±ÕÖˆøÿÿÿÿ8ÕÓÚå1J$d3bc7b99-bb2c-4da4-86cb-a748d797b47d
+jkotlin:S6524â"Make this collection immutable.(¸·Ó€ûÿÿÿÿ8’ÕÓÚå1J$9844d5bd-843e-4007-9942-b550d8d6461d
+Ÿkotlin:S1186¦"ZAdd a nested comment explaining why this function is empty or complete the implementation.(íÌàQ8•ÕÓÚå1J$d220b1ba-2ccd-43ee-9677-c48698803668

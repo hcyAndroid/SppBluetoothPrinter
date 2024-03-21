@@ -1,0 +1,32 @@
+
+’	java:S117ô"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…ºÏ„úÿÿÿÿJ$9b199cf9-9e64-46c3-a622-97d0bf0e8d0e
+’	java:S117À"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÃÖœşÿÿÿÿJ$4f363fad-bd4b-4f06-8ae8-616cc7115fd8
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œ˜ôıùÿÿÿÿJ$1d3d5f07-5ff6-400c-b123-be130566e4af
+	java:S117«"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰ÓçáJ$8c44cc99-5f23-4564-a881-ac245e162ee1
+’	java:S117ğ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×áÈÖùÿÿÿÿJ$ae6866b6-2c65-459e-a8ef-42bb099eb7a6
+	java:S117€"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•¤¯ J$4471c63d-aa28-40e0-963c-ec2c0746e001
+’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Àó×êúÿÿÿÿJ$9c7b0a11-6f14-4e89-960c-62902bb2e8fe
+’	java:S117 "QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ğ»„’ÿÿÿÿÿJ$eea5d14f-8daa-47da-87e6-ffe38c04a9fc
+
+java:S3776*"RRefactor this method to reduce its Cognitive Complexity from 74 to the 15 allowed.(öºÀ J$b505c8de-060a-46b1-93e3-3c45741b3466
+b	java:S1311""Add a default case to this switch.(ıŞ³‹ùÿÿÿÿJ$aa5c4941-85e7-4ced-8679-0a1bc18495a3
+”
+java:S3776‘"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(™À”ÍúÿÿÿÿJ$abc494fc-db65-4d3a-a8d2-d67df77c9d4c
+m
+java:S1874±"0Remove this use of "setValue"; it is deprecated.(á¸ÄÊJ$801a5b4a-781b-4b3d-9aef-7d95ee41ae70
+y
+java:S1874³"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿJ$68a7fbd8-1159-4ae0-a463-68f037fb0246
+
+java:S3776Ş"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ÜêÉåJ$2914b5ce-8821-4ee4-bdf8-62d122eedfb9
+m
+java:S1874ş"0Remove this use of "setValue"; it is deprecated.(Æ¯ê…J$ce180404-a0f0-4772-8385-711441c05e89
+y
+java:S1874€"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿJ$1ef2cb00-e6f6-4a1a-b13b-e9b17c456d65
+”
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(œ˜ôıùÿÿÿÿJ$5daa336e-4032-4e41-b8ba-aa315e39b1cc
+r
+java:S1874›"0Remove this use of "setValue"; it is deprecated.(Ó†™–şÿÿÿÿJ$aae318a4-8dca-468c-84fe-0337a6dbe47e
+}
+java:S1874";Remove this use of "writeCharacteristic"; it is deprecated.(Š²üêùÿÿÿÿJ$e6bac718-2611-4413-8ca7-05cee6222a90
+ˆ
+java:S6541/"ÆA "Brain Method" was detected. Refactor it to reduce at least one of the following metrics: LOC from 148 to 64, Complexity from 35 to 14, Nesting Level from 3 to 2, Number of Variables from 35 to 6.(ñ‰ÿÜıÿÿÿÿJ$f6537f85-4c4d-4386-b49a-f5dd088bc290

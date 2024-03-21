@@ -3,21 +3,16 @@ package com.issyzone.blelibs
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
-import android.os.Handler
-import android.util.Log
-import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.MutableLiveData
+import com.issyzone.blelibs.callback.BleMtuChangedCallback
 import com.issyzone.blelibs.callback.BleScanCallback
 import com.issyzone.blelibs.data.BleDevice
+import com.issyzone.blelibs.exception.BleException
 import com.issyzone.blelibs.scan.BleScanRuleConfig
 import com.issyzone.blelibs.utils.AppGlobels
-import com.issyzone.blelibs.utils.BleLog
 import com.orhanobut.logger.Logger
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import java.nio.charset.Charset
-import java.util.concurrent.Flow
+
 
 /**
  *
@@ -46,6 +41,7 @@ object SYZBleUtils {
             .setScanTimeOut(10000) // 扫描超时时间，可选，默认10秒
             .build()
         BleManager.getInstance().initScanRule(scanRuleConfig)
+
     }
 
     //手动判断蓝牙是否开启 ble open

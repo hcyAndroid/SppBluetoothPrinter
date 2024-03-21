@@ -1,0 +1,11 @@
+
+d
+java:S1604Q"(Make this anonymous inner class a lambda(ı’Ÿ÷J$abc7018e-bf65-4c4b-8684-119d1a6119ee
+Ú
+java:S6548"˜A Singleton implementation was detected. Make sure the use of the Singleton pattern is required and the implementation is the right one for the context.(ÏõÍ£ÿÿÿÿÿJ$22e2e5f2-ab57-4482-8fcb-e4e71a6453eb
+
+java:S1155H">Use isEmpty() to check whether the collection is empty or not.(‘¨‡õıÿÿÿÿJ$ce9a5f47-4911-4b6c-9730-e986b7136bbd
+o
+java:S1874{"3Remove this use of "startLeScan"; it is deprecated.(Ø¢»ÔJ$3dd90795-9a82-4595-9ee6-ccdc951fd0ec
+t
+java:S1874"2Remove this use of "stopLeScan"; it is deprecated.(˜É¢æıÿÿÿÿJ$78ec29b6-6b75-4e5e-88b1-fcb45394dafb

@@ -7,7 +7,6 @@ private var applications: Application? = null
 
 object AppGlobels {
     private const val TAG = "AppGlobels>>>"
-
     //反射获取application
     fun getApplication(): Application {
         if (applications == null) {
