@@ -252,7 +252,6 @@ public class BleBluetooth {
                     if (connectRetryCount < BleManager.getInstance().getReConnectCount()) {
                         BleLog.e("Connect fail, try reconnect " + BleManager.getInstance().getReConnectInterval() + " millisecond later");
                         ++connectRetryCount;
-
                         Message message = mainHandler.obtainMessage();
                         message.what = BleMsg.MSG_RECONNECT;
                         mainHandler.sendMessageDelayed(message, BleManager.getInstance().getReConnectInterval());

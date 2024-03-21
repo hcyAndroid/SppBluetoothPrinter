@@ -52,9 +52,9 @@ public class BleManager {
     private static final int DEFAULT_OPERATE_TIME = 5000;
     private static final int DEFAULT_CONNECT_RETRY_COUNT = 0;
     private static final int DEFAULT_CONNECT_RETRY_INTERVAL = 5000;
-    private static final int DEFAULT_MTU = 100;
+    private static final int DEFAULT_MTU = 23;
     private static final int DEFAULT_MAX_MTU = 512;
-    private static final int DEFAULT_WRITE_DATA_SPLIT_COUNT = 20;
+    private static final int DEFAULT_WRITE_DATA_SPLIT_COUNT = 130;
     private static final int DEFAULT_CONNECT_OVER_TIME = 10000;
 
     private int maxConnectCount = DEFAULT_MAX_MULTIPLE_DEVICE;
@@ -586,6 +586,16 @@ public class BleManager {
                       BleWriteCallback callback) {
 
         write(bleDevice, uuid_service, uuid_write, data, split, true, 0, callback);
+    }
+
+
+    public void write2(BleDevice bleDevice,
+                      String uuid_service,
+                      String uuid_write,
+                      byte[] data,
+                      BleWriteCallback callback) {
+
+        write(bleDevice, uuid_service, uuid_write, data, false, true, 0, callback);
     }
 
     /**

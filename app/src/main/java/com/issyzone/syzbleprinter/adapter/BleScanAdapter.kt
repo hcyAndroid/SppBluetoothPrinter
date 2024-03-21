@@ -64,12 +64,12 @@ class BlueScanAdapter(var click: (ble: BleDevice) -> Unit) :
             }
 
 
-//            vm.tvSetPrintImg.setOnClickListener {
-//               val bitmap= ImageUtilKt.convertBinary(BitmapExt.test(), 128)
-//                FmBitmapPrinterUtils.test(
-//                    ImageUtilKt.convertBinary(BitmapExt.test(), 128), bitmap.width, bitmap.height, 1
-//                )
-//            }
+            vm.tvSetPrintImg.setOnClickListener {
+               val bitmap= ImageUtilKt.convertBinary(BitmapExt.test(), 128)
+                FmBitmapPrinterUtils.test(
+                    ImageUtilKt.convertBinary(BitmapExt.test(), 128), bitmap.width, bitmap.height, 1
+                )
+            }
 
             vm.tvDeviceName.text = item?.name ?: ""
             vm.tvDeviceMac.text = item?.mac ?: ""

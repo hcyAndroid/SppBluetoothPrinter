@@ -20,7 +20,7 @@ object FmBitmapPrinterUtils {
             val bitmapArray = BitmapUtils.print(bitmap, width, height)
             Logger.d("图片总字节数${bitmapArray.size}")
             //对bitmaparray进行每100个字节分包
-            val aplitafter = splitByteArray(bitmapArray)
+            val aplitafter = splitByteArray(bitmapArray,100)
             var total = aplitafter.size //总包数
             Logger.d("图片总包数${total}")
             val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()

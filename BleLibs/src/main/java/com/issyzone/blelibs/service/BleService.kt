@@ -4,6 +4,7 @@ import android.app.Service
 import android.bluetooth.BluetoothGatt
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import com.issyzone.blelibs.BleManager
 import com.issyzone.blelibs.FMPrinter
 import com.issyzone.blelibs.SYZBleUtils
@@ -163,6 +164,7 @@ class BleService : Service() {
                 write_abf1?.first.toString(),
                 write_abf1?.second.toString(),
                 Upacker.frameEncode(data),
+                false,
                 object : BleWriteCallback() {
                     override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
                         // 发送数据到设备成功（分包发送的情况下，可以通过方法中返回的参数可以查看发送进度）
@@ -185,12 +187,13 @@ class BleService : Service() {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
                 if (fmBle != null) {
+                    Logger.d("蓝牙TETST>>>>>>${data.size}")
+                    Logger.d("蓝牙TETST>>>>>>  ${Upacker.frameEncode(data).size}")
                     val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
-                    BleManager.getInstance().write(fmBle?.bleDevice,
+                    BleManager.getInstance().write2(fmBle?.bleDevice,
                         write_abf1?.first.toString(),
                         write_abf1?.second.toString(),
                         Upacker.frameEncode(data),
-                        false,
                         object : BleWriteCallback() {
                             override fun onWriteSuccess(
                                 current: Int, total: Int, justWrite: ByteArray
@@ -209,7 +212,7 @@ class BleService : Service() {
 
                             override fun onWriteFailure(exception: BleException) {
                                 // 发送数据到设备失败
-                                Logger.e("$TAG=abf4写入失败==${exception.code}===${exception.description}")
+                                Logger.e("$TAG=abf4写入失败=====第${index}个包===总共${totalSize}个包====${exception.code}===${exception.description}")
                                 if (isActive) {
                                     continuation.resume(false)
                                 }
@@ -229,7 +232,9 @@ class BleService : Service() {
         for (index in 0 until dataList.size) {
             try {
                 val data = dataList[index]
+
                 val dataArray = data.toByteArray()
+                Logger.d("$TAG========第${index}===字节数${dataArray.size}")
                 success = writeABF4(dataArray, index, dataList.size)
                 if (success) {
                     // 如果写入成功，继续递归写入
@@ -295,21 +300,27 @@ class BleService : Service() {
      * 设置最大传输单元，设置里是默认20左右
      */
     private suspend fun initBleMTU(bleDevice: BleDevice): Boolean {
-        val MAX_MTU = 130
+        val MAX_MTU = 180
         return suspendCoroutine { continuation ->
             BleManager.getInstance().setMtu(bleDevice, MAX_MTU, object : BleMtuChangedCallback() {
                 override fun onSetMTUFailure(exception: BleException) {
                     // 设置 MTU 失败
                     Logger.e("$TAG 设置MTU失败==${exception.description}")
+
                     continuation.resume(false) // 返回 false 表示初始化失败
+
                 }
 
                 override fun onMtuChanged(mtu: Int) {
                     // 设置 MTU 成功
                     Logger.d("$TAG 设置MTU成功==${mtu}")
+
                     continuation.resume(true) // 返回 true 表示初始化成功
+
+
                 }
             })
+
         }
 
 
@@ -318,6 +329,9 @@ class BleService : Service() {
     fun conenctBle2(bleDevice: BleDevice) {
         serviceScope?.launch {
             withContext(Dispatchers.IO) {
+                if (fmBle != null) {
+                    Logger.d("$TAG fmBle!=null")
+                }
                 val connectBleTask = async { connectBLe(bleDevice) }
                 fmBle = connectBleTask.await()
                 if (fmBle != null && fmBle?.bleDevice != null) {
@@ -345,12 +359,21 @@ class BleService : Service() {
                 }
 
                 override fun onConnectFail(bleDevice: BleDevice, exception: BleException?) {
-                    cancellableContinuation.resume(FMBle(bleDevice, null, null)) {
-                        Logger.d("$TAG,连接失败::失败原因==${exception?.code}===${exception?.description}")
+                    Logger.e("$TAG,连接失败${bleDevice.device.name}::失败原因==${exception?.code}===${exception?.description}")
+
+
+
+
+
+                    if (exception?.code == 100) {
+                        if (bleDevice != null) {
+                            BleManager.getInstance().disconnect(bleDevice)
+                            Logger.e("$TAG 蓝牙连接超时，很有可能已经连接了")
+                        }
                     }
-                    Logger.d("$TAG,连接失败${bleDevice.device.name}::失败原因==${exception?.code}===${exception?.description}")
+
                     cancellableContinuation.resume(null) {
-                        Logger.e("协诚连接蓝牙返回数据异常:${it.message.toString()}")
+                        Logger.e("$TAG 协诚连接蓝牙返回数据异常:${it.message.toString()}")
                     }
                 }
 
