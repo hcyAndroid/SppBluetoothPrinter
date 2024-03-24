@@ -1,5 +1,8 @@
 package com.issyzone.blelibs
 
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
@@ -10,8 +13,10 @@ import com.issyzone.blelibs.data.BleDevice
 import com.issyzone.blelibs.exception.BleException
 import com.issyzone.blelibs.scan.BleScanRuleConfig
 import com.issyzone.blelibs.utils.AppGlobels
+import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import java.nio.charset.Charset
+import java.util.UUID
 
 
 /**
@@ -29,19 +34,22 @@ object SYZBleUtils {
         return BleManager.getInstance().isSupportBle;
     }
 
-    fun initBle() {
+    fun initBle(needScan:Boolean=false) {
+        Logger.addLogAdapter(AndroidLogAdapter())
         BleManager.getInstance().init(AppGlobels.getApplication());
-        BleManager.getInstance().enableLog(true).setReConnectCount(3, 5000).setOperateTimeout(5000)
+        BleManager.getInstance().enableLog(true)
+            .setReConnectCount(0, 10000).operateTimeout = 5000
 
-        val scanRuleConfig = BleScanRuleConfig.Builder()
-            //.setServiceUuids(serviceUuids) // 只扫描指定的服务的设备，可选
-            //.setDeviceName(true, names) // 只扫描指定广播名的设备，可选
-            // .setDeviceMac(mac) // 只扫描指定mac的设备，可选
-            // .setAutoConnect(isAutoConnect) // 连接时的autoConnect参数，可选，默认false
-            .setScanTimeOut(10000) // 扫描超时时间，可选，默认10秒
-            .build()
-        BleManager.getInstance().initScanRule(scanRuleConfig)
-
+        if (needScan){
+            val scanRuleConfig = BleScanRuleConfig.Builder()
+                //.setServiceUuids(serviceUuids) // 只扫描指定的服务的设备，可选
+                //.setDeviceName(true, names) // 只扫描指定广播名的设备，可选
+                // .setDeviceMac(mac) // 只扫描指定mac的设备，可选
+                // .setAutoConnect(isAutoConnect) // 连接时的autoConnect参数，可选，默认false
+                .setScanTimeOut(10000) // 扫描超时时间，可选，默认10秒
+                .build()
+            BleManager.getInstance().initScanRule(scanRuleConfig)
+        }
     }
 
     //手动判断蓝牙是否开启 ble open
@@ -113,5 +121,26 @@ object SYZBleUtils {
         })
     }
 
+
+
+    fun isMyNeedNotify(desc: BluetoothGattDescriptor):Boolean{
+      return  desc.characteristic.uuid.toString().lowercase().startsWith(FMPrinter.Charac_ABF3.characterid.lowercase())
+    }
+
+
+    fun getNotifyCharac(gatt: BluetoothGatt?):Pair<UUID, BluetoothGattCharacteristic>?{
+        val serviceList= gatt?.services?.filter {
+            it.uuid.toString().lowercase().startsWith(FMPrinter.Charac_ABF3.serviceId.lowercase())
+        }?.toMutableList()
+        if (!serviceList.isNullOrEmpty()){
+            val characList= serviceList[0].characteristics.filter {
+                it.uuid.toString().lowercase().startsWith(FMPrinter.Charac_ABF3.characterid.lowercase())
+            }.toMutableList()
+            if (!characList.isNullOrEmpty()){
+               return Pair(serviceList[0].uuid,characList[0])
+            }
+        }
+        return null
+    }
 
 }

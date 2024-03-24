@@ -1,4 +1,3 @@
-
 package com.issyzone.blelibs.bluetooth;
 
 import android.annotation.TargetApi;
@@ -13,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 
 import com.issyzone.blelibs.BleManager;
+import com.issyzone.blelibs.SYZBleUtils;
 import com.issyzone.blelibs.callback.BleIndicateCallback;
 import com.issyzone.blelibs.callback.BleMtuChangedCallback;
 import com.issyzone.blelibs.callback.BleNotifyCallback;
@@ -25,6 +25,7 @@ import com.issyzone.blelibs.exception.GattException;
 import com.issyzone.blelibs.exception.OtherException;
 import com.issyzone.blelibs.exception.TimeoutException;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -241,10 +242,8 @@ public class BleConnector {
     /**
      * notify
      */
-    public void enableCharacteristicNotify(BleNotifyCallback bleNotifyCallback, String uuid_notify,
-                                           boolean userCharacteristicDescriptor) {
-        if (mCharacteristic != null
-                && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+    public void enableCharacteristicNotify(BleNotifyCallback bleNotifyCallback, String uuid_notify, boolean userCharacteristicDescriptor) {
+        if (mCharacteristic != null && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
 
             handleCharacteristicNotifyCallback(bleNotifyCallback, uuid_notify);
             setCharacteristicNotification(mBluetoothGatt, mCharacteristic, userCharacteristicDescriptor, true, bleNotifyCallback);
@@ -254,14 +253,23 @@ public class BleConnector {
         }
     }
 
+    public void enableCharacteristicNotify2(BleNotifyCallback bleNotifyCallback, String uuid_notify,  BluetoothGattCharacteristic characteristic) {
+        if (mCharacteristic != null && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+            handleCharacteristicNotifyCallback(bleNotifyCallback, uuid_notify);
+            setCharacteristicNotification2(mBluetoothGatt, characteristic, true, bleNotifyCallback);
+        } else {
+            if (bleNotifyCallback != null)
+                bleNotifyCallback.onNotifyFailure(new OtherException("this characteristic not support notify!"));
+        }
+    }
+
+
     /**
      * stop notify
      */
     public boolean disableCharacteristicNotify(boolean useCharacteristicDescriptor) {
-        if (mCharacteristic != null
-                && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-            return setCharacteristicNotification(mBluetoothGatt, mCharacteristic,
-                    useCharacteristicDescriptor, false, null);
+        if (mCharacteristic != null && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+            return setCharacteristicNotification(mBluetoothGatt, mCharacteristic, useCharacteristicDescriptor, false, null);
         } else {
             return false;
         }
@@ -270,11 +278,7 @@ public class BleConnector {
     /**
      * notify setting
      */
-    private boolean setCharacteristicNotification(BluetoothGatt gatt,
-                                                  BluetoothGattCharacteristic characteristic,
-                                                  boolean useCharacteristicDescriptor,
-                                                  boolean enable,
-                                                  BleNotifyCallback bleNotifyCallback) {
+    private boolean setCharacteristicNotification(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, boolean useCharacteristicDescriptor, boolean enable, BleNotifyCallback bleNotifyCallback) {
         if (gatt == null || characteristic == null) {
             notifyMsgInit();
             if (bleNotifyCallback != null)
@@ -302,8 +306,57 @@ public class BleConnector {
                 bleNotifyCallback.onNotifyFailure(new OtherException("descriptor equals null"));
             return false;
         } else {
-            descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE :
-                    BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            boolean success2 = gatt.writeDescriptor(descriptor);
+            if (!success2) {
+                notifyMsgInit();
+                if (bleNotifyCallback != null)
+                    bleNotifyCallback.onNotifyFailure(new OtherException("gatt writeDescriptor fail"));
+            }
+            return success2;
+        }
+    }
+
+
+    private boolean setCharacteristicNotification2(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, boolean enable, BleNotifyCallback bleNotifyCallback) {
+        if (gatt == null || characteristic == null) {
+            notifyMsgInit();
+            if (bleNotifyCallback != null)
+                bleNotifyCallback.onNotifyFailure(new OtherException("gatt or characteristic equal null"));
+            return false;
+        }
+
+        boolean success1 = gatt.setCharacteristicNotification(characteristic, enable);
+        if (!success1) {
+            notifyMsgInit();
+            if (bleNotifyCallback != null)
+                bleNotifyCallback.onNotifyFailure(new OtherException("gatt setCharacteristicNotification fail"));
+            return false;
+        }
+
+        BluetoothGattDescriptor descriptor = null;
+
+        List<BluetoothGattDescriptor> descriptors = characteristic.getDescriptors();
+        for (BluetoothGattDescriptor desc : descriptors) {
+            if (SYZBleUtils.INSTANCE.isMyNeedNotify(desc)){
+                descriptor=desc;
+                break;
+            }
+        }
+
+
+//        if (useCharacteristicDescriptor) {
+//            descriptor = characteristic.getDescriptor(characteristic.getUuid());
+//        } else {
+//            descriptor = characteristic.getDescriptor(formUUID(UUID_CLIENT_CHARACTERISTIC_CONFIG_DESCRIPTOR));
+//        }
+        if (descriptor == null) {
+            notifyMsgInit();
+            if (bleNotifyCallback != null)
+                bleNotifyCallback.onNotifyFailure(new OtherException("descriptor equals null"));
+            return false;
+        } else {
+            descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
             boolean success2 = gatt.writeDescriptor(descriptor);
             if (!success2) {
                 notifyMsgInit();
@@ -317,13 +370,10 @@ public class BleConnector {
     /**
      * indicate
      */
-    public void enableCharacteristicIndicate(BleIndicateCallback bleIndicateCallback, String uuid_indicate,
-                                             boolean useCharacteristicDescriptor) {
-        if (mCharacteristic != null
-                && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+    public void enableCharacteristicIndicate(BleIndicateCallback bleIndicateCallback, String uuid_indicate, boolean useCharacteristicDescriptor) {
+        if (mCharacteristic != null && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
             handleCharacteristicIndicateCallback(bleIndicateCallback, uuid_indicate);
-            setCharacteristicIndication(mBluetoothGatt, mCharacteristic,
-                    useCharacteristicDescriptor, true, bleIndicateCallback);
+            setCharacteristicIndication(mBluetoothGatt, mCharacteristic, useCharacteristicDescriptor, true, bleIndicateCallback);
         } else {
             if (bleIndicateCallback != null)
                 bleIndicateCallback.onIndicateFailure(new OtherException("this characteristic not support indicate!"));
@@ -335,10 +385,8 @@ public class BleConnector {
      * stop indicate
      */
     public boolean disableCharacteristicIndicate(boolean userCharacteristicDescriptor) {
-        if (mCharacteristic != null
-                && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
-            return setCharacteristicIndication(mBluetoothGatt, mCharacteristic,
-                    userCharacteristicDescriptor, false, null);
+        if (mCharacteristic != null && (mCharacteristic.getProperties() | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+            return setCharacteristicIndication(mBluetoothGatt, mCharacteristic, userCharacteristicDescriptor, false, null);
         } else {
             return false;
         }
@@ -347,11 +395,7 @@ public class BleConnector {
     /**
      * indicate setting
      */
-    private boolean setCharacteristicIndication(BluetoothGatt gatt,
-                                                BluetoothGattCharacteristic characteristic,
-                                                boolean useCharacteristicDescriptor,
-                                                boolean enable,
-                                                BleIndicateCallback bleIndicateCallback) {
+    private boolean setCharacteristicIndication(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, boolean useCharacteristicDescriptor, boolean enable, BleIndicateCallback bleIndicateCallback) {
         if (gatt == null || characteristic == null) {
             indicateMsgInit();
             if (bleIndicateCallback != null)
@@ -379,8 +423,7 @@ public class BleConnector {
                 bleIndicateCallback.onIndicateFailure(new OtherException("descriptor equals null"));
             return false;
         } else {
-            descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE :
-                    BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            descriptor.setValue(enable ? BluetoothGattDescriptor.ENABLE_INDICATION_VALUE : BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
             boolean success2 = gatt.writeDescriptor(descriptor);
             if (!success2) {
                 indicateMsgInit();
@@ -394,21 +437,53 @@ public class BleConnector {
     /**
      * write
      */
-    public void writeCharacteristic(byte[] data, BleWriteCallback bleWriteCallback, String uuid_write) {
+    public void writeCharacteristic(byte[] data, BleWriteCallback bleWriteCallback, String uuid_write,boolean isWriteWithNoResponse) {
         if (data == null || data.length <= 0) {
             if (bleWriteCallback != null)
                 bleWriteCallback.onWriteFailure(new OtherException("the data to be written is empty"));
             return;
         }
 
-        if (mCharacteristic == null
-                || (mCharacteristic.getProperties() & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0) {
+        if (mCharacteristic == null || (mCharacteristic.getProperties() & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0) {
             if (bleWriteCallback != null)
                 bleWriteCallback.onWriteFailure(new OtherException("this characteristic not support write!"));
             return;
         }
 
+
         if (mCharacteristic.setValue(data)) {
+            if (isWriteWithNoResponse){
+                mCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            }else {
+                mCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+            }
+            handleCharacteristicWriteCallback(bleWriteCallback, uuid_write);
+            if (!mBluetoothGatt.writeCharacteristic(mCharacteristic)) {
+                writeMsgInit();
+                if (bleWriteCallback != null)
+                    bleWriteCallback.onWriteFailure(new OtherException("gatt writeCharacteristic fail"));
+            }
+        } else {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("Updates the locally stored value of this characteristic fail"));
+        }
+    }
+
+
+    public void writeCharacteristic2(byte[] data, BleWriteCallback bleWriteCallback, String uuid_write) {
+        if (data == null || data.length <= 0) {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("the data to be written is empty"));
+            return;
+        }
+
+        if (mCharacteristic == null || (mCharacteristic.getProperties() & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0) {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("this characteristic not support write!"));
+            return;
+        }
+        if (mCharacteristic.setValue(data)) {
+            mCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             handleCharacteristicWriteCallback(bleWriteCallback, uuid_write);
             if (!mBluetoothGatt.writeCharacteristic(mCharacteristic)) {
                 writeMsgInit();
@@ -425,8 +500,7 @@ public class BleConnector {
      * read
      */
     public void readCharacteristic(BleReadCallback bleReadCallback, String uuid_read) {
-        if (mCharacteristic != null
-                && (mCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+        if (mCharacteristic != null && (mCharacteristic.getProperties() & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
 
             handleCharacteristicReadCallback(bleReadCallback, uuid_read);
             if (!mBluetoothGatt.readCharacteristic(mCharacteristic)) {
@@ -492,64 +566,52 @@ public class BleConnector {
     /**
      * notify
      */
-    private void handleCharacteristicNotifyCallback(BleNotifyCallback bleNotifyCallback,
-                                                    String uuid_notify) {
+    private void handleCharacteristicNotifyCallback(BleNotifyCallback bleNotifyCallback, String uuid_notify) {
         if (bleNotifyCallback != null) {
             notifyMsgInit();
             bleNotifyCallback.setKey(uuid_notify);
             bleNotifyCallback.setHandler(mHandler);
             mBleBluetooth.addNotifyCallback(uuid_notify, bleNotifyCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_CHA_NOTIFY_START, bleNotifyCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_CHA_NOTIFY_START, bleNotifyCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 
     /**
      * indicate
      */
-    private void handleCharacteristicIndicateCallback(BleIndicateCallback bleIndicateCallback,
-                                                      String uuid_indicate) {
+    private void handleCharacteristicIndicateCallback(BleIndicateCallback bleIndicateCallback, String uuid_indicate) {
         if (bleIndicateCallback != null) {
             indicateMsgInit();
             bleIndicateCallback.setKey(uuid_indicate);
             bleIndicateCallback.setHandler(mHandler);
             mBleBluetooth.addIndicateCallback(uuid_indicate, bleIndicateCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_CHA_INDICATE_START, bleIndicateCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_CHA_INDICATE_START, bleIndicateCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 
     /**
      * write
      */
-    private void handleCharacteristicWriteCallback(BleWriteCallback bleWriteCallback,
-                                                   String uuid_write) {
+    private void handleCharacteristicWriteCallback(BleWriteCallback bleWriteCallback, String uuid_write) {
         if (bleWriteCallback != null) {
             writeMsgInit();
             bleWriteCallback.setKey(uuid_write);
             bleWriteCallback.setHandler(mHandler);
             mBleBluetooth.addWriteCallback(uuid_write, bleWriteCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_CHA_WRITE_START, bleWriteCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_CHA_WRITE_START, bleWriteCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 
     /**
      * read
      */
-    private void handleCharacteristicReadCallback(BleReadCallback bleReadCallback,
-                                                  String uuid_read) {
+    private void handleCharacteristicReadCallback(BleReadCallback bleReadCallback, String uuid_read) {
         if (bleReadCallback != null) {
             readMsgInit();
             bleReadCallback.setKey(uuid_read);
             bleReadCallback.setHandler(mHandler);
             mBleBluetooth.addReadCallback(uuid_read, bleReadCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_CHA_READ_START, bleReadCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_CHA_READ_START, bleReadCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 
@@ -561,9 +623,7 @@ public class BleConnector {
             rssiMsgInit();
             bleRssiCallback.setHandler(mHandler);
             mBleBluetooth.addRssiCallback(bleRssiCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_READ_RSSI_START, bleRssiCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_READ_RSSI_START, bleRssiCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 
@@ -575,9 +635,7 @@ public class BleConnector {
             mtuChangedMsgInit();
             bleMtuChangedCallback.setHandler(mHandler);
             mBleBluetooth.addMtuChangedCallback(bleMtuChangedCallback);
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(BleMsg.MSG_SET_MTU_START, bleMtuChangedCallback),
-                    BleManager.getInstance().getOperateTimeout());
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(BleMsg.MSG_SET_MTU_START, bleMtuChangedCallback), BleManager.getInstance().getOperateTimeout());
         }
     }
 

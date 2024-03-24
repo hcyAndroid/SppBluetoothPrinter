@@ -340,7 +340,6 @@ public class BleBluetooth {
                     isActiveDisconnect = false;
                     BleManager.getInstance().getMultipleBluetoothController().removeConnectingBle(BleBluetooth.this);
                     BleManager.getInstance().getMultipleBluetoothController().addBleBluetooth(BleBluetooth.this);
-
                     BleConnectStateParameter para = (BleConnectStateParameter) msg.obj;
                     int status = para.getStatus();
                     if (bleGattCallback != null)

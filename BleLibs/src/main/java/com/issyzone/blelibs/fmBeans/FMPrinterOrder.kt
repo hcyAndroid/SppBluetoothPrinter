@@ -40,6 +40,7 @@ object FMPrinterOrder {
      *设备取消打印
      */
     fun orderForGetFmCancelPrinter(): ByteArray {
+
         var mSendMsg =
             MPSendMsg.newBuilder().setEventType(MPMessage.EventType.CANCELPRINTING).build()
         Logger.d("设备取消打印的命令${mSendMsg.toString()}")
@@ -52,6 +53,7 @@ object FMPrinterOrder {
      *
      */
     fun orderForGetFmSetPrintSpeed(speed: Int): ByteArray {
+
         if (speed in 1..4) {
             var mSendMsg = MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
                 .setSendInt(speed).build()

@@ -1,7 +1,6 @@
 package com.issyzone.blelibs.fmBeans
 
 import com.issyzone.blelibs.exception.BleException
-import com.issyzone.blelibs.upacker.Upacker
 import com.orhanobut.logger.Logger
 
 //0 代表  notify打开失败
@@ -11,30 +10,34 @@ data class FmNotifyBean(
     var notifyState: Int = 0, var exception: BleException? = null, var byteArray: ByteArray? = null
 ) {
 
-    private fun bleDeviceError(mpRespondMsg: MPMessage.MPRespondMsg) {
+    private fun bleDeviceError(mpRespondMsg: MPMessage.MPRespondMsg): MPMessage.MPCodeMsg {
         val deviceErrorInfo = MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())
         Logger.e("设备问题>>>>${deviceErrorInfo.toString()}")
+        return deviceErrorInfo
     }
 
-    fun getFmDeviceInfo() {
+    fun getFmDeviceInfo(
+        deviceInfoCall: ((deviceInfo: MPMessage.MPDeviceInfoMsg) -> Unit)? = null,
+        orderResult: ((OrderResult, MPMessage.MPCodeMsg?) -> Unit)? = null,
+        activelyReport:((OrderResult, MPMessage.MPCodeMsg?) -> Unit)? = null,
+    ) {
         val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(byteArray)
         Logger.i("NOTIFY返回信息>>>>${mpRespondMsg.toString()}")
         when (mpRespondMsg.eventType) {
-            MPMessage.EventType.DEVICEPRINT->{
+            MPMessage.EventType.DEVICEPRINT -> {
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
                     Logger.d("打印图片主动上报>>>>${deviceInfo.toString()}")
+                    orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
-                    if (mpRespondMsg.respondData!=null){
-                        val deviceInfo =
-                            MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                        Logger.e("打印图片出错主动上报>>>>${deviceInfo.toString()}")
-                        bleDeviceError(mpRespondMsg)
+                    if (mpRespondMsg.respondData != null) {
+                        orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
                     }
 
                 }
             }
+
             MPMessage.EventType.DEVICEREPORT -> {
                 /**
                  *
@@ -49,21 +52,36 @@ data class FmNotifyBean(
                     val deviceInfo =
                         MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
                     Logger.d("设备状况主动上报>>>>${deviceInfo.toString()}")
+
+
+
+                    if (deviceInfo.code==300&&deviceInfo.info=="1"){
+                        Logger.e("开始下一张打印")
+                        //PrintBimapUtils.getInstance().removePrintWhenSuccess()
+                    }
+                     orderResult?.invoke(OrderResult.OrderActivelyReport, deviceInfo)
                 } else {
-                    bleDeviceError(mpRespondMsg)
+                    val deviceErrorInfo = MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())
+                    Logger.e("设备问题>>>>${deviceErrorInfo.toString()}")
+
+
+                    activelyReport?.invoke(OrderResult.OrderActivelyReport, bleDeviceError(mpRespondMsg))
                 }
             }
 
-            MPMessage.EventType.DEVICEINFO -> {
-                //打印设备信息
-                if (mpRespondMsg.code == 200) {
-                    val deviceInfo =
-                        MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("获取设备信息>>>>${deviceInfo.toString()}")
-                } else {
-                    bleDeviceError(mpRespondMsg)
-                }
-            }
+        //    MPMessage.EventType.DEVICEINFO -> {
+//                //打印设备信息
+//                if (mpRespondMsg.code == 200) {
+//                    val deviceInfo =
+//                        MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
+//                    Logger.d("获取设备信息>>>>${deviceInfo.toString()}")
+//                    deviceInfoCall?.invoke(deviceInfo)
+//                    orderResult?.invoke(OrderResult.OrderSuccess, null)
+//                } else {
+//                    bleDeviceError(mpRespondMsg)
+//                    orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
+//                }
+          //  }
 
             MPMessage.EventType.CLOSETIME -> {
                 //设置关机的返回
@@ -71,13 +89,52 @@ data class FmNotifyBean(
                     val deviceInfo =
                         MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
                     Logger.d("设置关机>>>>${deviceInfo.toString()}")
+                    orderResult?.invoke(OrderResult.OrderSuccess, null)
+                } else {
+                    orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
+                }
+            }
+
+            MPMessage.EventType.DEVICEPRINT -> {
+                //设置关机的返回
+                if (mpRespondMsg.code == 200) {
+                    val deviceInfo =
+                        MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
+                    Logger.d("内容打印>>>>${deviceInfo.toString()}")
+                    orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     bleDeviceError(mpRespondMsg)
+                    orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
+                }
+            }
+
+            MPMessage.EventType.PRINTINGSPEED -> {
+                //设置关机的返回
+                if (mpRespondMsg.code == 200) {
+                    val deviceInfo =
+                        MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
+                    Logger.d("打印速度>>>>${deviceInfo.toString()}")
+                    orderResult?.invoke(OrderResult.OrderSuccess, null)
+                } else {
+                    bleDeviceError(mpRespondMsg)
+                    orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
+                }
+            }
+
+            MPMessage.EventType.PRINTINCONCENTRATION -> {
+                //设置关机的返回
+                if (mpRespondMsg.code == 200) {
+                    val deviceInfo =
+                        MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
+                    Logger.d("打印浓度>>>>${deviceInfo.toString()}")
+                    orderResult?.invoke(OrderResult.OrderSuccess, null)
+                } else {
+                    bleDeviceError(mpRespondMsg)
+                    orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
                 }
             }
 
             else -> {
-
 
 
             }

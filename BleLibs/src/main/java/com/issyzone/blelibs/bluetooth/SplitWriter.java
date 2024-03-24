@@ -112,7 +112,7 @@ public class SplitWriter {
                                 }
                             }
                         },
-                        mUuid_write);
+                        mUuid_write,false);
 
         if (!mSendNextWhenLastSuccess) {
             Message message = mHandler.obtainMessage(BleMsg.MSG_SPLIT_WRITE_NEXT);

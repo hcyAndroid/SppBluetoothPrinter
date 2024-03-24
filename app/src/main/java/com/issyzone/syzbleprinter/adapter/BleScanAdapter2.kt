@@ -1,12 +1,5 @@
 package com.issyzone.syzbleprinter.adapter
 
-import android.content.Context
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.chad.library.adapter4.BaseQuickAdapter
-import com.chad.library.adapter4.viewholder.QuickViewHolder
-import com.issyzone.blelibs.data.BleDevice
 
 
 

@@ -154,8 +154,7 @@ public class BleManager {
      * @return BleManager
      */
     public BleManager setMaxConnectCount(int count) {
-        if (count > DEFAULT_MAX_MULTIPLE_DEVICE)
-            count = DEFAULT_MAX_MULTIPLE_DEVICE;
+        if (count > DEFAULT_MAX_MULTIPLE_DEVICE) count = DEFAULT_MAX_MULTIPLE_DEVICE;
         this.maxConnectCount = count;
         return this;
     }
@@ -215,10 +214,8 @@ public class BleManager {
      * @return BleManager
      */
     public BleManager setReConnectCount(int count, long interval) {
-        if (count > 10)
-            count = 10;
-        if (interval < 0)
-            interval = 0;
+        if (count > 10) count = 10;
+        if (interval < 0) interval = 0;
         this.reConnectCount = count;
         this.reConnectInterval = interval;
         return this;
@@ -393,12 +390,25 @@ public class BleManager {
      * @param uuid_notify
      * @param callback
      */
-    public void notify(BleDevice bleDevice,
-                       String uuid_service,
-                       String uuid_notify,
-                       BleNotifyCallback callback) {
+    public void notify(BleDevice bleDevice, String uuid_service, String uuid_notify, BleNotifyCallback callback) {
         notify(bleDevice, uuid_service, uuid_notify, false, callback);
     }
+
+//    /**
+//     *
+//     * @param bleDevice
+//     * @param uuid_service
+//     * @param uuid_notify
+//     * @param characteristic
+//     * @param callback
+//     */
+//    public void notify(BleDevice bleDevice,
+//                       String uuid_service,
+//                       String uuid_notify,
+//                       BluetoothGattCharacteristic characteristic,
+//                       BleNotifyCallback callback) {
+//        notify(bleDevice, uuid_service, uuid_notify, true, characteristic,callback);
+//    }
 
     /**
      * notify
@@ -409,11 +419,7 @@ public class BleManager {
      * @param useCharacteristicDescriptor
      * @param callback
      */
-    public void notify(BleDevice bleDevice,
-                       String uuid_service,
-                       String uuid_notify,
-                       boolean useCharacteristicDescriptor,
-                       BleNotifyCallback callback) {
+    public void notify(BleDevice bleDevice, String uuid_service, String uuid_notify, boolean useCharacteristicDescriptor, BleNotifyCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleNotifyCallback can not be Null!");
         }
@@ -422,9 +428,20 @@ public class BleManager {
         if (bleBluetooth == null) {
             callback.onNotifyFailure(new OtherException("This device not connect!"));
         } else {
-            bleBluetooth.newBleConnector()
-                    .withUUIDString(uuid_service, uuid_notify)
-                    .enableCharacteristicNotify(callback, uuid_notify, useCharacteristicDescriptor);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).enableCharacteristicNotify(callback, uuid_notify, useCharacteristicDescriptor);
+        }
+    }
+
+    public void notify2(BleDevice bleDevice, String uuid_service, String uuid_notify, BluetoothGattCharacteristic bluetoothGattCharacteristic, BleNotifyCallback callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("BleNotifyCallback can not be Null!");
+        }
+
+        BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+        if (bleBluetooth == null) {
+            callback.onNotifyFailure(new OtherException("This device not connect!"));
+        } else {
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).enableCharacteristicNotify2(callback, uuid_notify, bluetoothGattCharacteristic);
         }
     }
 
@@ -436,10 +453,7 @@ public class BleManager {
      * @param uuid_indicate
      * @param callback
      */
-    public void indicate(BleDevice bleDevice,
-                         String uuid_service,
-                         String uuid_indicate,
-                         BleIndicateCallback callback) {
+    public void indicate(BleDevice bleDevice, String uuid_service, String uuid_indicate, BleIndicateCallback callback) {
         indicate(bleDevice, uuid_service, uuid_indicate, false, callback);
     }
 
@@ -452,11 +466,7 @@ public class BleManager {
      * @param useCharacteristicDescriptor
      * @param callback
      */
-    public void indicate(BleDevice bleDevice,
-                         String uuid_service,
-                         String uuid_indicate,
-                         boolean useCharacteristicDescriptor,
-                         BleIndicateCallback callback) {
+    public void indicate(BleDevice bleDevice, String uuid_service, String uuid_indicate, boolean useCharacteristicDescriptor, BleIndicateCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleIndicateCallback can not be Null!");
         }
@@ -465,9 +475,7 @@ public class BleManager {
         if (bleBluetooth == null) {
             callback.onIndicateFailure(new OtherException("This device not connect!"));
         } else {
-            bleBluetooth.newBleConnector()
-                    .withUUIDString(uuid_service, uuid_indicate)
-                    .enableCharacteristicIndicate(callback, uuid_indicate, useCharacteristicDescriptor);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_indicate).enableCharacteristicIndicate(callback, uuid_indicate, useCharacteristicDescriptor);
         }
     }
 
@@ -479,9 +487,7 @@ public class BleManager {
      * @param uuid_notify
      * @return
      */
-    public boolean stopNotify(BleDevice bleDevice,
-                              String uuid_service,
-                              String uuid_notify) {
+    public boolean stopNotify(BleDevice bleDevice, String uuid_service, String uuid_notify) {
         return stopNotify(bleDevice, uuid_service, uuid_notify, false);
     }
 
@@ -494,17 +500,12 @@ public class BleManager {
      * @param useCharacteristicDescriptor
      * @return
      */
-    public boolean stopNotify(BleDevice bleDevice,
-                              String uuid_service,
-                              String uuid_notify,
-                              boolean useCharacteristicDescriptor) {
+    public boolean stopNotify(BleDevice bleDevice, String uuid_service, String uuid_notify, boolean useCharacteristicDescriptor) {
         BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
         if (bleBluetooth == null) {
             return false;
         }
-        boolean success = bleBluetooth.newBleConnector()
-                .withUUIDString(uuid_service, uuid_notify)
-                .disableCharacteristicNotify(useCharacteristicDescriptor);
+        boolean success = bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).disableCharacteristicNotify(useCharacteristicDescriptor);
         if (success) {
             bleBluetooth.removeNotifyCallback(uuid_notify);
         }
@@ -519,9 +520,7 @@ public class BleManager {
      * @param uuid_indicate
      * @return
      */
-    public boolean stopIndicate(BleDevice bleDevice,
-                                String uuid_service,
-                                String uuid_indicate) {
+    public boolean stopIndicate(BleDevice bleDevice, String uuid_service, String uuid_indicate) {
         return stopIndicate(bleDevice, uuid_service, uuid_indicate, false);
     }
 
@@ -534,17 +533,12 @@ public class BleManager {
      * @param useCharacteristicDescriptor
      * @return
      */
-    public boolean stopIndicate(BleDevice bleDevice,
-                                String uuid_service,
-                                String uuid_indicate,
-                                boolean useCharacteristicDescriptor) {
+    public boolean stopIndicate(BleDevice bleDevice, String uuid_service, String uuid_indicate, boolean useCharacteristicDescriptor) {
         BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
         if (bleBluetooth == null) {
             return false;
         }
-        boolean success = bleBluetooth.newBleConnector()
-                .withUUIDString(uuid_service, uuid_indicate)
-                .disableCharacteristicIndicate(useCharacteristicDescriptor);
+        boolean success = bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_indicate).disableCharacteristicIndicate(useCharacteristicDescriptor);
         if (success) {
             bleBluetooth.removeIndicateCallback(uuid_indicate);
         }
@@ -560,13 +554,13 @@ public class BleManager {
      * @param data
      * @param callback
      */
-    public void write(BleDevice bleDevice,
-                      String uuid_service,
-                      String uuid_write,
-                      byte[] data,
-                      BleWriteCallback callback) {
-        write(bleDevice, uuid_service, uuid_write, data, true, callback);
-    }
+//    public void write(BleDevice bleDevice,
+//                      String uuid_service,
+//                      String uuid_write,
+//                      byte[] data,
+//                      BleWriteCallback callback) {
+//        write(bleDevice, uuid_service, uuid_write, data, true, callback);
+//    }
 
     /**
      * write
@@ -578,24 +572,35 @@ public class BleManager {
      * @param split
      * @param callback
      */
-    public void write(BleDevice bleDevice,
-                      String uuid_service,
-                      String uuid_write,
-                      byte[] data,
-                      boolean split,
-                      BleWriteCallback callback) {
+    public void writeWriteResponse(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, boolean split, BleWriteCallback callback) {
 
-        write(bleDevice, uuid_service, uuid_write, data, split, true, 0, callback);
+        write(bleDevice, uuid_service, uuid_write, data, split, true, 0, callback, false);
     }
 
 
-    public void write2(BleDevice bleDevice,
-                      String uuid_service,
-                      String uuid_write,
-                      byte[] data,
-                      BleWriteCallback callback) {
+    public void writeWithNoResponse(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, BleWriteCallback callback) {
 
-        write(bleDevice, uuid_service, uuid_write, data, false, true, 0, callback);
+        write(bleDevice, uuid_service, uuid_write, data, false, true, 0, callback, true);
+    }
+
+    public void writeWithNoResponse2(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, BleWriteCallback callback) {
+
+        if (callback == null) {
+            throw new IllegalArgumentException("BleWriteCallback can not be Null!");
+        }
+
+        if (data == null) {
+            BleLog.e("data is Null!");
+            callback.onWriteFailure(new OtherException("data is Null!"));
+            return;
+        }
+
+        BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+        if (bleBluetooth == null) {
+            callback.onWriteFailure(new OtherException("This device not connect!"));
+        } else {
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic2(data, callback, uuid_write);
+        }
     }
 
     /**
@@ -610,14 +615,7 @@ public class BleManager {
      * @param intervalBetweenTwoPackage
      * @param callback
      */
-    public void write(BleDevice bleDevice,
-                      String uuid_service,
-                      String uuid_write,
-                      byte[] data,
-                      boolean split,
-                      boolean sendNextWhenLastSuccess,
-                      long intervalBetweenTwoPackage,
-                      BleWriteCallback callback) {
+    public void write(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, boolean split, boolean sendNextWhenLastSuccess, long intervalBetweenTwoPackage, BleWriteCallback callback, boolean isWriteWithNoResponse) {
 
         if (callback == null) {
             throw new IllegalArgumentException("BleWriteCallback can not be Null!");
@@ -638,13 +636,30 @@ public class BleManager {
             callback.onWriteFailure(new OtherException("This device not connect!"));
         } else {
             if (split && data.length > getSplitWriteNum()) {
-                new SplitWriter().splitWrite(bleBluetooth, uuid_service, uuid_write, data,
-                        sendNextWhenLastSuccess, intervalBetweenTwoPackage, callback);
+                new SplitWriter().splitWrite(bleBluetooth, uuid_service, uuid_write, data, sendNextWhenLastSuccess, intervalBetweenTwoPackage, callback);
             } else {
-                bleBluetooth.newBleConnector()
-                        .withUUIDString(uuid_service, uuid_write)
-                        .writeCharacteristic(data, callback, uuid_write);
+                bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic(data, callback, uuid_write, isWriteWithNoResponse);
             }
+        }
+    }
+
+
+    public void writeWithNoSplit(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, boolean sendNextWhenLastSuccess, long intervalBetweenTwoPackage, BleWriteCallback callback, boolean isWriteWithNoResponse) {
+        if (callback == null) {
+            throw new IllegalArgumentException("BleWriteCallback can not be Null!");
+        }
+        if (data == null) {
+            BleLog.e("data is Null!");
+            callback.onWriteFailure(new OtherException("data is Null!"));
+            return;
+        }
+        BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+        if (bleBluetooth == null) {
+            callback.onWriteFailure(new OtherException("This device not connect!"));
+        } else {
+            bleBluetooth.newBleConnector()
+                    .withUUIDString(uuid_service, uuid_write).
+                    writeCharacteristic(data, callback, uuid_write, isWriteWithNoResponse);
         }
     }
 
@@ -656,10 +671,7 @@ public class BleManager {
      * @param uuid_read
      * @param callback
      */
-    public void read(BleDevice bleDevice,
-                     String uuid_service,
-                     String uuid_read,
-                     BleReadCallback callback) {
+    public void read(BleDevice bleDevice, String uuid_service, String uuid_read, BleReadCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleReadCallback can not be Null!");
         }
@@ -668,9 +680,7 @@ public class BleManager {
         if (bleBluetooth == null) {
             callback.onReadFailure(new OtherException("This device is not connected!"));
         } else {
-            bleBluetooth.newBleConnector()
-                    .withUUIDString(uuid_service, uuid_read)
-                    .readCharacteristic(callback, uuid_read);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_read).readCharacteristic(callback, uuid_read);
         }
     }
 
@@ -680,8 +690,7 @@ public class BleManager {
      * @param bleDevice
      * @param callback
      */
-    public void readRssi(BleDevice bleDevice,
-                         BleRssiCallback callback) {
+    public void readRssi(BleDevice bleDevice, BleRssiCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleRssiCallback can not be Null!");
         }
@@ -701,9 +710,7 @@ public class BleManager {
      * @param mtu
      * @param callback
      */
-    public void setMtu(BleDevice bleDevice,
-                       int mtu,
-                       BleMtuChangedCallback callback) {
+    public void setMtu(BleDevice bleDevice, int mtu, BleMtuChangedCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleMtuChangedCallback can not be Null!");
         }
@@ -756,8 +763,7 @@ public class BleManager {
      * @return
      */
     public boolean isSupportBle() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2
-                && context.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && context.getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
     }
 
     /**
@@ -774,8 +780,7 @@ public class BleManager {
      */
     public void disableBluetooth() {
         if (bluetoothAdapter != null) {
-            if (bluetoothAdapter.isEnabled())
-                bluetoothAdapter.disable();
+            if (bluetoothAdapter.isEnabled()) bluetoothAdapter.disable();
         }
     }
 
@@ -802,8 +807,7 @@ public class BleManager {
         int rssi = scanResult.getRssi();
         ScanRecord scanRecord = scanResult.getScanRecord();
         byte[] bytes = null;
-        if (scanRecord != null)
-            bytes = scanRecord.getBytes();
+        if (scanRecord != null) bytes = scanRecord.getBytes();
         long timestampNanos = scanResult.getTimestampNanos();
         return new BleDevice(bluetoothDevice, rssi, bytes, timestampNanos);
     }
@@ -817,8 +821,7 @@ public class BleManager {
 
     public BluetoothGatt getBluetoothGatt(BleDevice bleDevice) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            return bleBluetooth.getBluetoothGatt();
+        if (bleBluetooth != null) return bleBluetooth.getBluetoothGatt();
         return null;
     }
 
@@ -836,50 +839,42 @@ public class BleManager {
 
     public void removeConnectGattCallback(BleDevice bleDevice) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeConnectGattCallback();
+        if (bleBluetooth != null) bleBluetooth.removeConnectGattCallback();
     }
 
     public void removeRssiCallback(BleDevice bleDevice) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeRssiCallback();
+        if (bleBluetooth != null) bleBluetooth.removeRssiCallback();
     }
 
     public void removeMtuChangedCallback(BleDevice bleDevice) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeMtuChangedCallback();
+        if (bleBluetooth != null) bleBluetooth.removeMtuChangedCallback();
     }
 
     public void removeNotifyCallback(BleDevice bleDevice, String uuid_notify) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeNotifyCallback(uuid_notify);
+        if (bleBluetooth != null) bleBluetooth.removeNotifyCallback(uuid_notify);
     }
 
     public void removeIndicateCallback(BleDevice bleDevice, String uuid_indicate) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeIndicateCallback(uuid_indicate);
+        if (bleBluetooth != null) bleBluetooth.removeIndicateCallback(uuid_indicate);
     }
 
     public void removeWriteCallback(BleDevice bleDevice, String uuid_write) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeWriteCallback(uuid_write);
+        if (bleBluetooth != null) bleBluetooth.removeWriteCallback(uuid_write);
     }
 
     public void removeReadCallback(BleDevice bleDevice, String uuid_read) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.removeReadCallback(uuid_read);
+        if (bleBluetooth != null) bleBluetooth.removeReadCallback(uuid_read);
     }
 
     public void clearCharacterCallback(BleDevice bleDevice) {
         BleBluetooth bleBluetooth = getBleBluetooth(bleDevice);
-        if (bleBluetooth != null)
-            bleBluetooth.clearCharacterCallback();
+        if (bleBluetooth != null) bleBluetooth.clearCharacterCallback();
     }
 
     public BleScanState getScanSate() {
@@ -887,8 +882,7 @@ public class BleManager {
     }
 
     public List<BleDevice> getAllConnectedDevice() {
-        if (multipleBluetoothController == null)
-            return null;
+        if (multipleBluetoothController == null) return null;
         return multipleBluetoothController.getDeviceList();
     }
 

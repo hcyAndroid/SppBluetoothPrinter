@@ -26,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -35,6 +34,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -128,8 +128,9 @@ class BleService : Service() {
                 Logger.d("${TAG}>>>扫描到BLE设备个数:${scanResultList.size}")
                 val needDeviceList = scanResultList.filter {
 
-                    (!it.name.isNullOrEmpty()) && (!it.mac.isNullOrEmpty()) && (it.name.lowercase()
-                        .startsWith("fm"))
+                    (!it.name.isNullOrEmpty()) && (!it.mac.isNullOrEmpty()) &&( (it.name.lowercase()
+                        .startsWith("fm"))|| (it.name.lowercase()
+                        .startsWith("rw")))
                 }
                 Logger.d("${TAG}>>>BLE名字和mac地址不为null,且name开头为fm的设备的个数:${needDeviceList.size}")
                 try {
@@ -160,7 +161,7 @@ class BleService : Service() {
                     ).size
                 }"
             )
-            BleManager.getInstance().write(fmBle?.bleDevice,
+            BleManager.getInstance().writeWriteResponse(fmBle?.bleDevice,
                 write_abf1?.first.toString(),
                 write_abf1?.second.toString(),
                 Upacker.frameEncode(data),
@@ -190,7 +191,7 @@ class BleService : Service() {
                     Logger.d("蓝牙TETST>>>>>>${data.size}")
                     Logger.d("蓝牙TETST>>>>>>  ${Upacker.frameEncode(data).size}")
                     val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
-                    BleManager.getInstance().write2(fmBle?.bleDevice,
+                    BleManager.getInstance().writeWithNoResponse(fmBle?.bleDevice,
                         write_abf1?.first.toString(),
                         write_abf1?.second.toString(),
                         Upacker.frameEncode(data),
@@ -225,6 +226,7 @@ class BleService : Service() {
     }
 
 
+
     // 递归写入函数
     suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
         var success = true
@@ -232,24 +234,58 @@ class BleService : Service() {
         for (index in 0 until dataList.size) {
             try {
                 val data = dataList[index]
-
                 val dataArray = data.toByteArray()
-                Logger.d("$TAG========第${index}===字节数${dataArray.size}")
+                Logger.d("$TAG========第${index}包===字节数${dataArray.size}")
                 success = writeABF4(dataArray, index, dataList.size)
                 if (success) {
                     // 如果写入成功，继续递归写入
-                    delay(6)//延时写入
-                    // continue
+                    //延时写入
+                    delay(60)
+                    continue
                 } else {
                     // 如果写入失败，停止递归写入
-                    // break
+                    break
                 }
             } catch (e: Exception) {
-
+                break
             }
         }
     }
 
+
+    /**
+     * 跟新dex文件  写入一次 delay 60 ms   每写入4k，delay600ms ，之后写入一次60kb delay 60 以此类推直到完成
+     */
+    suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
+        var success = true
+        Logger.d("$TAG========总共要发${dataList.size}个包")
+        var writeCount=0
+        for (index in 0 until dataList.size) {
+            try {
+                val data = dataList[index]
+                val dataArray = data.toByteArray()  //一次写入的数据量
+                Logger.d("$TAG========第${index}包===字节数${dataArray.size}")
+                success = writeABF4(dataArray, index, dataList.size)
+                if (success) {
+                    //如果写入成功，继续递归写入
+                    //延时写入
+                    writeCount+=dataArray.size
+                    if (writeCount>=4*1024){
+                        delay(400)
+                        writeCount=writeCount-(4*1024)//重新计算
+                    }else{
+                        delay(60)
+                    }
+                    continue
+                } else {
+                    // 如果写入失败，停止递归写入
+                    break
+                }
+            } catch (e: Exception) {
+                break
+            }
+        }
+    }
 
     private var abf3NotifyCallback: ((FmNotifyBean) -> Unit)? = null
 
@@ -286,9 +322,7 @@ class BleService : Service() {
                                 String(data, Charsets.UTF_8)
                             }==>字节数据长度>>>>>${data.size}"
                         )
-
                         val fmNotifyBean = FmNotifyBean(2, byteArray = data)
-                        fmNotifyBean.getFmDeviceInfo()
                         abf3NotifyCallback?.invoke(fmNotifyBean)
                     }
                 })
@@ -335,7 +369,6 @@ class BleService : Service() {
                 val connectBleTask = async { connectBLe(bleDevice) }
                 fmBle = connectBleTask.await()
                 if (fmBle != null && fmBle?.bleDevice != null) {
-                    initBleMTU(fmBle!!.bleDevice!!)
                     val setMTUTask = async { initBleMTU(fmBle!!.bleDevice!!) }
                     val mtuflag = setMTUTask.await()
                     Logger.d("$TAG 协诚设置MTU成功==${mtuflag}")
@@ -441,11 +474,11 @@ class BleService : Service() {
         }
     }
 
-
-    private fun UpBleUI() {
-
-
-    }
+    /**
+     *手机端发送bin包给设备,设备拿去升级,
+     * 将bin包分包分成多份再传,每次传递的数据格式如下,
+     *发送前需要将data 用upack(在文件夹里)库进行打包,然后再下发
+     */
 
     override fun onDestroy() {
         super.onDestroy()

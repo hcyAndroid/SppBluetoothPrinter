@@ -2,20 +2,23 @@ package com.issyzone.syzbleprinter.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.issyzone.blelibs.callback.SyzBleCallBack
 import com.issyzone.blelibs.data.BleDevice
 import com.issyzone.blelibs.databinding.ItemScanBleBinding
 import com.issyzone.blelibs.fmBeans.FMPrinterOrder
-import com.issyzone.blelibs.fmBeans.FmBitmapPrinterUtils
+import com.issyzone.blelibs.fmBeans.FmBitmapOrDexPrinterUtils
 import com.issyzone.blelibs.service.BleService
+import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
-import com.issyzone.blelibs.utils.BitmapUtils
 import com.issyzone.blelibs.utils.ImageUtilKt
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.issyzone.blelibs.utils.SYZFileUtils
+import com.issyzone.blelibs.utils.SYZFileUtils.copyAssetGetFilePath
+import com.orhanobut.logger.Logger
+import kotlinx.coroutines.GlobalScope
 
 
 /**
@@ -34,12 +37,13 @@ class BlueScanAdapter(var click: (ble: BleDevice) -> Unit) :
     }) {
     inner class BluetoothViewHolder(var vm: ItemScanBleBinding) : RecyclerView.ViewHolder(vm.root) {
         fun bind(item: BleDevice?) {
+
             vm.tvConnect.setOnClickListener {
                 item?.apply {
-                    click.invoke(this)
+                   // click.invoke(this)
+                    BleService.getInstance().conenctBle2(this)
 
                 }
-
             }
             vm.tvCheck.setOnClickListener {
                 BleService.getInstance().fmWriteABF1(FMPrinterOrder.orderForGetFmDevicesInfo())
@@ -65,10 +69,21 @@ class BlueScanAdapter(var click: (ble: BleDevice) -> Unit) :
 
 
             vm.tvSetPrintImg.setOnClickListener {
-               val bitmap= ImageUtilKt.convertBinary(BitmapExt.test(), 128)
-                FmBitmapPrinterUtils.test(
-                    ImageUtilKt.convertBinary(BitmapExt.test(), 128), bitmap.width, bitmap.height, 1
+                Logger.d("FmBitmapPrinterUtils》》》bitmap字节数${BitmapExt.bitmapToByteArray(BitmapExt.decodeBitmap()).size}")
+                val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(), 128)
+                FmBitmapOrDexPrinterUtils.writeBitmap(
+                    bitmap, bitmap.width, bitmap.height, 1
                 )
+            }
+            vm.tvDexUpdate.setOnClickListener {
+
+                val path =
+                    SYZFileUtils.copyAssetGetFilePath("FM226_print_app(1.1.0.0.8).bin")
+                path?.apply {
+                    FmBitmapOrDexPrinterUtils.writeDex(
+                        this
+                    )
+                }
             }
 
             vm.tvDeviceName.text = item?.name ?: ""
