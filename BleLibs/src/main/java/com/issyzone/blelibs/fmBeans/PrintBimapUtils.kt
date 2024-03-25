@@ -1,7 +1,7 @@
 package com.issyzone.blelibs.fmBeans
 
+import android.util.Log
 import com.issyzone.blelibs.service.SyzBleManager
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 
 class PrintBimapUtils {
-
+   private val TAG="PrintBimapUtils"
     companion object {
         private var bitMapPrintTaskList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
         private var instance: PrintBimapUtils? = null
@@ -40,18 +40,18 @@ class PrintBimapUtils {
                  SyzBleManager.getInstance().fmWriteABF4(doFirst)
 
              }else{
-                 Logger.d("PrintBimapUtils>>>所有图片打印成功》》》")
+                 Log.d("$TAG","PrintBimapUtils>>>所有图片打印成功》》》")
              }
          }
     }
    fun removePrintWhenSuccess(){
-        Logger.d("PrintBimapUtils>>>一张图片打印成功》》》")
+       Log.d("$TAG","PrintBimapUtils>>>一张图片打印成功》》》")
        val doFistAlready=bitMapPrintTaskList.removeFirst()
        if (bitMapPrintTaskList.isNotEmpty()){
-           Logger.e("开始下一张打印")
+           Log.d("$TAG","开始下一张打印")
            doPrint()
        }else{
-           Logger.e("bitmap全部成功")
+           Log.d("$TAG","bitmap全部成功")
        }
     }
 

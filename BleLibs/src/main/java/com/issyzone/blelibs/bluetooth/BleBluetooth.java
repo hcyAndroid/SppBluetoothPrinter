@@ -506,6 +506,16 @@ public class BleBluetooth {
             }
         }
 
+        /**
+         *
+         * @param gatt           GATT client that invoked
+         *                       {@link BluetoothGatt#writeCharacteristic(BluetoothGattCharacteristic,
+         *                       byte[], int)}
+         * @param characteristic Characteristic that was written to the associated remote device.
+         * @param status         The result of the write operation {@link BluetoothGatt#GATT_SUCCESS} if
+         *                       the
+         *                       operation succeeds.
+         */
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             super.onCharacteristicWrite(gatt, characteristic, status);
@@ -524,6 +534,7 @@ public class BleBluetooth {
                             message.obj = bleWriteCallback;
                             Bundle bundle = new Bundle();
                             bundle.putInt(BleMsg.KEY_WRITE_BUNDLE_STATUS, status);
+                            bundle.putInt(BleMsg.KEY_WRITE_TYPE,characteristic.getWriteType());
                             bundle.putByteArray(BleMsg.KEY_WRITE_BUNDLE_VALUE, characteristic.getValue());
                             message.setData(bundle);
                             handler.sendMessage(message);

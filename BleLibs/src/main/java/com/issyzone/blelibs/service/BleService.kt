@@ -20,7 +20,6 @@ import com.issyzone.blelibs.fmBeans.FmNotifyBean
 import com.issyzone.blelibs.fmBeans.MPMessage
 import com.issyzone.blelibs.upacker.Upacker
 import com.issyzone.blelibs.utils.AppGlobels
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -75,7 +74,7 @@ class BleService : Service() {
 
     fun getScanResultFlow(): SharedFlow<List<BleDevice>> {
         val scanResultFlow = _scanResultFlow.asSharedFlow()
-        Logger.d("${TAG}订阅数据")
+        Log.d("$TAG", "订阅数据")
         return scanResultFlow
     }
 
@@ -86,7 +85,7 @@ class BleService : Service() {
      * START_REDELIVER_INTENT：如果 Service 进程被杀死，系统会重新创建 Service 并调用 onStartCommand() 方法，并重新传递最后一个 Intent。这种模式适用于执行需要确保不丢失数据的任务。
      */
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Logger.d("${TAG}启动BLE服务")
+        Log.d("$TAG", "启动BLE服务")
         serviceScope?.launch {
             // 在后台线程中执行耗时操作
             withContext(Dispatchers.Main) {
@@ -113,7 +112,7 @@ class BleService : Service() {
 
     private suspend fun scanBle() {
         if (scanJob != null) {
-            Logger.d("${TAG}>>>扫描协诚取消")
+            Log.d("$TAG", ">>>扫描协诚取消")
             scanJob?.cancel()
         }
         scanScope = CoroutineScope(Dispatchers.IO)
@@ -125,21 +124,23 @@ class BleService : Service() {
             }
             withContext(Dispatchers.IO) {
                 // 扫描完成后，向activity暴露扫描的数据
-                Logger.d("${TAG}>>>扫描到BLE设备个数:${scanResultList.size}")
+                Log.d("$TAG", ">>>扫描到BLE设备个数:${scanResultList.size}")
                 val needDeviceList = scanResultList.filter {
 
-                    (!it.name.isNullOrEmpty()) && (!it.mac.isNullOrEmpty()) &&( (it.name.lowercase()
-                        .startsWith("fm"))|| (it.name.lowercase()
-                        .startsWith("rw")))
+                    (!it.name.isNullOrEmpty()) && (!it.mac.isNullOrEmpty()) && ((it.name.lowercase()
+                        .startsWith("fm")) || (it.name.lowercase().startsWith("rw")))
                 }
-                Logger.d("${TAG}>>>BLE名字和mac地址不为null,且name开头为fm的设备的个数:${needDeviceList.size}")
+                Log.d(
+                    "$TAG",
+                    ">>>BLE名字和mac地址不为null,且name开头为fm的设备的个数:${needDeviceList.size}"
+                )
                 try {
                     withContext(Dispatchers.Main) {
-                        Logger.d("${TAG}>>>FLOW发送数据")
+                        Log.d("$TAG", ">>>FLOW发送数据")
                         _scanResultFlow.emit(needDeviceList)
                     }
                 } catch (e: Exception) {
-                    Logger.e("${TAG}>>>发送扫描数据异常${e.message}")
+                    Log.d("$TAG", ">>>发送扫描数据异常${e.message}")
                 }
 
 
@@ -154,8 +155,9 @@ class BleService : Service() {
     fun fmWriteABF1(data: ByteArray) {
         if (fmBle != null) {
             val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF1)?.get(0)
-            Logger.d(
-                "$TAG=======ABF1准备写入serviceUUID=${write_abf1?.first}==CharaUUID=${write_abf1?.second}==写入长度${
+            Log.d(
+                "$TAG",
+                "=======ABF1准备写入serviceUUID=${write_abf1?.first}==CharaUUID=${write_abf1?.second}==写入长度${
                     Upacker.frameEncode(
                         data
                     ).size
@@ -169,12 +171,12 @@ class BleService : Service() {
                 object : BleWriteCallback() {
                     override fun onWriteSuccess(current: Int, total: Int, justWrite: ByteArray) {
                         // 发送数据到设备成功（分包发送的情况下，可以通过方法中返回的参数可以查看发送进度）
-                        Logger.d("$TAG=abf1写入成功==")
+                        Log.d("$TAG", "=abf1写入成功==")
                     }
 
                     override fun onWriteFailure(exception: BleException) {
                         // 发送数据到设备失败
-                        Logger.d("$TAG=abf1写入失败==${exception.code}===${exception.description}")
+                        Log.d("$TAG", "=abf1写入失败==${exception.code}===${exception.description}")
                     }
                 })
         }
@@ -188,8 +190,8 @@ class BleService : Service() {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
                 if (fmBle != null) {
-                    Logger.d("蓝牙TETST>>>>>>${data.size}")
-                    Logger.d("蓝牙TETST>>>>>>  ${Upacker.frameEncode(data).size}")
+                    Log.d("$TAG", "蓝牙TETST>>>>>>${data.size}")
+                    Log.d("$TAG", "蓝牙TETST>>>>>>  ${Upacker.frameEncode(data).size}")
                     val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
                     BleManager.getInstance().writeWithNoResponse(fmBle?.bleDevice,
                         write_abf1?.first.toString(),
@@ -201,9 +203,15 @@ class BleService : Service() {
                             ) {
                                 // 发送数据到设备成功（分包发送的情况下，可以通过方法中返回的参数可以查看发送进度）
                                 if (index < totalSize) {
-                                    Logger.d("$TAG=abf4写入成功=第${index}个包===总共${totalSize}个包====")
+                                    Log.d(
+                                        "$TAG",
+                                        "=abf4写入成功=第${index}个包===总共${totalSize}个包===="
+                                    )
                                 } else {
-                                    Logger.d("$TAG=abf4完全写入成功=第${index}个包=总共${totalSize}个包======")
+                                    Log.d(
+                                        "$TAG",
+                                        "=abf4完全写入成功=第${index}个包=总共${totalSize}个包======"
+                                    )
                                 }
                                 if (isActive) {
                                     continuation.resume(true)
@@ -213,7 +221,10 @@ class BleService : Service() {
 
                             override fun onWriteFailure(exception: BleException) {
                                 // 发送数据到设备失败
-                                Logger.e("$TAG=abf4写入失败=====第${index}个包===总共${totalSize}个包====${exception.code}===${exception.description}")
+                                Log.d(
+                                    "$TAG",
+                                    "=abf4写入失败=====第${index}个包===总共${totalSize}个包====${exception.code}===${exception.description}"
+                                )
                                 if (isActive) {
                                     continuation.resume(false)
                                 }
@@ -226,26 +237,26 @@ class BleService : Service() {
     }
 
 
-
     // 递归写入函数
     suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
         var success = true
-        Logger.d("$TAG========总共要发${dataList.size}个包")
+        Log.d("$TAG", "========总共要发${dataList.size}个包")
         for (index in 0 until dataList.size) {
             try {
                 val data = dataList[index]
                 val dataArray = data.toByteArray()
-                Logger.d("$TAG========第${index}包===字节数${dataArray.size}")
+                Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
                 success = writeABF4(dataArray, index, dataList.size)
-                if (success) {
-                    // 如果写入成功，继续递归写入
-                    //延时写入
-                    delay(60)
-                    continue
-                } else {
-                    // 如果写入失败，停止递归写入
-                    break
-                }
+                delay(6)
+//                if (success) {
+//                    // 如果写入成功，继续递归写入
+//                    //延时写入
+//                    delay(6)
+//                    continue
+//                } else {
+//                    // 如果写入失败，停止递归写入
+//                    break
+//                }
             } catch (e: Exception) {
                 break
             }
@@ -258,22 +269,22 @@ class BleService : Service() {
      */
     suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
         var success = true
-        Logger.d("$TAG========总共要发${dataList.size}个包")
-        var writeCount=0
+        Log.d("$TAG", "========总共要发${dataList.size}个包")
+        var writeCount = 0
         for (index in 0 until dataList.size) {
             try {
                 val data = dataList[index]
                 val dataArray = data.toByteArray()  //一次写入的数据量
-                Logger.d("$TAG========第${index}包===字节数${dataArray.size}")
+                Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
                 success = writeABF4(dataArray, index, dataList.size)
                 if (success) {
                     //如果写入成功，继续递归写入
                     //延时写入
-                    writeCount+=dataArray.size
-                    if (writeCount>=4*1024){
+                    writeCount += dataArray.size
+                    if (writeCount >= 4 * 1024) {
                         delay(400)
-                        writeCount=writeCount-(4*1024)//重新计算
-                    }else{
+                        writeCount = writeCount - (4 * 1024)//重新计算
+                    } else {
                         delay(60)
                     }
                     continue
@@ -298,27 +309,33 @@ class BleService : Service() {
     private fun initFmNotify() {
         if (fmBle != null) {
             val notify = fmBle?.getCharatersType(FMPrinter.Charac_ABF3)?.get(0)
-            Logger.d("$TAG=======正在打开通知serviceUUID=${notify?.first}==CharaUUID=${notify?.second}")
+            Log.d(
+                "$TAG",
+                "=======正在打开通知serviceUUID=${notify?.first}==CharaUUID=${notify?.second}"
+            )
             BleManager.getInstance().notify(fmBle?.bleDevice,
                 notify?.first.toString(),
                 notify?.second.toString(),
                 object : BleNotifyCallback() {
                     override fun onNotifySuccess() {
                         // 打开通知操作成功
-                        Logger.d("$TAG=======打开通知操作成功==")
+                        Log.d("$TAG", "=======打开通知操作成功==")
                         abf3NotifyCallback?.invoke(FmNotifyBean(1))
                     }
 
                     override fun onNotifyFailure(exception: BleException) {
                         // 打开通知操作失败
-                        Logger.d("$TAG=======打开通知操作失败==${exception.code}====${exception.description}")
+                        Log.d(
+                            "$TAG",
+                            "=======打开通知操作失败==${exception.code}====${exception.description}"
+                        )
                         abf3NotifyCallback?.invoke(FmNotifyBean(0, exception))
                     }
 
                     override fun onCharacteristicChanged(data: ByteArray) {
                         // 打开通知后，设备发过来的数据将在这里出现
-                        Logger.d(
-                            "$TAG===ABF3====收到蓝牙数据${
+                        Log.d(
+                            "$TAG", "===ABF3====收到蓝牙数据${
                                 String(data, Charsets.UTF_8)
                             }==>字节数据长度>>>>>${data.size}"
                         )
@@ -339,15 +356,14 @@ class BleService : Service() {
             BleManager.getInstance().setMtu(bleDevice, MAX_MTU, object : BleMtuChangedCallback() {
                 override fun onSetMTUFailure(exception: BleException) {
                     // 设置 MTU 失败
-                    Logger.e("$TAG 设置MTU失败==${exception.description}")
-
+                    Log.d("$TAG", " 设置MTU失败==${exception.description}")
                     continuation.resume(false) // 返回 false 表示初始化失败
 
                 }
 
                 override fun onMtuChanged(mtu: Int) {
                     // 设置 MTU 成功
-                    Logger.d("$TAG 设置MTU成功==${mtu}")
+                    Log.d("$TAG", " 设置MTU成功==${mtu}")
 
                     continuation.resume(true) // 返回 true 表示初始化成功
 
@@ -364,14 +380,14 @@ class BleService : Service() {
         serviceScope?.launch {
             withContext(Dispatchers.IO) {
                 if (fmBle != null) {
-                    Logger.d("$TAG fmBle!=null")
+                    Log.d("$TAG", "fmBle != null")
                 }
                 val connectBleTask = async { connectBLe(bleDevice) }
                 fmBle = connectBleTask.await()
                 if (fmBle != null && fmBle?.bleDevice != null) {
                     val setMTUTask = async { initBleMTU(fmBle!!.bleDevice!!) }
                     val mtuflag = setMTUTask.await()
-                    Logger.d("$TAG 协诚设置MTU成功==${mtuflag}")
+                    Log.d("$TAG", " 协诚设置MTU成功==${mtuflag}")
                     if (mtuflag) {
                         //注测读取通道
                         initFmNotify()
@@ -388,11 +404,14 @@ class BleService : Service() {
         return suspendCancellableCoroutine<FMBle?> { cancellableContinuation ->
             val callback = object : BleGattCallback() {
                 override fun onStartConnect() {
-                    Logger.d("$TAG,开始连接")
+                    Log.d("$TAG", "开始连接")
                 }
 
                 override fun onConnectFail(bleDevice: BleDevice, exception: BleException?) {
-                    Logger.e("$TAG,连接失败${bleDevice.device.name}::失败原因==${exception?.code}===${exception?.description}")
+                    Log.d(
+                        "$TAG",
+                        "连接失败${bleDevice.device.name}::失败原因==${exception?.code}===${exception?.description}"
+                    )
 
 
 
@@ -401,22 +420,22 @@ class BleService : Service() {
                     if (exception?.code == 100) {
                         if (bleDevice != null) {
                             BleManager.getInstance().disconnect(bleDevice)
-                            Logger.e("$TAG 蓝牙连接超时，很有可能已经连接了")
+                            Log.d("$TAG", "蓝牙连接超时，很有可能已经连接了")
                         }
                     }
 
                     cancellableContinuation.resume(null) {
-                        Logger.e("$TAG 协诚连接蓝牙返回数据异常:${it.message.toString()}")
+                        Log.d("$TAG", "协诚连接蓝牙返回数据异常:${it.message.toString()}")
                     }
                 }
 
                 override fun onConnectSuccess(
                     bleDevice: BleDevice?, gatt: BluetoothGatt?, status: Int
                 ) {
-                    Logger.d("$TAG,连接成功状态码${status}")
+                    Log.d("$TAG", "连接成功状态码${status}")
 
                     cancellableContinuation.resume(FMBle(bleDevice, gatt, status)) {
-                        Logger.e("协诚连接蓝牙返回数据异常:${it.message.toString()}")
+                        Log.d("$TAG", "协诚连接蓝牙返回数据异常:${it.message.toString()}")
                     }
                     //建立读通道
                     // 3.	ABF3: 通知的特征(Notify), 打印机上报任何信息都通过这个特征来读取
@@ -429,7 +448,7 @@ class BleService : Service() {
                     gatt: BluetoothGatt?,
                     status: Int
                 ) {
-                    Logger.d("$TAG,断开连接")
+                    Log.d("$TAG", ",断开连接")
                 }
 
             }
@@ -457,11 +476,11 @@ class BleService : Service() {
                     // 扫描完成时的回调
                     if (scanResultList != null) {
                         continuation.resume(scanResultList) {
-                            Logger.e("协诚返回数据异常:${it.message.toString()}")
+                            Log.d("$TAG", "协诚返回数据异常:${it.message.toString()}")
                         } // 将扫描结果列表作为结果传递给协程
                     } else {
                         continuation.resume(emptyList()) {
-                            Logger.e("协诚返回数据异常:${it.message.toString()}")
+                            Log.d("$TAG", "协诚返回数据异常:${it.message.toString()}")
                         } // 如果扫描结果列表为空，则返回空列表
                     }
                 }
@@ -482,7 +501,7 @@ class BleService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Logger.d("${TAG}销毁BLE服务")
+        Log.d("$TAG", "销毁BLE服务")
         serviceScope?.cancel()
     }
 }

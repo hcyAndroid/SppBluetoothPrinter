@@ -132,7 +132,12 @@ public class BleConnector {
                         byte[] value = bundle.getByteArray(BleMsg.KEY_WRITE_BUNDLE_VALUE);
                         if (writeCallback != null) {
                             if (status == BluetoothGatt.GATT_SUCCESS) {
-                                writeCallback.onWriteSuccess(BleWriteState.DATA_WRITE_SINGLE, BleWriteState.DATA_WRITE_SINGLE, value);
+                                int write_type = bundle.getInt(BleMsg.KEY_WRITE_TYPE,BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                                if (write_type==BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT){
+                                    writeCallback.onWriteSuccess(BleWriteState.DATA_WRITE_SINGLE, BleWriteState.DATA_WRITE_SINGLE, value);
+                                }else {
+                                    writeCallback.onWriteSuccess(BleWriteState.DATA_WRITE_WITHOUTRESPONSE, BleWriteState.DATA_WRITE_WITHOUTRESPONSE, value);
+                                }
                             } else {
                                 writeCallback.onWriteFailure(new GattException(status));
                             }
@@ -468,6 +473,33 @@ public class BleConnector {
                 bleWriteCallback.onWriteFailure(new OtherException("Updates the locally stored value of this characteristic fail"));
         }
     }
+    public void writeCharacteristic3(byte[] data, BleWriteCallback bleWriteCallback, String uuid_write,BluetoothGattCharacteristic characteristic) {
+        if (data == null || data.length <= 0) {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("the data to be written is empty"));
+            return;
+        }
+
+        if (characteristic == null || (characteristic.getProperties() & (BluetoothGattCharacteristic.PROPERTY_WRITE | BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE)) == 0) {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("this characteristic not support write!"));
+            return;
+        }
+
+        if (characteristic.setValue(data)) {
+            //设置了没回复，writeCharacteristic这个方法会立即回调
+            characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
+            handleCharacteristicWriteCallback(bleWriteCallback, uuid_write);
+            if (!mBluetoothGatt.writeCharacteristic(characteristic)) {
+                writeMsgInit();
+                if (bleWriteCallback != null)
+                    bleWriteCallback.onWriteFailure(new OtherException("gatt writeCharacteristic fail"));
+            }
+        } else {
+            if (bleWriteCallback != null)
+                bleWriteCallback.onWriteFailure(new OtherException("Updates the locally stored value of this characteristic fail"));
+        }
+    }
 
 
     public void writeCharacteristic2(byte[] data, BleWriteCallback bleWriteCallback, String uuid_write) {
@@ -482,7 +514,9 @@ public class BleConnector {
                 bleWriteCallback.onWriteFailure(new OtherException("this characteristic not support write!"));
             return;
         }
+
         if (mCharacteristic.setValue(data)) {
+            //设置了没回复，writeCharacteristic这个方法会立即回调
             mCharacteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             handleCharacteristicWriteCallback(bleWriteCallback, uuid_write);
             if (!mBluetoothGatt.writeCharacteristic(mCharacteristic)) {

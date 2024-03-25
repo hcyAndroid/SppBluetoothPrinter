@@ -16,12 +16,12 @@ import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.BitmapUtils
 import com.issyzone.blelibs.utils.ImageUtilKt
-import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
+//import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 import com.issyzone.syzbleprinter.databinding.ActivityMain2Binding
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
 import com.issyzone.syzbleprinter.utils.invokeViewModel
 import com.issyzone.syzbleprinter.viewmodel.ScanBleViewModel
-import com.orhanobut.logger.Logger
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,9 +34,9 @@ import kotlinx.coroutines.withContext
 class MainActivity2 :  ComponentActivity() {
     private val vb:ActivityMain2Binding by invokeViewBinding()
     private val vm:ScanBleViewModel by invokeViewModel()
-    val bleScanAdapter = BlueScanAdapter(){
-        vm.connectBleDevice(it)
-    }
+//    val bleScanAdapter = BlueScanAdapter(){
+//        vm.connectBleDevice(it)
+//    }
     fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
@@ -45,19 +45,19 @@ class MainActivity2 :  ComponentActivity() {
         setContentView(vb.root)
         vm.startBleService()
         initRecyclerView()
-        vm.getScanBleDevice(bleScanAdapter)
+       // vm.getScanBleDevice(bleScanAdapter)
        // ImageUtilKt.convertBinary(BitmapExt.test(), 128)
         SyzBleManager.getInstance().initBle()
         var bb=ImageUtilKt.convertBinary(BitmapExt.test(), 128)
-        Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
+      //  Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
         val bitmapArray = BitmapUtils.print(bb, bb.width, bb.height)
-        Logger.d(">>>>>AAA${ bitmapArray.size}")
+       // Logger.d(">>>>>AAA${ bitmapArray.size}")
         vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
         //vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
         vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapArray))
 
         SyzBleManager.getInstance().setActivelyReportBack {
-            Logger.v("主动上报的信息>>>>>>${it.toString()}")
+           // Logger.v("主动上报的信息>>>>>>${it.toString()}")
         }
 //        lifecycleScope.launch {
 //            //delay(40000)
@@ -88,7 +88,7 @@ class MainActivity2 :  ComponentActivity() {
 
     private fun initRecyclerView() {
         vb.listBle.layoutManager = LinearLayoutManager(this@MainActivity2)
-        vb.listBle.adapter = bleScanAdapter
+        //vb.listBle.adapter = bleScanAdapter
 
     }
 }

@@ -1,3 +1,5 @@
+import org.apache.commons.logging.LogFactory.release
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -19,8 +21,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -32,7 +33,7 @@ android {
         jvmTarget = "1.8"
     }
     viewBinding {
-        enable=true
+        enable = true
     }
 
 }
@@ -40,7 +41,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
-    api(libs.logger)
+
     implementation(libs.bundles.proto3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
@@ -50,14 +51,33 @@ dependencies {
 //plugins {
 //    id("io.objectbox") version "3.0.0" apply false
 //}
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            create<MavenPublication>("release") {
+//                from(components["release"])
+//                groupId = "com.issyzone.jx800r18_sdk"
+//                artifactId = "syz-editor"
+//                version = "v1.0.0-alpha"
+//            }
+//        }
+//        repositories {
+//            maven {
+//                url = uri("file:///D:\\BleLib")
+//            }
+//        }
+//    }
+//}
+
 afterEvaluate {
     publishing {
         publications {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = "com.issyzone.jx800r18_sdk"
-                artifactId = "syz-editor"
-                version = "v1.0.0-alpha"
+                groupId = "com.issyzone.sdk"
+                artifactId = "syz-device"
+                version = "v1.1.0-alpha"
+//                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
             }
         }
         repositories {
@@ -66,7 +86,14 @@ afterEvaluate {
             }
         }
     }
+//    repositories {
+//        maven {
+//            name = "JitPack"
+//            url = uri("https://jitpack.io/")
+//        }
+//    }
 }
+
 
 
 

@@ -1,7 +1,8 @@
 package com.issyzone.blelibs.fmBeans
 
+import android.util.Log
 import com.issyzone.blelibs.exception.BleException
-import com.orhanobut.logger.Logger
+
 
 //0 代表  notify打开失败
 //1 代表  notify 打开成功
@@ -12,7 +13,7 @@ data class FmNotifyBean(
 
     private fun bleDeviceError(mpRespondMsg: MPMessage.MPRespondMsg): MPMessage.MPCodeMsg {
         val deviceErrorInfo = MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())
-        Logger.e("设备问题>>>>${deviceErrorInfo.toString()}")
+        Log.e("设备问题>>>>","${deviceErrorInfo.toString()}")
         return deviceErrorInfo
     }
 
@@ -22,13 +23,13 @@ data class FmNotifyBean(
         activelyReport:((OrderResult, MPMessage.MPCodeMsg?) -> Unit)? = null,
     ) {
         val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(byteArray)
-        Logger.i("NOTIFY返回信息>>>>${mpRespondMsg.toString()}")
+        Log.i("NOTIFY返回信息>>>>","${mpRespondMsg.toString()}")
         when (mpRespondMsg.eventType) {
             MPMessage.EventType.DEVICEPRINT -> {
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("打印图片主动上报>>>>${deviceInfo.toString()}")
+                    Log.d("打印图片主动上报>>>>","${deviceInfo.toString()}")
                     orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     if (mpRespondMsg.respondData != null) {
@@ -51,20 +52,18 @@ data class FmNotifyBean(
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("设备状况主动上报>>>>${deviceInfo.toString()}")
+                   // Logger.d("设备状况主动上报>>>>${deviceInfo.toString()}")
 
 
 
                     if (deviceInfo.code==300&&deviceInfo.info=="1"){
-                        Logger.e("开始下一张打印")
+                      //  Logger.e("开始下一张打印")
                         //PrintBimapUtils.getInstance().removePrintWhenSuccess()
                     }
                      orderResult?.invoke(OrderResult.OrderActivelyReport, deviceInfo)
                 } else {
                     val deviceErrorInfo = MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())
-                    Logger.e("设备问题>>>>${deviceErrorInfo.toString()}")
-
-
+                    //Logger.e("设备问题>>>>${deviceErrorInfo.toString()}")
                     activelyReport?.invoke(OrderResult.OrderActivelyReport, bleDeviceError(mpRespondMsg))
                 }
             }
@@ -88,7 +87,7 @@ data class FmNotifyBean(
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("设置关机>>>>${deviceInfo.toString()}")
+                    //Logger.d("设置关机>>>>${deviceInfo.toString()}")
                     orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     orderResult?.invoke(OrderResult.OrderError, bleDeviceError(mpRespondMsg))
@@ -100,7 +99,7 @@ data class FmNotifyBean(
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("内容打印>>>>${deviceInfo.toString()}")
+                   // Logger.d("内容打印>>>>${deviceInfo.toString()}")
                     orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     bleDeviceError(mpRespondMsg)
@@ -113,7 +112,7 @@ data class FmNotifyBean(
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("打印速度>>>>${deviceInfo.toString()}")
+                   // Logger.d("打印速度>>>>${deviceInfo.toString()}")
                     orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     bleDeviceError(mpRespondMsg)
@@ -126,7 +125,7 @@ data class FmNotifyBean(
                 if (mpRespondMsg.code == 200) {
                     val deviceInfo =
                         MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-                    Logger.d("打印浓度>>>>${deviceInfo.toString()}")
+                    //Logger.d("打印浓度>>>>${deviceInfo.toString()}")
                     orderResult?.invoke(OrderResult.OrderSuccess, null)
                 } else {
                     bleDeviceError(mpRespondMsg)

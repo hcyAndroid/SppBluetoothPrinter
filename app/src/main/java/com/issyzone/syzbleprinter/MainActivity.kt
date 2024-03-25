@@ -1,10 +1,13 @@
 package com.issyzone.syzbleprinter
 
+import SyzPrinterState
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import com.issyzone.blelibs.BleManager
 import com.issyzone.blelibs.callback.SyzBleCallBack
 import com.issyzone.blelibs.data.BleDevice
+import com.issyzone.blelibs.dataimp.BlePrinterInfoCall
 import com.issyzone.blelibs.dataimp.DeviceBleInfoCall
 import com.issyzone.blelibs.dataimp.DeviceInfoCall
 import com.issyzone.blelibs.fmBeans.MPMessage
@@ -14,11 +17,10 @@ import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.blelibs.utils.SYZFileUtils
 import com.issyzone.syzbleprinter.databinding.ActivityMainBinding
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
-import com.orhanobut.logger.Logger
+
 
 class MainActivity : ComponentActivity() {
     private val vm: ActivityMainBinding by invokeViewBinding()
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,47 +30,55 @@ class MainActivity : ComponentActivity() {
         SyzBleManager.getInstance().initBle()
     }
 
-    val pair = Pair("RW402B", "DD:0D:30:00:02:E5")
-    val pair1 = Pair("FM226", "03:25:65:DF:0B:0C")
+    // val pair = Pair("RW402B", "DD:0D:30:00:02:E5")
+    val pair = Pair("FM226", "03:25:65:DF:0B:0C")
     private fun initRecyclerView() {
         SyzBleManager.getInstance().setBleCallBack(object : SyzBleCallBack {
             override fun onStartConnect() {
-                Logger.d("当前线程名onStartConnect：${Thread.currentThread().name}")
+                Log.d("", "当前线程名onStartConnect：${Thread.currentThread().name}")
             }
 
             override fun onConnectFail(bleDevice: BleDevice?, msg: String) {
-                Logger.d("当前线程名onConnectFail：${Thread.currentThread().name}")
+                Log.d("", "当前线程名onConnectFail：${Thread.currentThread().name}")
             }
 
             override fun onConnectFailNeedUserRestart(bleDevice: BleDevice?, msg: String) {
-                Logger.d("当前线程名onConnectFailNeedUserRestart：${Thread.currentThread().name}")
+                Log.d("", "当前线程名onConnectFailNeedUserRestart：${Thread.currentThread().name}")
             }
 
             override fun onConnectSuccess(bleDevice: BleDevice?) {
-                Logger.d("当前线程名onConnectSuccess：${Thread.currentThread().name}")
+                Log.d("", "当前线程名onConnectSuccess：${Thread.currentThread().name}")
             }
 
             override fun onDisConnected(device: BleDevice?) {
-                Logger.d("当前线程名onDisConnected：${Thread.currentThread().name}")
+                Log.d("", "当前线程名onDisConnected：${Thread.currentThread().name}")
             }
 
         })
         SyzBleManager.getInstance().setActivelyReportBack {
-            Logger.d("主动上报>>>>${it.toString()}")
+            Log.d("", "主动上报>>>>${it.toString()}")
+            when (it) {
+                SyzPrinterState.PRINTER_LID_OPEN -> {
+                    Log.d("", "主动上报>>>>开盖")
+                }
+
+                else -> {
+
+                }
+            }
         }
         vm.tvConnect.setOnClickListener {
             //RW402B,DD:0D:30:00:02:E5
             //03:25:65:DF:0B:0C  FM226
-
             SyzBleManager.getInstance().connectBle(pair.first, pair.second)
         }
 
         vm.tvDisconnect.setOnClickListener {
-            if (SyzBleManager.getInstance().isBleConnected()){
-                Logger.d("判断蓝牙是否已经连接>>>>${SyzBleManager.getInstance().isBleConnected()}")
+            if (SyzBleManager.getInstance().isBleConnected()) {
+                Log.d("", "判断蓝牙是否已经连接>>>>${SyzBleManager.getInstance().isBleConnected()}")
                 SyzBleManager.getInstance().disconnectBle()
-            }else{
-                Logger.d("判断蓝牙没有连接")
+            } else {
+                Log.d("", "判断蓝牙没有连接")
                 SyzBleManager.getInstance().connectBle(pair.first, pair.second)
             }
 
@@ -76,7 +86,7 @@ class MainActivity : ComponentActivity() {
         vm.tvCheck.setOnClickListener {
             SyzBleManager.getInstance().getDeviceInfo(object : DeviceInfoCall {
                 override fun getDeviceInfo(msg: MPMessage.MPDeviceInfoMsg) {
-                    Logger.d("获取设备信息${msg.toString()}")
+                    Log.d("", "获取设备信息${msg.toString()}")
                 }
 
                 override fun getDeviceInfoError(errorMsg: MPMessage.MPCodeMsg) {
@@ -84,13 +94,14 @@ class MainActivity : ComponentActivity() {
                 }
             })
         }
+
         vm.tvSelfChecking.setOnClickListener {
-            SyzBleManager.getInstance().writeSelfCheck(object : DeviceBleInfoCall {
-                override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
+            SyzBleManager.getInstance().writeSelfCheck(object : BlePrinterInfoCall {
+                override fun getBleNotifyInfo(isSuccess: Boolean, msg: SyzPrinterState) {
                     if (isSuccess) {
-                        Logger.d("打印自检页成功>>>>${msg.toString()}")
+                        Log.d("", "打印自检页成功>>>>${msg.toString()}")
                     } else {
-                        Logger.d("打印自检页失败>>>>${msg.toString()}")
+                        Log.d("", "打印自检页失败>>>>${msg.toString()}")
                     }
                 }
             })
@@ -99,9 +110,9 @@ class MainActivity : ComponentActivity() {
             SyzBleManager.getInstance().writeShutdown(2, object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
-                        Logger.d("设置关机时间成功>>>>${msg.toString()}")
+                        Log.d("", "设置关机时间成功>>>>${msg.toString()}")
                     } else {
-                        Logger.d("设置关机时间失败>>>>${msg.toString()}")
+                        Log.d("", "设置关机时间失败>>>>${msg.toString()}")
                     }
                 }
             })
@@ -110,9 +121,9 @@ class MainActivity : ComponentActivity() {
             SyzBleManager.getInstance().writeCancelPrinter(object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
-                        Logger.d("取消打印成功>>>>${msg.toString()}")
+                        Log.d("", "取消打印成功>>>>${msg.toString()}")
                     } else {
-                        Logger.d("取消打印失败>>>>${msg.toString()}")
+                        Log.d("", "取消打印失败>>>>${msg.toString()}")
                     }
                 }
             })
@@ -121,9 +132,9 @@ class MainActivity : ComponentActivity() {
             SyzBleManager.getInstance().writePrintSpeed(2, object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
-                        Logger.d("设置打印速度成功>>>>${msg.toString()}")
+                        Log.d("", "设置打印速度成功>>>>${msg.toString()}")
                     } else {
-                        Logger.d("设置打印速度失败>>>>${msg.toString()}")
+                        Log.d("", "设置打印速度失败>>>>${msg.toString()}")
                     }
                 }
             })
@@ -132,37 +143,33 @@ class MainActivity : ComponentActivity() {
             SyzBleManager.getInstance().writePrintConcentration(4, object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
-                        Logger.d("设置打印浓度成功>>>>${msg.toString()}")
+                        Log.d("", "设置打印浓度成功>>>>${msg.toString()}")
                     } else {
-                        Logger.d("设置打印浓度失败>>>>${msg.toString()}")
+                        Log.d("", "设置打印浓度失败>>>>${msg.toString()}")
                     }
                 }
             })
         }
         vm.tvSetPrintImg.setOnClickListener {
-            Logger.d(
-                "FmBitmapPrinterUtils》》》bitmap字节数${
+            Log.d(
+                "", "FmBitmapPrinterUtils》》》bitmap字节数${
                     BitmapExt.bitmapToByteArray(
                         BitmapExt.decodeBitmap()
                     ).size
                 }"
             )
-            Logger.d("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT111")
+            Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT111")
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(), 128)
-            Logger.d("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT22222")
-//            SyzBleManager.getInstance().writeBitmap(
-//                bitmap,  1
-//            )
+            Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT22222")
+
 
             SyzBleManager.getInstance()
-                .writeBitmaps(mutableListOf(bitmap), 1, object : DeviceBleInfoCall {
-                    override fun getBleNotifyInfo(
-                        isSuccess: Boolean, msg: MPMessage.MPCodeMsg?
-                    ) {
+                .writeBitmaps(mutableListOf(bitmap), 3, object : BlePrinterInfoCall {
+                    override fun getBleNotifyInfo(isSuccess: Boolean, msg: SyzPrinterState) {
                         if (isSuccess) {
-                            Logger.d("全部图片下载成功")
+                            Log.i("图片打印成功>>>", msg.toString())
                         } else {
-                            Logger.e("全部图片下载失败>>>${msg?.toString()}")
+                            Log.i("图片打印失败>>>", msg.toString())
                         }
                     }
                 })
@@ -170,19 +177,27 @@ class MainActivity : ComponentActivity() {
         vm.tvDexUpdate.setOnClickListener {
             val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(1.1.0.0.8).bin")
             path?.apply {
-                SyzBleManager.getInstance().writeDex(this, object : DeviceBleInfoCall {
-                    override fun getBleNotifyInfo(
-                        isSuccess: Boolean, msg: MPMessage.MPCodeMsg?
-                    ) {
-                        if (isSuccess) {
-                            Logger.d("固件更新成功")
-                        }
+                SyzBleManager.getInstance().writeDex(this) {
+                    if (it==SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS){
+                        Log.d("", "固件更新成功")
+                    }else if (it==SyzPrinterState.PRINTER_DEXUPDATE_FAILED){
+                        Log.d("", "固件更新失败")
+                    }else{
+                        Log.d("", "固件更新其他异常")
                     }
-
-                })
+                }
             }
         }
+        object : DeviceBleInfoCall {
+            override fun getBleNotifyInfo(
+                isSuccess: Boolean, msg: MPMessage.MPCodeMsg?
+            ) {
+                if (isSuccess) {
+                    Log.d("", "固件更新成功")
+                }
+            }
 
+        }
 
     }
 

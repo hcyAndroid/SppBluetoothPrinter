@@ -1,6 +1,7 @@
 package com.issyzone.blelibs.data;
 
 
+import android.bluetooth.BluetoothGattCharacteristic;
 
 public class BleMsg {
 
@@ -37,6 +38,7 @@ public class BleMsg {
     public static final String KEY_WRITE_BUNDLE_STATUS = "write_status";
     public static final String KEY_WRITE_BUNDLE_VALUE = "write_value";
 
+    public static final String KEY_WRITE_TYPE = "write_type";
     // Read
     public static final int MSG_CHA_READ_START = 0x41;
     public static final int MSG_CHA_READ_RESULT = 0x42;

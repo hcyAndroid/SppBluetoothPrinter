@@ -1,7 +1,8 @@
 package com.issyzone.blelibs.utils
 
 import android.app.Application
-import com.orhanobut.logger.Logger
+import android.util.Log
+
 
 private var applications: Application? = null
 
@@ -16,7 +17,7 @@ object AppGlobels {
                         .invoke(null, *emptyArray()) as Application
             }.onFailure {
                 it.printStackTrace()
-                Logger.e(TAG, "反射application失败")
+                Log.e(TAG, "反射application失败")
             }
         }
         return applications!!

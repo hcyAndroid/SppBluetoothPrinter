@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.issyzone.blelibs.callback.BleMtuChangedCallback
 import com.issyzone.blelibs.callback.BleScanCallback
@@ -13,8 +14,6 @@ import com.issyzone.blelibs.data.BleDevice
 import com.issyzone.blelibs.exception.BleException
 import com.issyzone.blelibs.scan.BleScanRuleConfig
 import com.issyzone.blelibs.utils.AppGlobels
-import com.orhanobut.logger.AndroidLogAdapter
-import com.orhanobut.logger.Logger
 import java.nio.charset.Charset
 import java.util.UUID
 
@@ -35,7 +34,6 @@ object SYZBleUtils {
     }
 
     fun initBle(needScan:Boolean=false) {
-        Logger.addLogAdapter(AndroidLogAdapter())
         BleManager.getInstance().init(AppGlobels.getApplication());
         BleManager.getInstance().enableLog(true)
             .setReConnectCount(0, 10000).operateTimeout = 5000
@@ -59,12 +57,12 @@ object SYZBleUtils {
     fun scanBle() {
        BleManager.getInstance().scan(object : BleScanCallback() {
            override fun onScanStarted(success: Boolean) {
-               Logger.d("${TAG}扫描开始${success}")
+               Log.d("$TAG","扫描开始${success}")
            }
 
 
            override fun onScanning(bleDevice: BleDevice?) {
-               Logger.d("${TAG}扫描中${bleDevice?.device?.name}===${bleDevice?.device?.address}")
+               Log.d("$TAG","扫描中${bleDevice?.device?.name}===${bleDevice?.device?.address}")
            }
 
            override fun onScanFinished(scanResultList: MutableList<BleDevice>?) {
@@ -77,7 +75,7 @@ object SYZBleUtils {
 //                    }
 //                    tag.toString()
 //                }
-               Logger.d("${TAG}扫描结束==${scanResultList?.size ?: 0}")
+               Log.d("$TAG","扫描结束==${scanResultList?.size ?: 0}")
 
                if (scanResultList.isNullOrEmpty()){
                    scanBleResultLiveData.postValue(mutableListOf())
@@ -138,6 +136,22 @@ object SYZBleUtils {
             }.toMutableList()
             if (!characList.isNullOrEmpty()){
                return Pair(serviceList[0].uuid,characList[0])
+            }
+        }
+        return null
+    }
+
+
+    fun getABF4Charac(gatt: BluetoothGatt?):Pair<UUID, BluetoothGattCharacteristic>?{
+        val serviceList= gatt?.services?.filter {
+            it.uuid.toString().lowercase().startsWith(FMPrinter.Charac_ABF4.serviceId.lowercase())
+        }?.toMutableList()
+        if (!serviceList.isNullOrEmpty()){
+            val characList= serviceList[0].characteristics.filter {
+                it.uuid.toString().lowercase().startsWith(FMPrinter.Charac_ABF4.characterid.lowercase())
+            }.toMutableList()
+            if (!characList.isNullOrEmpty()){
+                return Pair(serviceList[0].uuid,characList[0])
             }
         }
         return null

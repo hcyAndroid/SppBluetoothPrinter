@@ -4,8 +4,6 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattService
 import com.issyzone.blelibs.FMPrinter
 import com.issyzone.blelibs.data.BleDevice
-import com.issyzone.blelibs.utils.AppGlobels
-import com.orhanobut.logger.Logger
 import java.util.UUID
 
 

@@ -17,7 +17,7 @@ import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.blelibs.utils.SYZFileUtils
 import com.issyzone.blelibs.utils.SYZFileUtils.copyAssetGetFilePath
-import com.orhanobut.logger.Logger
+//import com.orhanobut.logger.Logger
 import kotlinx.coroutines.GlobalScope
 
 
@@ -69,7 +69,7 @@ class BlueScanAdapter(var click: (ble: BleDevice) -> Unit) :
 
 
             vm.tvSetPrintImg.setOnClickListener {
-                Logger.d("FmBitmapPrinterUtils》》》bitmap字节数${BitmapExt.bitmapToByteArray(BitmapExt.decodeBitmap()).size}")
+               // Logger.d("FmBitmapPrinterUtils》》》bitmap字节数${BitmapExt.bitmapToByteArray(BitmapExt.decodeBitmap()).size}")
                 val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(), 128)
                 FmBitmapOrDexPrinterUtils.writeBitmap(
                     bitmap, bitmap.width, bitmap.height, 1

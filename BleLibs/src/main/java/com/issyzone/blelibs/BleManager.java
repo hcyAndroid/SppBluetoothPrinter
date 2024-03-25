@@ -49,13 +49,13 @@ public class BleManager {
 
     public static final int DEFAULT_SCAN_TIME = 10000;
     private static final int DEFAULT_MAX_MULTIPLE_DEVICE = 7;
-    private static final int DEFAULT_OPERATE_TIME = 5000;
+    private static final int DEFAULT_OPERATE_TIME = 10000;
     private static final int DEFAULT_CONNECT_RETRY_COUNT = 0;
     private static final int DEFAULT_CONNECT_RETRY_INTERVAL = 5000;
     private static final int DEFAULT_MTU = 23;
     private static final int DEFAULT_MAX_MTU = 512;
     private static final int DEFAULT_WRITE_DATA_SPLIT_COUNT = 130;
-    private static final int DEFAULT_CONNECT_OVER_TIME = 10000;
+    private static final int DEFAULT_CONNECT_OVER_TIME = 100000;
 
     private int maxConnectCount = DEFAULT_MAX_MULTIPLE_DEVICE;
     private int operateTimeout = DEFAULT_OPERATE_TIME;
@@ -577,6 +577,24 @@ public class BleManager {
         write(bleDevice, uuid_service, uuid_write, data, split, true, 0, callback, false);
     }
 
+    public static int sos_otaCalculateCrc(int beforeCrc, byte[] src, int len) {
+        int crc = beforeCrc;
+
+        int index = 0;
+        while (len-- != 0) {
+            byte i = (byte) 0x80;
+            while (i != 0) {
+                crc *= 2;
+                if ((crc & 0x10000) != 0)
+                    crc ^= 0x11021;
+                if ((src[index] & i) != 0)
+                    crc ^= 0x1021;
+                i = (byte) (i / 2);
+            }
+            index++;
+        }
+        return crc;
+    }
 
     public void writeWithNoResponse(BleDevice bleDevice, String uuid_service, String uuid_write, byte[] data, BleWriteCallback callback) {
 
@@ -600,6 +618,26 @@ public class BleManager {
             callback.onWriteFailure(new OtherException("This device not connect!"));
         } else {
             bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic2(data, callback, uuid_write);
+        }
+    }
+
+    public void writeWithNoResponse3(BleDevice bleDevice, String uuid_service, String uuid_write,BluetoothGattCharacteristic characteristic, byte[] data, BleWriteCallback callback) {
+
+        if (callback == null) {
+            throw new IllegalArgumentException("BleWriteCallback can not be Null!");
+        }
+
+        if (data == null) {
+            BleLog.e("data is Null!");
+            callback.onWriteFailure(new OtherException("data is Null!"));
+            return;
+        }
+
+        BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+        if (bleBluetooth == null) {
+            callback.onWriteFailure(new OtherException("This device not connect!"));
+        } else {
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic3(data, callback, uuid_write,characteristic);
         }
     }
 

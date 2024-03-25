@@ -50,8 +50,17 @@ android {
     viewBinding {
         enable=true
     }
+//    repositories {
+//        flatDir {
+//            dirs("libs")     // 声明添加libs文件夹为库
+//        }
+//    }
 }
 
+val libsDir = file("libs")
+val arrAar = fileTree(libsDir) {
+    include("syz-device-v1.0.4-alpha.aar")
+}
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -64,12 +73,20 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
+    //implementation(files(arrJars))
+    //implementation(files(arrAar))
+
+   // api(libs.logger)
+    api(libs.bundles.proto3)
+   // implementation(files(fileTree(libsDir) { include("arr*.jar") }))
     implementation(project(":BleLibs"))
     implementation(libs.recyclerview)
+     implementation(libs.logger)
   //  implementation(libs.baserecyclerviewadapterhelper4)
     implementation(libs.appcompat)
     implementation(libs.page.runtime)
-    implementation(libs.bundles.proto3)
+//    implementation(libs.bundles.proto3)
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))

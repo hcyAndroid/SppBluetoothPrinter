@@ -5,7 +5,7 @@ import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import com.orhanobut.logger.Logger
+
 
 
 object SYZBlePermission {
@@ -36,15 +36,15 @@ object SYZBlePermission {
             val allGranted = permissions.all { it.value }
             if (allGranted) {
                 // 所有权限均已授予
-                Logger.d(">>>>>所有的权限已经授予")
+               // Logger.d(">>>>>所有的权限已经授予")
                 //startBluetoothScan()
                 call.invoke()
             } else {
                 // 有权限被拒绝，您可以向用户显示一个提示或者禁用相应功能
-                Logger.d(">>>>>所有的权限没有授予")
+                //Logger.d(">>>>>所有的权限没有授予")
                 if (permissionToRequest.any { !permissions[it]!! }) {
                     // AppGlobels.showAppSettings(context)
-                    Logger.d("${TAG}需要手动设置权限")
+                    //Logger.d("${TAG}需要手动设置权限")
                 }
             }
         }
