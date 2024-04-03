@@ -1,6 +1,7 @@
 *.iml
 .gradle
-.idea
+/.idea
+/.idea/sonarlint/
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -15,3 +16,4 @@
 .cxx
 local.properties
 gradle.properties
+

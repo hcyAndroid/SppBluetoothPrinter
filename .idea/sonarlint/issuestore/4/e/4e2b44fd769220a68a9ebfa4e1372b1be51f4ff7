@@ -1,23 +1,0 @@
-
-Œ	java:S117O"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êßÿªJ$e9035bad-0cd5-41f8-8023-931f2d78d3e8
-“	java:S116"XRename this field "MAX_PACK_SIZE" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œª°ÈJ$a669be05-99c7-4da7-a6f0-32c3973dbd0c
-	java:S116"PRename this field "STX_L" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(»ÖÜÿÿÿÿÿJ$7040f339-0c0c-4052-8169-c0eca9445415
-•	java:S116	"URename this field "RET_FAILED" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(î³«ĞÿÿÿÿÿJ$e6523906-27c6-4c1a-a40a-c5e45572cdd4
-–	java:S116
-"VRename this field "RET_SUCCESS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(é¯ØÑıÿÿÿÿJ$7be33126-6c7b-46c4-a4ee-945bbf9096ad
-–	java:S116"VRename this field "RET_PROCESS" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¯ï¤üıÿÿÿÿJ$e656db5a-b5d3-43b4-92a7-35e9f5a5d693
-]
-java:S1170"!Make this final field static too.(œª°ÈJ$72997d82-a99a-41b4-85a7-c300dea5d93a
-b
-java:S1170"!Make this final field static too.(»ÖÜÿÿÿÿÿJ$516b80d4-f694-4919-8794-58c72d239b8f
-b
-java:S1170	"!Make this final field static too.(î³«ĞÿÿÿÿÿJ$3bb07daf-30df-4f83-a857-1481c95ddde7
-b
-java:S1170
-"!Make this final field static too.(é¯ØÑıÿÿÿÿJ$cffeb4bd-f429-4bc8-acb8-cb059ada0070
-b
-java:S1170"!Make this final field static too.(¯ï¤üıÿÿÿÿJ$42b9d0b3-75eb-47f0-9397-31cdc1f28f9c
-
-java:S37767"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(ÔõıJ$79b10f86-dfad-41b1-8675-f89a84604b65
-k
-java:S1197s"*Move the array designators [] to the type.(óÜõùÿÿÿÿJ$7405f3a9-6eff-48af-a2ce-6f1c057e245d

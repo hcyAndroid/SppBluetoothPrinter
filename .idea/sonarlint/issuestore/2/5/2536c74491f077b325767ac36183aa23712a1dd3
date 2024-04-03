@@ -1,23 +1,0 @@
-
-kotlin:S6615ò";Remove this variable, which is assigned but never accessed.(Á–ú›8€ì×úæ1J$c93697b1-679c-4dd4-a640-90ada7402f82
-lkotlin:S6615ù"&The value assigned here is never used.(­­ÆÄ8æğÍ€ç1J$0a03665d-216e-4345-9af8-991310ef54d5
-fkotlin:S6615" Remove this useless initializer.(Á–ú›8ì×úæ1J$3003e409-4faa-449f-beb5-bdec5285e74f
-‚kotlin:S6619¥"7Remove this useless non-null check, it always succeeds.(×ç‡‰øÿÿÿÿ8ü‡‰ÿæ1J$2d922560-0f56-4fe5-b682-b872e1760ac3
-ikotlin:S125ç"Remove this commented out code.(üúĞÿÿÿÿÿ8„ì×úæ1J$f0b30834-51b0-4f15-a3d6-04d5ab81f3ba
-dkotlin:S125û"Remove this commented out code.(†¼Îü8êğÍ€ç1J$1799b453-af2f-4fbb-bc74-7dcf655b530e
-˜kotlin:S117â"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(™Œ”›8‡ì×úæ1J$068fc24b-fc25-40e8-b29a-5471b4f005d0
-kotlin:S117"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(¯›Çùÿÿÿÿ8ì×úæ1J$c509b5c1-b4e1-4edc-a04e-911e46be92bd
-˜kotlin:S117Ã"SRename this local variable to match the regular expression ^`?[_a-z][a-zA-Z0-9]*`?$(ùÎòò8ì×úæ1J$f98d4f35-a867-4441-971d-ee2bc2833b82
-bkotlin:S6310¾"Avoid hardcoded dispatchers.(ÏÃâ8ì×úæ1J$ffc6087f-cbc2-436e-ae17-fb4fe7022ec9
-akotlin:S6310["Avoid hardcoded dispatchers.(Í¡·Ş8ì×úæ1J$6e9df341-dfea-49c9-a157-3a831f63d3f9
-bkotlin:S6310ı"Avoid hardcoded dispatchers.(Ô¥‚ü8ì×úæ1J$2797f882-e099-400f-82bd-5cec343247fe
-akotlin:S6310}"Avoid hardcoded dispatchers.(Ô¥‚ü8ì×úæ1J$f579733d-1bd2-40bb-8412-11bb6c6d2b9c
-akotlin:S6310y"Avoid hardcoded dispatchers.(ùŠö8ì×úæ1J$3193da5e-8ccc-431b-8767-41c8238e3325
-bkotlin:S6310Š"Avoid hardcoded dispatchers.(Í¡·Ş8ì×úæ1J$9a7002cc-6791-4367-ac4e-952426283f88
-–kotlin:S6311y"QRemove this dispatcher. It is pointless when used with only suspending functions.(ùŠö8ì×úæ1J$e2db9e1b-48f0-438b-b4a6-4c1d20fe8740
-dkotlin:S1128$"Remove this unused import.( í»Òùÿÿÿÿ8¢ì×úæ1J$fa3812e1-584e-444f-a6f6-3987b9e89035
-dkotlin:S1128&"Remove this unused import.(ûê†¶úÿÿÿÿ8¢ì×úæ1J$82172db3-551e-4b92-a939-c2892e105166
-kotlin:S3776½"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(±ÕÖˆøÿÿÿÿ8§ì×úæ1J$a7a1ca32-fdb3-4b82-a871-3c818de92726
-jkotlin:S6524ñ"Make this collection immutable.(¸·Ó€ûÿÿÿÿ8©ì×úæ1J$35a1669b-f816-4409-9ba9-a81d5cda5966
-jkotlin:S6524"Make this collection immutable.(é•¢ïşÿÿÿÿ8©ì×úæ1J$0401e18e-e189-4af7-a164-a1025655ae3c
-ykotlin:S1066¤".Merge this "if" statement with the nested one.(üòšªúÿÿÿÿ8­ì×úæ1J$b0590967-2a92-4ffb-a8cb-ccef394a5bf9
