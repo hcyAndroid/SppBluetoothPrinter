@@ -17,6 +17,7 @@ import android.os.Build;
 import android.os.Looper;
 
 import com.issyzone.blelibs.bluetooth.BleBluetooth;
+import com.issyzone.blelibs.bluetooth.BleConnector;
 import com.issyzone.blelibs.bluetooth.MultipleBluetoothController;
 import com.issyzone.blelibs.bluetooth.SplitWriter;
 import com.issyzone.blelibs.callback.BleGattCallback;
@@ -410,6 +411,10 @@ public class BleManager {
 //        notify(bleDevice, uuid_service, uuid_notify, true, characteristic,callback);
 //    }
 
+    public  BleBluetooth getMyBleBluetooth(BleDevice device){
+      return  multipleBluetoothController.getBleBluetooth(device);
+    }
+
     /**
      * notify
      *
@@ -432,7 +437,7 @@ public class BleManager {
         }
     }
 
-    public void notify2(BleDevice bleDevice, String uuid_service, String uuid_notify, BluetoothGattCharacteristic bluetoothGattCharacteristic, BleNotifyCallback callback) {
+    public void notify2(BleDevice bleDevice, String uuid_service, BluetoothGattCharacteristic bluetoothGattCharacteristic, BleNotifyCallback callback) {
         if (callback == null) {
             throw new IllegalArgumentException("BleNotifyCallback can not be Null!");
         }
@@ -441,7 +446,7 @@ public class BleManager {
         if (bleBluetooth == null) {
             callback.onNotifyFailure(new OtherException("This device not connect!"));
         } else {
-            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).enableCharacteristicNotify2(callback, uuid_notify, bluetoothGattCharacteristic);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, bluetoothGattCharacteristic.getUuid().toString()).enableCharacteristicNotify2(callback, bluetoothGattCharacteristic.getUuid().toString(), bluetoothGattCharacteristic);
         }
     }
 
@@ -506,6 +511,18 @@ public class BleManager {
             return false;
         }
         boolean success = bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).disableCharacteristicNotify(useCharacteristicDescriptor);
+        if (success) {
+            bleBluetooth.removeNotifyCallback(uuid_notify);
+        }
+        return success;
+    }
+
+    public boolean stopNotify2(BleDevice bleDevice, String uuid_service, String uuid_notify, BluetoothGattCharacteristic characteristic) {
+        BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+        if (bleBluetooth == null) {
+            return false;
+        }
+        boolean success = bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_notify).disableCharacteristicNotify2(true, characteristic);
         if (success) {
             bleBluetooth.removeNotifyCallback(uuid_notify);
         }
@@ -585,10 +602,8 @@ public class BleManager {
             byte i = (byte) 0x80;
             while (i != 0) {
                 crc *= 2;
-                if ((crc & 0x10000) != 0)
-                    crc ^= 0x11021;
-                if ((src[index] & i) != 0)
-                    crc ^= 0x1021;
+                if ((crc & 0x10000) != 0) crc ^= 0x11021;
+                if ((src[index] & i) != 0) crc ^= 0x1021;
                 i = (byte) (i / 2);
             }
             index++;
@@ -621,25 +636,48 @@ public class BleManager {
         }
     }
 
-    public void writeWithNoResponse3(BleDevice bleDevice, String uuid_service, String uuid_write,BluetoothGattCharacteristic characteristic, byte[] data, BleWriteCallback callback) {
+    public void writeWithNoResponse3(BleDevice bleDevice, String uuid_service, String uuid_write, BluetoothGattCharacteristic characteristic, byte[] data, BleWriteCallback callback) {
 
         if (callback == null) {
             throw new IllegalArgumentException("BleWriteCallback can not be Null!");
         }
 
-        if (data == null) {
-            BleLog.e("data is Null!");
-            callback.onWriteFailure(new OtherException("data is Null!"));
-            return;
-        }
+//        if (data == null) {
+//            BleLog.e("data is Null!");
+//            callback.onWriteFailure(new OtherException("data is Null!"));
+//            return;
+//        }
 
         BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
         if (bleBluetooth == null) {
             callback.onWriteFailure(new OtherException("This device not connect!"));
         } else {
-            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic3(data, callback, uuid_write,characteristic);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic3(data, callback, uuid_write, characteristic);
         }
     }
+
+
+    private BleConnector mBleConnector = null;
+
+    public void writeWithNoResponse4(BleDevice bleDevice, String uuid_service, String uuid_write, BluetoothGattCharacteristic characteristic, byte[] data, BleWriteCallback callback) {
+
+        if (callback == null) {
+            throw new IllegalArgumentException("BleWriteCallback can not be Null!");
+        }
+        if (mBleConnector == null) {
+            BleBluetooth bleBluetooth = multipleBluetoothController.getBleBluetooth(bleDevice);
+            if (bleBluetooth == null) {
+                mBleConnector = null;
+            } else {
+                mBleConnector = bleBluetooth.newBleConnector().withUUIDString(uuid_service, characteristic.getUuid().toString());
+
+            }
+        }
+        if (mBleConnector != null) {
+            mBleConnector.writeCharacteristic4(data, characteristic);
+        }
+    }
+
 
     /**
      * write
@@ -695,9 +733,7 @@ public class BleManager {
         if (bleBluetooth == null) {
             callback.onWriteFailure(new OtherException("This device not connect!"));
         } else {
-            bleBluetooth.newBleConnector()
-                    .withUUIDString(uuid_service, uuid_write).
-                    writeCharacteristic(data, callback, uuid_write, isWriteWithNoResponse);
+            bleBluetooth.newBleConnector().withUUIDString(uuid_service, uuid_write).writeCharacteristic(data, callback, uuid_write, isWriteWithNoResponse);
         }
     }
 

@@ -1,13 +1,13 @@
 
 p
-java:S1121’".Extract the assignment out of this expression.(¹ØÖ²ùÿÿÿÿJ$4ab81a08-762d-4c25-803a-746cba702aab
+java:S1121’".Extract the assignment out of this expression.(¹ØÖ²ùÿÿÿÿJ$0b2f689d-9b8a-449d-97ed-e16eaa8de8bb
 p
-java:S1121”".Extract the assignment out of this expression.(úŒÿ¬üÿÿÿÿJ$1c54ddf9-29b2-4775-9d6c-b5bf5291365c
-‘	java:S1172"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$ac4766c0-80a7-4afb-92f7-908cd3ca1ff2
-‘	java:S1173"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…‘¼ÜşÿÿÿÿJ$02d90f96-02af-4b96-b171-8265ba9df204
+java:S1121”".Extract the assignment out of this expression.(úŒÿ¬üÿÿÿÿJ$dfde8ca5-0e76-4efc-83ad-22499c56ba48
+‘	java:S1172"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(˜ö½ıÿÿÿÿJ$9db41565-c366-4e94-8eae-58c2435dcf54
+‘	java:S1173"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…‘¼ÜşÿÿÿÿJ$2e56eb47-5778-4324-a87b-718e82b46e43
 ~
-java:S2184‰"ACast one of the operands of this addition operation to a "float".(ı†Õ²J$6dcd5cdc-ba70-442e-bdf3-3fa0dc93b148
-˜	java:S116"XRename this field "mUuid_service" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¼ê“øûÿÿÿÿJ$209cf0f5-22e2-4716-93e3-5bab11a6cc1a
-‘	java:S116"VRename this field "mUuid_write" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÊÌã›J$378c2639-a37d-4df8-8001-2f6d1154016b
+java:S2184‰"ACast one of the operands of this addition operation to a "float".(ı†Õ²J$80f00f56-2737-4827-b984-aa7c541e990b
+˜	java:S116"XRename this field "mUuid_service" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¼ê“øûÿÿÿÿJ$d35904f5-95a1-4c7c-8432-5f0d3eaa8800
+‘	java:S116"VRename this field "mUuid_write" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÊÌã›J$b1002e4f-814a-471e-b234-9cbddbbbb6cd
 i
-java:S2185‰",Remove this unnecessary call to "Math.round"(ı†Õ²J$55eb2caf-971d-433d-9e27-a0101a41893e
+java:S2185‰",Remove this unnecessary call to "Math.round"(ı†Õ²J$0f898a98-2d3f-4279-a404-0244df8c8082

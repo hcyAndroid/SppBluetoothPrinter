@@ -19,7 +19,7 @@ object BitmapExt {
         return BitmapFactory.decodeResource(AppGlobels.getApplication().resources, drawableId)
     }
 
-    fun decodeBitmap(drawableId: Int = R.drawable.test3): Bitmap {
+    fun decodeBitmap(drawableId: Int = R.drawable.test5): Bitmap {
         // 通过资源 ID 获取原始图片的字节数组
         val inputStream = AppGlobels.getApplication().resources.openRawResource(drawableId)
         val byteArray = inputStream.readBytes()

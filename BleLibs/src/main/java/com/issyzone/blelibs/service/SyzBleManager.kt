@@ -1,15 +1,14 @@
 package com.issyzone.blelibs.service
 
-import SyzPrinterState
 import android.bluetooth.BluetoothGatt
-
+import android.bluetooth.BluetoothGattCharacteristic
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.protobuf.ByteString
 import com.issyzone.blelibs.BleManager
 import com.issyzone.blelibs.FMPrinter
 import com.issyzone.blelibs.SYZBleUtils
-
+import com.issyzone.blelibs.bluetooth.BleBluetooth
 import com.issyzone.blelibs.bluetooth.FMBle
 import com.issyzone.blelibs.callback.BleGattCallback
 import com.issyzone.blelibs.callback.BleMtuChangedCallback
@@ -19,10 +18,12 @@ import com.issyzone.blelibs.callback.SyzBleCallBack
 import com.issyzone.blelibs.data.BLE_CONNECT_ERROR_MSG
 import com.issyzone.blelibs.data.BLE_CONNECT_ERROR_MSG2
 import com.issyzone.blelibs.data.BleDevice
+import com.issyzone.blelibs.data.SyzPrinterState
+import com.issyzone.blelibs.data.SyzPrinterState2
 import com.issyzone.blelibs.dataimp.BlePrinterInfoCall
+import com.issyzone.blelibs.dataimp.BlePrinterInfoCall2
 import com.issyzone.blelibs.dataimp.DeviceBleInfoCall
 import com.issyzone.blelibs.dataimp.DeviceInfoCall
-
 import com.issyzone.blelibs.exception.BleException
 import com.issyzone.blelibs.fmBeans.FMPrinterOrder
 import com.issyzone.blelibs.fmBeans.FmBitmapOrDexPrinterUtils
@@ -33,7 +34,6 @@ import com.issyzone.blelibs.fmBeans.NotifyResult
 import com.issyzone.blelibs.fmBeans.NotifyResult2
 import com.issyzone.blelibs.fmBeans.PrintBimapUtils
 import com.issyzone.blelibs.upacker.Upacker
-import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.BitmapUtils
 import com.issyzone.blelibs.utils.fileToByteArray
 import com.issyzone.blelibs.utils.isExtension
@@ -42,11 +42,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -63,6 +67,7 @@ class SyzBleManager {
         private var bitScope: CoroutineScope? = null
         private var dexScope: CoroutineScope? = null
         private var bleisConencted: Boolean = false
+        private val currentPrintStatusFlow = MutableSharedFlow<SyzPrinterState2>()
         fun getInstance(): SyzBleManager {
             if (instance == null) {
                 instance = SyzBleManager()
@@ -91,6 +96,7 @@ class SyzBleManager {
 
     /**
      * func:判断蓝牙是否连接
+     * 这里指notify打开成功
      */
     fun isBleConnected(): Boolean {
         if (fmBle != null && fmBle?.bleDevice != null) {
@@ -100,41 +106,110 @@ class SyzBleManager {
         }
     }
 
+    //蓝牙连接回调
     private var bleCallBack: SyzBleCallBack? = null;
     fun setBleCallBack(bleCallBack: SyzBleCallBack) {
         this.bleCallBack = bleCallBack
     }
 
+    //ble连接状态的回调
     private var bleNotifyCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
-    private var activelyReportCallBack: ((msg: SyzPrinterState) -> Unit)? = null
-    private var currentOrderEventType: MPMessage.EventType? = null
+    //主动回调
+    private var activelyReportCallBack: ((msg: SyzPrinterState2) -> Unit)? = null
+
+    // private var currentOrderEventType: MPMessage.EventType? = null
+    //电池电量
     private var batteryReportCallBack: ((msg: SyzPrinterState) -> Unit)? = null
 
-    fun setActivelyReportBack(activelyReport: ((msg: SyzPrinterState) -> Unit)) {
+    /**
+     * 主动上报的回调
+     */
+    fun setActivelyReportBack(activelyReport: ((msg: SyzPrinterState2) -> Unit)) {
         this.activelyReportCallBack = activelyReport
     }
 
+    /**
+     * 电池电量的回调
+     */
     fun setBatteryReportBack(batteryReportCallBack: ((msg: SyzPrinterState) -> Unit)) {
         this.batteryReportCallBack = batteryReportCallBack
     }
 
+
+    /**
+     * 关闭notify通道
+     */
+    private fun stopNotify() {
+        if (fmBle != null) {
+            val notifyGatte = SYZBleUtils.getNotifyCharac(fmBle?.gatt)
+            BleManager.getInstance().stopNotify2(
+                fmBle?.bleDevice,
+                notifyGatte?.first.toString(),
+                notifyGatte?.second?.uuid?.toString(),
+                notifyGatte?.second
+            )
+            Log.i(TAG, "==stopNotify====")
+        }
+    }
+
+    /**
+     * 断开ble
+     */
     fun disconnectBle() {
-        BleManager.getInstance().disconnect(fmBle?.bleDevice)
+        stopNotify()
         if (serviceScope != null && serviceScope!!.isActive) {
             serviceScope!!.cancel()
         }
         if (bitScope != null && bitScope!!.isActive) {
             bitScope!!.cancel()
         }
-
         if (dexScope != null && dexScope!!.isActive) {
             dexScope!!.cancel()
         }
-
-        //instance = null
+        // BleManager.getInstance().disconnect(fmBle?.bleDevice)
+        BleManager.getInstance().disconnectAllDevice()
     }
 
+    //重试notify的次数
+    private var retryNotifyTime = 0
+    private suspend fun actionNotifyTask() {
+        withContext(Dispatchers.IO) {
+            //注测读取通道
+            delay(10)
+            val setNotyfyTask = async { initFmNotify() }
+            val notifyFlag = setNotyfyTask.await()
+            if (notifyFlag) {
+                bleisConencted = true
+                bleCallBack?.onConnectSuccess(fmBle!!.bleDevice)
+                delay(10)
+                //需要主动去查询设备信息,===查询打印机的状态
+                getDeviceInfo(object : DeviceInfoCall {
+                    override fun getDeviceInfo(msg: MPMessage.MPDeviceInfoMsg) {
+
+
+                    }
+
+                    override fun getDeviceInfoError(errorMsg: MPMessage.MPCodeMsg) {
+
+                    }
+                })
+
+            } else {
+                if (retryNotifyTime == 0) {
+                    retryNotifyTime++
+                    actionNotifyTask()
+                } else {
+                    bleisConencted = false
+                    bleCallBack?.onConnectFail(fmBle?.bleDevice, "notify create fail")
+                }
+            }
+        }
+    }
+
+    /**
+     * 连接ble
+     */
     fun connectBle(name: String, mac: String) {
         if (serviceScope != null && serviceScope!!.isActive) {
             serviceScope!!.cancel()
@@ -143,6 +218,7 @@ class SyzBleManager {
         serviceScope?.launch {
             bleisConencted = false
             withContext(Dispatchers.IO) {
+                delay(500)
                 val connectBleTask = async { connectBLe(name, mac) }
                 fmBle = connectBleTask.await()
                 if (fmBle != null && fmBle?.bleDevice != null) {
@@ -151,24 +227,36 @@ class SyzBleManager {
                     val mtuflag = setMTUTask.await()
                     if (mtuflag) {
                         //注测读取通道
-                        delay(10)
-                        val setNotyfyTask = async { initFmNotify() }
-                        val notifyFlag = setNotyfyTask.await()
-                        if (notifyFlag) {
-                            bleisConencted = true
-                            bleCallBack?.onConnectSuccess(fmBle!!.bleDevice)
+                        actionNotifyTask()/*  delay(10)
+                          val setNotyfyTask = async { initFmNotify() }
+                          val notifyFlag = setNotyfyTask.await()
+                          if (notifyFlag) {
+                              bleisConencted = true
+                              bleCallBack?.onConnectSuccess(fmBle!!.bleDevice)
 
+                          } else {
+                              bleisConencted = false
+                              bleCallBack?.onConnectFail(fmBle?.bleDevice, "notify create fail")
+                          }*/
+                    } else {
+                        //设置mtu失败
+                        //尝试下再次申请
+                        val setMTUTask = async { initBleMTU(fmBle!!.bleDevice!!) }
+                        val mtuflag = setMTUTask.await()
+                        if (mtuflag) {
+                            actionNotifyTask()
                         } else {
                             bleisConencted = false
-                            bleCallBack?.onConnectFail(fmBle?.bleDevice, "notify create fail")
-                            // bleCallBack?.onDisConnected(fmBle!!.bleDevice)
+                            bleCallBack?.onConnectFail(fmBle?.bleDevice, "MTU create fail")
                         }
+
                     }
                 }
             }
         }
     }
 
+    private var currentPrintStatus = SyzPrinterState2.PRINTER_OK;//当前打印状态
 
     private suspend fun initFmNotify(): Boolean {
         return withContext(Dispatchers.IO) {
@@ -181,7 +269,6 @@ class SyzBleManager {
                 )
                 BleManager.getInstance().notify2(fmBle?.bleDevice,
                     notifyGatte?.first.toString(),
-                    notifyGatte?.second?.uuid.toString(),
                     notifyGatte?.second,
                     object : BleNotifyCallback() {
                         override fun onNotifySuccess() {
@@ -209,9 +296,16 @@ class SyzBleManager {
 
                         override fun onCharacteristicChanged(data: ByteArray) {
                             // 打开通知后，设备发过来的数据将在这里出现
+                            //Log.i(TAG,"${data.toString()}")
                             try {
                                 val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(data)
-                                Log.d("$TAG", " NOTIFY返回的信息 ${mpRespondMsg.toString()}")
+                                Log.d(
+                                    "$TAG", " NOTIFY返回的信息 ${
+                                        MPMessage.MPCodeMsg.parseFrom(
+                                            mpRespondMsg.respondData.toByteArray()
+                                        )
+                                    }"
+                                )
                                 if (mpRespondMsg.eventType == EventType.DEVICEREPORT) {
                                     if (mpRespondMsg.code == 200) {
                                         val mpCodeMsg = MPMessage.MPCodeMsg.parseFrom(
@@ -236,24 +330,31 @@ class SyzBleManager {
 
                                             13 -> {
                                                 //电量回调
-                                                batteryReportCallBack?.invoke(
-                                                    FmNotifyBeanUtils.getActivelyReport(
-                                                        MPMessage.MPCodeMsg.parseFrom(
-                                                            mpRespondMsg.respondData.toByteArray()
-                                                        )
-                                                    )
-                                                )
+//                                                batteryReportCallBack?.invoke(
+//                                                    FmNotifyBeanUtils.getActivelyReport(
+//                                                        MPMessage.MPCodeMsg.parseFrom(
+//                                                            mpRespondMsg.respondData.toByteArray()
+//                                                        )
+//                                                    )
+//                                                )
                                             }
 
-                                            else -> {
-                                                //其他的主动回调
-                                                activelyReportCallBack?.invoke(
-                                                    FmNotifyBeanUtils.getActivelyReport(
-                                                        MPMessage.MPCodeMsg.parseFrom(
-                                                            mpRespondMsg.respondData.toByteArray()
-                                                        )
+                                            10 -> {
+                                                val state = FmNotifyBeanUtils.getActivelyReport(
+                                                    MPMessage.MPCodeMsg.parseFrom(
+                                                        mpRespondMsg.respondData.toByteArray()
                                                     )
                                                 )
+                                                //其他的主动回调
+                                                activelyReportCallBack?.invoke(
+                                                    state
+                                                )
+                                                CoroutineScope(Dispatchers.IO).launch {
+                                                    currentPrintStatusFlow.emit(state)
+                                                }
+                                                //blePrintBimapCallBack?.invoke(state)
+
+                                                currentPrintStatus = state
                                             }
                                         }
                                     } else {
@@ -284,10 +385,45 @@ class SyzBleManager {
                                       }*/
 
                                 } else {
+                                    if (mpRespondMsg.eventType == EventType.FIRMWAREUPGRADE) {
+                                        //dex文件更新回调
+                                        dexUpdateCallBack?.invoke(
+                                            FmNotifyBeanUtils.getDexUpdateReport(
+                                                if (mpRespondMsg.respondData != null) {
+                                                    MPMessage.MPCodeMsg.parseFrom(
+                                                        mpRespondMsg.respondData.toByteArray()
+                                                    )
+                                                } else {
+                                                    MPMessage.MPCodeMsg.parseFrom(
+                                                        mpRespondMsg.error.toByteArray()
+                                                    )
+                                                }
+                                            )
+                                        )
+//                                        if (mpRespondMsg.code == 200) {
+//                                            //4寸主动更新的回调
+//                                            dexUpdateCallBack?.invoke(
+//                                                FmNotifyBeanUtils.getDexUpdateReport(
+//                                                    MPMessage.MPCodeMsg.parseFrom(
+//                                                        mpRespondMsg.respondData.toByteArray()
+//                                                    )
+//                                                )
+//                                            )
+//                                        } else {
+//                                            dexUpdateCallBack?.invoke(
+//                                                FmNotifyBeanUtils.getDexUpdateReport(
+//                                                    MPMessage.MPCodeMsg.parseFrom(
+//                                                        mpRespondMsg.error.toByteArray()
+//                                                    )
+//                                                )
+//                                            )
+//                                        }
+
+                                    }
                                     bleNotifyCallBack?.invoke(data)
                                 }
                             } catch (e: Exception) {
-                                Log.d("$TAG", "$TAG NOTIFY解析数据出错")
+                                Log.d("$TAG", "$TAG NOTIFY解析数据出错${data.contentToString()}")
                             }
 
                         }
@@ -297,6 +433,7 @@ class SyzBleManager {
 
 
     }
+
 
     private suspend fun connectBLe(name: String, mac: String): FMBle? {
         return suspendCancellableCoroutine<FMBle?> { cancellableContinuation ->
@@ -313,6 +450,22 @@ class SyzBleManager {
                         "$TAG",
                         "连接失败${bleDevice.device.name}::失败原因==${exception?.code}===${exception?.description}"
                     )
+
+//                    if (reconnectTime==0){
+//                        //尝试一次重连
+//                        if (fmBle!=null&&fmBle!!.bleDevice!=null){
+//                            if (BleManager.getInstance().isConnected(fmBle?.bleDevice?.mac)){
+//                                disconnectBle()
+//                                connectBle(name,mac)
+//                                reconnectTime++
+//                            }else{
+//                                connectBle(name,mac)
+//                                reconnectTime++
+//                            }
+//                        }
+//                    }else{
+//
+//                    }
                     if (exception?.code == 100) {
                         if (bleDevice != null) {
                             BleManager.getInstance().disconnect(bleDevice)
@@ -343,8 +496,9 @@ class SyzBleManager {
                     gatt: BluetoothGatt?,
                     status: Int
                 ) {
-                    Log.d("$TAG", ",断开连接")
+                    Log.d("$TAG", "===断开连接===")
                     bleCallBack?.onDisConnected(device)
+                    retryNotifyTime = 0
                 }
 
             }
@@ -361,6 +515,8 @@ class SyzBleManager {
             val result = FmNotifyBeanUtils.getDeviceInfo(dataArray)
             when (result) {
                 is NotifyResult.Success -> {
+                    //这里可能要去判定打印机状态
+                    result.data.printStatus
                     callBack.getDeviceInfo(result.data)
                 }
 
@@ -369,7 +525,7 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.DEVICEINFO
+        // currentOrderEventType = MPMessage.EventType.DEVICEINFO
         fmWriteABF1(FMPrinterOrder.orderForGetFmDevicesInfo())
     }
 
@@ -390,7 +546,7 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.CLOSETIME
+        // currentOrderEventType = MPMessage.EventType.CLOSETIME
 
         fmWriteABF1(FMPrinterOrder.orderForGetFmSetShutdownTime(min))
     }
@@ -412,7 +568,7 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.CANCELPRINTING
+        //currentOrderEventType = MPMessage.EventType.CANCELPRINTING
         fmWriteABF1(FMPrinterOrder.orderForGetFmCancelPrinter())
     }
 
@@ -431,7 +587,7 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.PRINTINGSPEED
+        //currentOrderEventType = MPMessage.EventType.PRINTINGSPEED
         fmWriteABF1(FMPrinterOrder.orderForGetFmSetPrintSpeed(speed))
     }
 
@@ -450,7 +606,8 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.PRINTINCONCENTRATION
+
+        // currentOrderEventType = MPMessage.EventType.PRINTINCONCENTRATION
         fmWriteABF1(FMPrinterOrder.orderForGetFmSetPrintConcentration(Concentration))
     }
 
@@ -495,32 +652,34 @@ class SyzBleManager {
                 }
             }
         }
-        currentOrderEventType = MPMessage.EventType.SELFTEST
+        //currentOrderEventType = MPMessage.EventType.SELFTEST
         fmWriteABF1(FMPrinterOrder.orderForGetFmSelfcheckingPage())
     }
 
-    fun writeBitmaps(bipmaps: MutableList<Bitmap>, page: Int, callBack: BlePrinterInfoCall) {
-        bitmapCallBack = callBack
-        blePrintBimapCallBack = { dataArray ->
-            val result = FmNotifyBeanUtils.getBitmapsPrint(dataArray)
-            when (result) {
-                is NotifyResult2.Success -> {
-                    if (result.msg != null) {
-                        bitmapCallBack?.getBleNotifyInfo(
-                            true, FmNotifyBeanUtils.getPrintState(result.msg)
-                        )
+    fun writeBitmaps(
+        bipmaps: MutableList<Bitmap>,
+        width: Int,
+        height: Int,
+        page: Int,
+        callBack: BlePrinterInfoCall2
+    ) {
+        //bitmapCallBack = callBack
+        Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
+        CoroutineScope(Dispatchers.IO).launch {
+            currentPrintStatusFlow.asSharedFlow().collectLatest {
+                if (it == SyzPrinterState2.PRINTER_OK) {
+                    delay(50)
+                    PrintBimapUtils.getInstance().removePrintWhenSuccess()
+                    //callBack.getBleNotifyInfo(true, it)
+                    if (PrintBimapUtils.getInstance().isCompleteBitmapPrinter()) {
+                        callBack.getBleNotifyInfo(true, it)
                     }
-                }
-
-                is NotifyResult2.Error -> {
-                    if (result.errorMsg != null) {
-                        bitmapCallBack?.getBleNotifyInfo(
-                            true, FmNotifyBeanUtils.getPrintState(result.errorMsg)
-                        )
-                    }
+                } else {
+                    callBack.getBleNotifyInfo(false, it)
                 }
             }
         }
+
         if (bitListScope != null && bitListScope!!.isActive) {
             bitListScope?.cancel()
         }
@@ -529,24 +688,33 @@ class SyzBleManager {
             var startTime = System.currentTimeMillis()
             val totalBipmapsDataList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
             bipmaps.forEachIndexed { index, bitmap ->
-                Log.d(
-                    "$TAG", "二值化之后第${index}张bitmap字节数${
-                        BitmapExt.bitmapToByteArray(
-                            bitmap
-                        ).size
-                    }"
-                )
+                /*  Log.d(
+                      "$TAG", "二值化之后第${index}张bitmap字节数${
+                          BitmapExt.bitmapToByteArray(
+                              bitmap
+                          ).size
+                      }"
+                  )*/
                 val bitmapArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
-                Log.d("$TAG", "print()之后第${index}张图片总字节数${bitmapArray.size}")
+                //Log.d("$TAG", "print()之后第${index}张图片总字节数${bitmapArray.size}")
                 //对bitmaparray进行每100个字节分包
                 val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(bitmapArray, 100)
                 var total = aplitafter.size //总包数
-                Log.d("$TAG", "第${index}张图片总包数${total}")
+                // Log.d("$TAG", "第${index}张图片总包数${total}")
                 val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
                 aplitafter.forEachIndexed { index, bytes ->
-                    val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
-                        .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
-                        .setIndexPackage(index + 1).setTotalPackage(total).build()
+                    val mPPrintMsg = if (index == 0) {
+                        //第一包设置宽高
+                        MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                            .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                            .setIndexPackage(index + 1).setTotalPackage(total).setWidth(width)
+                            .setHeight(height).build()
+                    } else {
+                        MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                            .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                            .setIndexPackage(index + 1).setTotalPackage(total).build()
+                    }
+
                     needSendDataList.add(
                         MPMessage.MPSendMsg.newBuilder()
                             .setEventType(MPMessage.EventType.DEVICEPRINT)
@@ -556,10 +724,16 @@ class SyzBleManager {
                 totalBipmapsDataList.add(needSendDataList)
             }
             Log.d("$TAG", "生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
-            currentOrderEventType = MPMessage.EventType.DEVICEPRINT
-            PrintBimapUtils.getInstance().setBitmapTask(totalBipmapsDataList).doPrint()
+            //currentOrderEventType = MPMessage.EventType.DEVICEPRINT
+            val bleBluetooth = BleManager.getInstance().getBleBluetooth(fmBle?.bleDevice)
+            val abf4Charc = SYZBleUtils.getABF4Charac(fmBle?.gatt)?.second
+            PrintBimapUtils.getInstance()
+                .setBitmapTask(totalBipmapsDataList, bleBluetooth, abf4Charc!!).doPrint()
+
+
         }
     }
+
     fun CRC16_XMODEM(buffer: ByteArray): Int {
         var wCRCin = 0x0000
         val wCPoly = 0x1021
@@ -576,13 +750,28 @@ class SyzBleManager {
     }
 
 
-
     /**
      * 固件升级
      */
     private var dexUpdateCallBack: ((printState: SyzPrinterState) -> Unit)? = null
+
+    private fun stopWriteDex() {
+        Log.i(TAG, "停止写入Dex")
+        if (dexScope != null && dexScope!!.isActive) {
+            dexScope!!.cancel()
+        }
+    }
+
     fun writeDex(filePath: String, callBack: ((printState: SyzPrinterState) -> Unit)) {
-        dexUpdateCallBack = callBack
+        dexUpdateCallBack = {
+            if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
+                Log.d(TAG, "固件更新成功")
+            } else {
+                Log.d(TAG, "固件更新失败")
+                stopWriteDex() //停止写入dex文件
+            }
+            callBack.invoke(it)
+        }
         if (dexScope != null && dexScope!!.isActive) {
             dexScope!!.cancel()
         }
@@ -603,7 +792,7 @@ class SyzBleManager {
             //分包
             val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(fileArray, 100)
             //crc算法
-            val crccode=CRC16_XMODEM(fileArray)
+            val crccode = CRC16_XMODEM(fileArray)
             var total = aplitafter.size //总包数
             Log.d("$TAG", "Dex文件总包数${total}")
             val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
@@ -614,15 +803,13 @@ class SyzBleManager {
                     .setBinData(ByteString.copyFrom(bytes))//分包数据
                     .setDataLength(fileArray.size)//
                     .setIndexPackage(index + 1)//分包序列号 第一包是 1 以
-                    .setCrcCode(crccode)
-                    .setTotalPackage(total).build()
+                    .setCrcCode(crccode).setTotalPackage(total).build()
                 needSendDataList.add(
-                    MPMessage.MPSendMsg.newBuilder()
-                        .setEventType(EventType.FIRMWAREUPGRADE)
+                    MPMessage.MPSendMsg.newBuilder().setEventType(EventType.FIRMWAREUPGRADE)
                         .setSendData(mpFirmwareMsg.toByteString()).build()
                 )
             }
-            currentOrderEventType = EventType.FIRMWAREUPGRADE
+            //currentOrderEventType = EventType.FIRMWAREUPGRADE
             fmWriteDexABF4(needSendDataList)
         }
     }
@@ -694,19 +881,32 @@ class SyzBleManager {
 
     }
 
+    private suspend fun test(
+        bleBluetooth: BleBluetooth, characteristic: BluetoothGattCharacteristic
+    ): Boolean {
+        return withContext(Dispatchers.IO) {
+            suspendCoroutine { continuation ->
+                val isSendOver = bleBluetooth.bluetoothGatt.writeCharacteristic(characteristic)
+                if (isActive) {
+                    continuation.resume(isSendOver)
+                }
+            }
+        }
+    }
+
     // 递归写入函数
-    suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>): Boolean {
-        var success = false
-        var start = System.currentTimeMillis()
-        Log.d("$TAG", "========总共要发${dataList.size}个包")
-        for (index in 0 until dataList.size) {
-            try {
-                val data = dataList[index]
-                val dataArray = data.toByteArray()
-                Log.d("$TAG", "=======第${index}包===字节数${dataArray.size}")
-                //success = writeABF4(dataArray, index, dataList.size)
-                writeABF4Bitmap(dataArray, index, dataList.size)
-                delay(2)/* if (success) {
+    /*   suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>): Boolean {
+           var success = false
+           var start = System.currentTimeMillis()
+           //Log.d("$TAG", "========总共要发${dataList.size}个包")
+           for (index in 0 until dataList.size) {
+               try {
+                   val data = dataList[index]
+                   val dataArray = data.toByteArray()
+                   Log.d("$TAG", "=======第${index}包===字节数${dataArray.size}")
+                   //success = writeABF4(dataArray, index, dataList.size)
+                   writeABF4Bitmap(dataArray, index, dataList.size)
+                   delay(7)*//* if (success) {
                      Log.d("$TAG", "========第${index}包打印}")
                      // 如果写入成功，继续递归写入
                      //延时写入
@@ -716,13 +916,58 @@ class SyzBleManager {
                      bitmapCallBack?.getBleNotifyInfo(false, null)
                      // 如果写入失败，停止递归写入
                      break
-                 }*/
+                 }*//*
             } catch (e: Exception) {
                 break
             }
         }
         Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
         return success
+    }
+*/
+
+    private suspend fun sendData(
+        data: ByteArray, characteristic: BluetoothGattCharacteristic, bleBluetooth: BleBluetooth
+    ): Boolean {
+        try {
+            withContext(Dispatchers.IO) {
+                characteristic.setValue(data)
+                characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+                val isSendOver = bleBluetooth.bluetoothGatt.writeCharacteristic(characteristic)
+                Log.d(TAG, " Success: $isSendOver")
+                return@withContext isSendOver
+            }
+        } catch (e: IOException) {
+            Log.e(TAG, "Error sending data: ${e.message}")
+            // 可以根据需要进行错误处理和重试操作
+        }
+        return false
+    }
+
+    suspend fun fmWriteABF4(
+        dataList: MutableList<MPMessage.MPSendMsg>,
+        bleBluetooth: BleBluetooth,
+        characteristic: BluetoothGattCharacteristic
+    ) {
+
+        var start = System.currentTimeMillis()
+        //Log.d("$TAG", "========总共要发${dataList.size}个包")
+        for (index in 0 until dataList.size) {
+            try {
+                val data = dataList[index]
+                val dataArray = data.toByteArray()
+                val upackerData = Upacker.frameEncode(dataArray)
+                sendData(upackerData, characteristic, bleBluetooth)
+                Log.d(
+                    "$TAG", "=======第${index}包===字节数${dataArray.size}="
+                )
+                delay(10)
+            } catch (e: Exception) {
+                break
+            }
+        }
+        Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
+        return
     }
 
 
@@ -762,15 +1007,16 @@ class SyzBleManager {
         return withContext(Dispatchers.IO) {
             suspendCoroutine { continuation ->
                 if (fmBle != null) {
-                    Log.d("$TAG", " Upacker之前write的data数据大小:${data.size}")
+                    // Log.d("$TAG", " Upacker之前write的data数据大小:${data.size}")
                     val upackerData = Upacker.frameEncode(data)
-                   val abf4Charc= SYZBleUtils.getABF4Charac(fmBle?.gatt)?.second
-                    Log.d("$TAG", " Upacker之后write的data数据大小 ${upackerData.size}")
-                    val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
-                    Log.i("$TAG","写入的特征值${write_abf1?.first}===${write_abf1?.second}")
+                    val abf4Charc = SYZBleUtils.getABF4Charac(fmBle?.gatt)
+                    // Log.d("$TAG", " Upacker之后write的data数据大小 ${upackerData.size}")
+                    // val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
+                    // Log.i("$TAG", "写入的特征值${write_abf1?.first}===${write_abf1?.second}")
                     BleManager.getInstance().writeWithNoResponse3(fmBle?.bleDevice,
-                        write_abf1?.first.toString(),
-                        write_abf1?.second.toString(),abf4Charc,
+                        abf4Charc?.first.toString(),
+                        abf4Charc?.second?.uuid.toString(),
+                        abf4Charc?.second,
                         upackerData,
                         object : BleWriteCallback() {
                             override fun onWriteSuccess(
@@ -778,28 +1024,27 @@ class SyzBleManager {
                             ) {
                                 if (isActive) {
                                     // 发送数据到设备成功（分包发送的情况下，可以通过方法中返回的参数可以查看发送进度）
-                                    if (index < totalSize) {
-                                        Log.d(
-                                            "$TAG",
-                                            "$TAG=abf4写入成功=第${index}个包===总共${totalSize}个包===="
-                                        )
-                                    } else {
-                                        Log.d(
-                                            "$TAG",
-                                            "=abf4完全写入成功=第${index}个包=总共${totalSize}个包======"
-                                        )
-                                    }
+                                    /*   if (index < totalSize) {
+                                           Log.d(
+                                               "$TAG",
+                                               "$TAG=abf4写入成功=第${index}个包===总共${totalSize}个包===="
+                                           )
+                                       } else {
+                                           Log.d(
+                                               "$TAG",
+                                               "=abf4完全写入成功=第${index}个包=总共${totalSize}个包======"
+                                           )
+                                       }*/
                                     continuation.resume(true)
                                 }
                             }
 
                             override fun onWriteFailure(exception: BleException) {
                                 // 发送数据到设备失败
-                                if (isActive) {
-                                    Log.d(
-                                        "$TAG",
-                                        "=abf4写入失败=====第${index}个包===总共${totalSize}个包====${exception.code}===${exception.description}"
-                                    )
+                                if (isActive) {/*   Log.d(
+                                           "$TAG",
+                                           "=abf4写入失败=====第${index}个包===总共${totalSize}个包====${exception.code}===${exception.description}"
+                                       )*/
                                     continuation.resume(false)
                                 }
                                 //continuation.resumeWithException(Exception("Write abf4写入失败: ${exception.code}==${exception.description}"))
@@ -814,24 +1059,26 @@ class SyzBleManager {
     private suspend fun writeABF4Bitmap(data: ByteArray, index: Int, totalSize: Int) {
         return withContext(Dispatchers.IO) {
             if (fmBle != null) {
-                Log.d("$TAG", "Upacker之前write的data数据大小:${data.size}")
+                // Log.d("$TAG", "Upacker之前write的data数据大小:${data.size}")
                 val upackerData = Upacker.frameEncode(data)
-                Log.d("$TAG", " Upacker之后write的data数据大小 ${upackerData.size}")
-                val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
-                var testStartTime = System.currentTimeMillis()
-                Log.d("$TAG", "打印Bimap》》开始 ${testStartTime}")
-                BleManager.getInstance().writeWithNoResponse2(fmBle?.bleDevice,
-                    write_abf1?.first.toString(),
-                    write_abf1?.second.toString(),
+                // Log.d("$TAG", " Upacker之后write的data数据大小 ${upackerData.size}")
+                //val write_abf1 = fmBle?.getCharatersType(FMPrinter.Charac_ABF4)?.get(0)
+                // var testStartTime = System.currentTimeMillis()
+                // Log.d("$TAG", "打印Bimap》》开始 ${testStartTime}")
+                val abf4Charc = SYZBleUtils.getABF4Charac(fmBle?.gatt)
+                BleManager.getInstance().writeWithNoResponse3(fmBle?.bleDevice,
+                    abf4Charc?.first.toString(),
+                    abf4Charc?.second?.uuid.toString(),
+                    abf4Charc?.second,
                     upackerData,
                     object : BleWriteCallback() {
                         override fun onWriteSuccess(
                             current: Int, total: Int, justWrite: ByteArray
                         ) {
-                            Log.d(
-                                "$TAG",
-                                "打印Bimap》》结束 ${System.currentTimeMillis() - testStartTime}"
-                            )
+//                            Log.d(
+//                                "$TAG",
+//                                "打印Bimap》》结束 ${System.currentTimeMillis() - testStartTime}"
+//                            )
                         }
 
                         override fun onWriteFailure(exception: BleException) {
@@ -845,7 +1092,7 @@ class SyzBleManager {
 
 
     private suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
-       // var success = true
+        // var success = true
         Log.d("$TAG", "========总共要发${dataList.size}个包")
         var writeCount = 0
         for (index in 0 until dataList.size) {
@@ -853,19 +1100,23 @@ class SyzBleManager {
                 val data = dataList[index]
                 val dataArray = data.toByteArray()  //一次写入的数据量
                 Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
-                val success=writeABF4(dataArray, index, dataList.size)
-                if (success){
-                    writeCount += dataArray.size
+                val success = writeABF4(dataArray, index, dataList.size)
+                if (success) {
+                    writeCount += 100  //这里指原始数据累加，而不是包装的数据
                     if (writeCount >= 4 * 1024) {
-                        Log.d("$TAG", "abf4写入delay400========第${index}包===delay400==${writeCount}")
-                        delay(400)
+                        Log.d(
+                            "$TAG", "abf4写入delay400========第${index}包===delay400==${writeCount}"
+                        )
+                        delay(500)
                         writeCount = writeCount - (4 * 1024)//重新计算,有4k减去继续累加
                     } else {
-                        Log.d("$TAG", "abf4写入delay40========第${index}包===delay60==${writeCount}")
-                        delay(50) //这里50ms最低
+                        Log.d(
+                            "$TAG", "abf4写入delay40========第${index}包===delay60==${writeCount}"
+                        )
+                        delay(10)
                     }
                     continue
-                }else{
+                } else {
                     break
                 }
 

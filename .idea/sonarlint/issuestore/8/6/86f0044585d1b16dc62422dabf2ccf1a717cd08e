@@ -1,32 +1,82 @@
 
-’	java:S117ô"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…ºÏ„úÿÿÿÿJ$9b199cf9-9e64-46c3-a622-97d0bf0e8d0e
-’	java:S117À"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÃÖœşÿÿÿÿJ$4f363fad-bd4b-4f06-8ae8-616cc7115fd8
-’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(œ˜ôıùÿÿÿÿJ$1d3d5f07-5ff6-400c-b123-be130566e4af
-	java:S117«"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰ÓçáJ$8c44cc99-5f23-4564-a881-ac245e162ee1
-’	java:S117ğ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×áÈÖùÿÿÿÿJ$ae6866b6-2c65-459e-a8ef-42bb099eb7a6
-	java:S117€"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•¤¯ J$4471c63d-aa28-40e0-963c-ec2c0746e001
-’	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Àó×êúÿÿÿÿJ$9c7b0a11-6f14-4e89-960c-62902bb2e8fe
-’	java:S117 "QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ğ»„’ÿÿÿÿÿJ$eea5d14f-8daa-47da-87e6-ffe38c04a9fc
-
-java:S3776*"RRefactor this method to reduce its Cognitive Complexity from 74 to the 15 allowed.(öºÀ J$b505c8de-060a-46b1-93e3-3c45741b3466
-b	java:S1311""Add a default case to this switch.(ıŞ³‹ùÿÿÿÿJ$aa5c4941-85e7-4ced-8679-0a1bc18495a3
-”
-java:S3776‘"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(™À”ÍúÿÿÿÿJ$abc494fc-db65-4d3a-a8d2-d67df77c9d4c
-m
-java:S1874±"0Remove this use of "setValue"; it is deprecated.(á¸ÄÊJ$801a5b4a-781b-4b3d-9aef-7d95ee41ae70
+›
+java:S1192Â"WDefine a constant instead of duplicating this literal "descriptor equals null" 3 times.(úïàœ8Åß„ıç1J$2f6870ab-e74a-48fe-9866-7c8c0145263b
+
+java:S1192Ê"ZDefine a constant instead of duplicating this literal "gatt writeDescriptor fail" 3 times.(úáâÙ8Åß„ıç1J$1e76651e-1653-4ce4-b222-8a66309ff087
+¬
+java:S1192µ"hDefine a constant instead of duplicating this literal "gatt setCharacteristicNotification fail" 3 times.(ÌÚİÈ8Åß„ıç1J$82f1deb6-5979-4e97-a3da-33f4beaccd4c
+¡
+java:S1192à"^Define a constant instead of duplicating this literal "gatt writeCharacteristic fail" 3 times.(ŸÒó8Åß„ıç1J$a68ef3a8-f97b-4a6d-84fb-c15ed5ff7fd3
+ª
+java:S1192Ñ"gDefine a constant instead of duplicating this literal "this characteristic not support write!" 3 times.(Í¡8Åß„ıç1J$a56abe24-0682-466d-8ae6-b93ef85fc5ec
+¤
+java:S1192Ë"`Define a constant instead of duplicating this literal "the data to be written is empty" 3 times.(ÒÊâÁ8Åß„ıç1J$b1afc587-d4db-42f9-bae9-e61215ca30c5
+¦
+java:S1192­"bDefine a constant instead of duplicating this literal "gatt or characteristic equal null" 3 times.(¹åŞ‰8Åß„ıç1J$e5ea45db-4c1b-4adc-ac3d-e81c1724d39c
+Æ
+java:S1192ä"}Define a constant instead of duplicating this literal "Updates the locally stored value of this characteristic fail" 3 times.(ÂùäÔÿÿÿÿÿ8Åß„ıç1J$e7964c82-770e-4dad-ada3-912f8937217c
+s
+java:S1066ü"/Merge this if statement with the enclosing one.(•ˆœÿ8Çß„ıç1J$aafb3d99-aff0-4283-a712-9ff1e5fd7556
+™	java:S117‡"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è…û·ùÿÿÿÿ8Çß„ıç1J$c2e1687b-b021-4369-89c3-2083012dad4b
+“	java:S117ü"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(é÷ÜL8Éß„ıç1J$79acb96c-4528-484b-8c47-5c6ec869159c
+™	java:S117‡"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÉÑëüÿÿÿÿ8Éß„ıç1J$7835ea56-ae3b-4682-a5f1-9472185c09b4
+™	java:S117…"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¬ÊšÓùÿÿÿÿ8Éß„ıç1J$bf413240-448f-450f-8db2-df1ff6a66942
+”	java:S117È"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ˆÍ÷Î8Éß„ıç1J$8400e095-3b53-430c-b981-2cbcd6175f1c
+”	java:S117è"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êÄÖ8Éß„ıç1J$3192528b-f0ee-4ca7-aceb-78ffe6d8211d
+”	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äÌ£ß8ßêê€è1J$793db4a4-fb8c-41a8-9568-0f83c0496b9e
+”	java:S117˜"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(™íâğ8ßêê€è1J$a35d8ecc-11fd-4a7e-b270-59034d6f4ee0
+”	java:S117·"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰Óçá8ßêê€è1J$2858e9c7-76cf-472b-9640-70259cd84a7d
+™	java:S117ú"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ı–±¶úÿÿÿÿ8ßêê€è1J$3b21cc95-9cce-4559-8abc-d795340c69b9
+™	java:S117‡"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ú¨æûÿÿÿÿ8ßêê€è1J$18f9337f-643f-45e3-9606-9b69a9c82399
+”	java:S117”"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(€’² 8ßêê€è1J$f556871a-38ac-44a4-af3e-2d56dea1fddd
+”	java:S117¡"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(âæÃÈ8ßêê€è1J$baa8da75-a270-4e92-8d3c-c5a8028143c8
+•
+java:S3776,"RRefactor this method to reduce its Cognitive Complexity from 86 to the 15 allowed.(öºÀ 8ìå„ıç1J$e6abdf44-709c-411b-bd5b-1200c90a227a
+i	java:S1313""Add a default case to this switch.(ıŞ³‹ùÿÿÿÿ8ïå„ıç1J$3232b714-7569-4e30-a57d-dcc090f8beee
+•
+java:S3776©"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ıº©:8÷å„ıç1J$6ad335d0-7ee7-49f6-81ab-2db0296b51c4
+t
+java:S1874Å"0Remove this use of "setValue"; it is deprecated.(şò“8ùå„ıç1J$4f4f54b5-5f40-46aa-b9fa-5df717a56eea
+€
+java:S1874Æ"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿ8ùå„ıç1J$2686828c-a96c-4e2d-a152-6656350c2cc1
+›
+java:S3776Ñ"RRefactor this method to reduce its Cognitive Complexity from 21 to the 15 allowed.(æşãÏûÿÿÿÿ8ùå„ıç1J$8927607c-c07e-4269-8814-334bd9510073
+	java:S125ì"<This block of commented-out lines of code should be removed.(—³ûí8úå„ıç1J$1c41dc5f-8b82-4875-abc6-e783f127e602
+t
+java:S1874÷"0Remove this use of "setValue"; it is deprecated.(şò“8ûå„ıç1J$38b0863a-674c-4e94-b6b3-e12a66d62c79
+€
+java:S1874ø"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿ8ûå„ıç1J$e9f05127-67e3-430c-8b81-3b37df7f6749
+›
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(¡Áëôıÿÿÿÿ8ıå„ıç1J$e8b40230-d27e-4393-8181-f7d8432c62f9
 y
-java:S1874³"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿJ$68a7fbd8-1159-4ae0-a463-68f037fb0246
-
-java:S3776Ş"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ÜêÉåJ$2914b5ce-8821-4ee4-bdf8-62d122eedfb9
-m
-java:S1874ş"0Remove this use of "setValue"; it is deprecated.(Æ¯ê…J$ce180404-a0f0-4772-8385-711441c05e89
+java:S1874º"0Remove this use of "setValue"; it is deprecated.(Ú ”ûÿÿÿÿÿ8şå„ıç1J$87fdfe56-323e-4d0c-a158-37ba5db1dd63
+€
+java:S1874»"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿ8şå„ıç1J$5d0ef441-0469-4ba5-bb54-cac4f2d1dc1b
+–
+java:S3776È"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(ˆÍ÷Î8ÿå„ıç1J$ff708915-c9a3-411c-8533-8e3b00c8f117
 y
-java:S1874€"7Remove this use of "writeDescriptor"; it is deprecated.(Î”Ä…úÿÿÿÿJ$1ef2cb00-e6f6-4a1a-b13b-e9b17c456d65
-”
-java:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(œ˜ôıùÿÿÿÿJ$5daa336e-4032-4e41-b8ba-aa315e39b1cc
-r
-java:S1874›"0Remove this use of "setValue"; it is deprecated.(Ó†™–şÿÿÿÿJ$aae318a4-8dca-468c-84fe-0337a6dbe47e
-}
-java:S1874";Remove this use of "writeCharacteristic"; it is deprecated.(Š²üêùÿÿÿÿJ$e6bac718-2611-4413-8ca7-05cee6222a90
-ˆ
-java:S6541/"ÆA "Brain Method" was detected. Refactor it to reduce at least one of the following metrics: LOC from 148 to 64, Complexity from 35 to 14, Nesting Level from 3 to 2, Number of Variables from 35 to 6.(ñ‰ÿÜıÿÿÿÿJ$f6537f85-4c4d-4386-b49a-f5dd088bc290
+java:S1874Ö"0Remove this use of "setValue"; it is deprecated.(Ó†™–şÿÿÿÿ8ÿå„ıç1J$35f00fc0-b894-495d-9e5f-7973ffaa0b6f
+„
+java:S1874İ";Remove this use of "writeCharacteristic"; it is deprecated.(Š²üêùÿÿÿÿ8€æ„ıç1J$e87ef411-a3ea-4f51-aa32-933591a8fdf5
+–
+java:S3776è"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(êÄÖ8€æ„ıç1J$4cd55a4a-1a79-4454-a632-cc791121a73f
+y
+java:S1874õ"0Remove this use of "setValue"; it is deprecated.(Ö Ùèüÿÿÿÿ8æ„ıç1J$c968d277-ab32-49bb-95db-025c811735c8
+~	java:S125ø"<This block of commented-out lines of code should be removed.(ıÄ8æ„ıç1J$57cadc2f-98ee-41cd-a95c-a3ce3cbf421d
+„
+java:S1874ú";Remove this use of "writeCharacteristic"; it is deprecated.(îø¢šøÿÿÿÿ8æ„ıç1J$3ada30ea-1396-40d2-a344-fa7cc76b765b
+„	java:S125û"<This block of commented-out lines of code should be removed.(ÜÕÉ‡ûÿÿÿÿ8æ„ıç1J$a8b4af28-cee1-405d-bbaf-47998fb88478
+t
+java:S1874‡"0Remove this use of "setValue"; it is deprecated.(½›ó†8ïê€è1J$2bfa4c9f-1ee4-4898-92cf-e939ddb8c21e
+
+java:S1874‰";Remove this use of "writeCharacteristic"; it is deprecated.(»ÀçÂ8ïê€è1J$654dd886-e9f3-4410-ad70-ae756dd252fb
+„	java:S125"<This block of commented-out lines of code should be removed.(ÜÕÉ‡ûÿÿÿÿ8ïê€è1J$8cf9bc92-584a-42b7-bac2-007309072909
+„	java:S125“"<This block of commented-out lines of code should be removed.(ØÍ©áúÿÿÿÿ8ïê€è1J$bff2fd8c-660b-4228-97dc-6250dcc0f456
+–
+java:S3776˜"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(™íâğ8ïê€è1J$0c949225-3346-4d29-abcc-22c3f488eb18
+y
+java:S1874¥"0Remove this use of "setValue"; it is deprecated.(Ó†™–şÿÿÿÿ8ïê€è1J$6923eb92-25b0-4517-b6b8-5bc63d9aa5da
+„
+java:S1874©";Remove this use of "writeCharacteristic"; it is deprecated.(Š²üêùÿÿÿÿ8ïê€è1J$ad99454b-34cf-482c-a734-d20705cc7902
+
+java:S65411"ÆA "Brain Method" was detected. Refactor it to reduce at least one of the following metrics: LOC from 155 to 64, Complexity from 37 to 14, Nesting Level from 5 to 2, Number of Variables from 36 to 6.(ñ‰ÿÜıÿÿÿÿ8æ„ıç1J$3cf436d0-3d4a-4d7b-959e-1ae5b19e6f27

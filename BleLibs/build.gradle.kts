@@ -68,7 +68,7 @@ dependencies {
 //        }
 //    }
 //}
-
+/*
 afterEvaluate {
     publishing {
         publications {
@@ -76,7 +76,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.issyzone.sdk"
                 artifactId = "syz-device"
-                version = "v1.1.0-alpha"
+                version = "v1.2.1-alpha"
 //                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
             }
         }
@@ -92,7 +92,7 @@ afterEvaluate {
 //            url = uri("https://jitpack.io/")
 //        }
 //    }
-}
+}*/
 
 
 

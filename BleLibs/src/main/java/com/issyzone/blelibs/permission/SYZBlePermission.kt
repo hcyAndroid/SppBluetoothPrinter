@@ -7,25 +7,27 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
 
-
 object SYZBlePermission {
     private const val TAG = "SYZBlePermission>>>:"
-    private val permissionToRequest =if (Build.VERSION.SDK_INT>30){
+    private val permissionToRequest = if (Build.VERSION.SDK_INT > 30) {
         arrayOf(
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.BLUETOOTH_CONNECT,
+            Manifest.permission.BLUETOOTH_PRIVILEGED,
             Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_ADVERTISE,
+
         )
-    }else{
+    } else {
         arrayOf(
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_PRIVILEGED,
         )
     }
 
@@ -36,7 +38,7 @@ object SYZBlePermission {
             val allGranted = permissions.all { it.value }
             if (allGranted) {
                 // 所有权限均已授予
-               // Logger.d(">>>>>所有的权限已经授予")
+                // Logger.d(">>>>>所有的权限已经授予")
                 //startBluetoothScan()
                 call.invoke()
             } else {

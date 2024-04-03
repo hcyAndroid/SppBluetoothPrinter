@@ -4,13 +4,37 @@
     android:layout_height="400dp"
     android:background="@drawable/shape_rectangle_cornor_20px_solid_f6f8fa"
     android:orientation="horizontal">
+    <!--    -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="19dp"
+        android:layout_weight="7"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.core.widget.NestedScrollView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_margin="19dp"
         android:layout_weight="4"
+        android:visibility="gone"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -33,15 +57,16 @@
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="3"
-        android:orientation="vertical"
-        android:layout_height="match_parent">
+        android:orientation="vertical">
+
         <TextView
             android:id="@+id/tv_connect"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="连接"
@@ -51,8 +76,8 @@
             android:id="@+id/tv_disconnect"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="断开连接"
@@ -62,18 +87,19 @@
             android:id="@+id/tv_check"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="检查设备信息"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/tv_self_checking"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="打印自检页"
@@ -83,8 +109,8 @@
             android:id="@+id/tv_shutdown"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="设置关机时间"
@@ -94,8 +120,8 @@
             android:id="@+id/tv_cancel_printer"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="取消打印"
@@ -106,8 +132,8 @@
             android:id="@+id/tv_set_print_speed"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="设置打印速度"
@@ -117,8 +143,8 @@
             android:id="@+id/tv_set_print_concentration"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="设置打印浓度"
@@ -129,8 +155,8 @@
             android:id="@+id/tv_set_print_img"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="打印bitmap"
@@ -140,8 +166,8 @@
             android:id="@+id/tv_dex_update"
             style="@style/text_30_54c727"
             android:layout_height="0dp"
-            android:layout_weight="1"
             android:layout_gravity="center_vertical"
+            android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
             android:text="bin文件更新"

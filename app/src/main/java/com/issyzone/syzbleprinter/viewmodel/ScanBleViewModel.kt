@@ -1,5 +1,6 @@
 package com.issyzone.syzbleprinter.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -10,6 +11,7 @@ import androidx.paging.cachedIn
 import com.issyzone.blelibs.data.BleDevice
 import com.issyzone.blelibs.fmBeans.FMPrinterOrder
 import com.issyzone.blelibs.service.BleService
+import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 //import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 //import com.orhanobut.logger.Logger
 import kotlinx.coroutines.flow.catch
@@ -25,38 +27,38 @@ class ScanBleViewModel :ViewModel() {
 //            if (connectDevice!=null&&connectDevice.status!=null){
 //                //连接成功
 //                // connectDevice.getALLGatt()
-//                Logger.d("连接成功")
+//                Log.d("","连接成功")
 //
 //            }else{
 //                //连接失败
-//                Logger.d("连接失败")
+//                Log.d("","连接失败")
 //            }
         }
 
     }
 
-//    fun getScanBleDevice(bleScanAdapter: BlueScanAdapter){
-//        var  service=BleService.getInstance()
-//        service.getScanResultFlow()
-//        viewModelScope.launch {
-//           // delay(10000)
-//            BleService.getInstance().getScanResultFlow().catch {
-//                Logger.d("异常::${it.message}")
-//            }.collect {
-//                Logger.d("扫描到的FM设备个数：：${it.size}")
-//                if (it.size!=0){
-//                    Pager(PagingConfig(
-//                        pageSize = it.size, initialLoadSize = it.size
-//                    ), null, pagingSourceFactory = {
-//                        ScanBlePageSource2(it)
-//                    }).flow.cachedIn(viewModelScope).collect {
-//                        bleScanAdapter.submitData(it)
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
+    fun getScanBleDevice(bleScanAdapter: BlueScanAdapter){
+        var  service=BleService.getInstance()
+        service.getScanResultFlow()
+        viewModelScope.launch {
+           // delay(10000)
+            BleService.getInstance().getScanResultFlow().catch {
+                Log.d("","异常::${it.message}")
+            }.collect {
+                Log.d("","扫描到的FM设备个数：：${it.size}")
+                if (it.size!=0){
+                    Pager(PagingConfig(
+                        pageSize = it.size, initialLoadSize = it.size
+                    ), null, pagingSourceFactory = {
+                        ScanBlePageSource2(it)
+                    }).flow.cachedIn(viewModelScope).collect {
+                        bleScanAdapter.submitData(it)
+                    }
+                }
+
+            }
+        }
+    }
 
    inner class ScanBlePageSource2(var mutableList: List<BleDevice>) : PagingSource<Int, BleDevice>() {
         override fun getRefreshKey(state: PagingState<Int, BleDevice>): Int? {

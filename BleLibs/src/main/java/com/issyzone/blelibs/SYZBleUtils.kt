@@ -36,7 +36,7 @@ object SYZBleUtils {
     fun initBle(needScan:Boolean=false) {
         BleManager.getInstance().init(AppGlobels.getApplication());
         BleManager.getInstance().enableLog(true)
-            .setReConnectCount(0, 10000).operateTimeout = 5000
+            .setReConnectCount(1, 1000).operateTimeout = 5000
 
         if (needScan){
             val scanRuleConfig = BleScanRuleConfig.Builder()

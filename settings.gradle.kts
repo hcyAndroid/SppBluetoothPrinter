@@ -23,3 +23,4 @@ dependencyResolutionManagement {
 rootProject.name = "bluetoothPrinter"
 include(":app")
 include(":BleLibs")
+include(":classicBluLib")

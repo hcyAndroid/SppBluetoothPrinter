@@ -10,6 +10,7 @@ object FMPrinterOrder {
     //获取打印信息
     fun orderForGetFmDevicesInfo(): ByteArray {
         var mSendMsg = MPSendMsg.newBuilder().setEventType(MPMessage.EventType.DEVICEINFO).build()
+
         Log.d("$TAG","发送检查设备的命令${mSendMsg.toString()}")
         return mSendMsg.toByteArray()
     }

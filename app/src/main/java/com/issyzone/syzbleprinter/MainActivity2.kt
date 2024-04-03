@@ -16,6 +16,7 @@ import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.BitmapUtils
 import com.issyzone.blelibs.utils.ImageUtilKt
+import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 //import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 import com.issyzone.syzbleprinter.databinding.ActivityMain2Binding
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
@@ -34,9 +35,9 @@ import kotlinx.coroutines.withContext
 class MainActivity2 :  ComponentActivity() {
     private val vb:ActivityMain2Binding by invokeViewBinding()
     private val vm:ScanBleViewModel by invokeViewModel()
-//    val bleScanAdapter = BlueScanAdapter(){
-//        vm.connectBleDevice(it)
-//    }
+    val bleScanAdapter = BlueScanAdapter(){
+        vm.connectBleDevice(it)
+    }
     fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
@@ -45,7 +46,7 @@ class MainActivity2 :  ComponentActivity() {
         setContentView(vb.root)
         vm.startBleService()
         initRecyclerView()
-       // vm.getScanBleDevice(bleScanAdapter)
+        vm.getScanBleDevice(bleScanAdapter)
        // ImageUtilKt.convertBinary(BitmapExt.test(), 128)
         SyzBleManager.getInstance().initBle()
         var bb=ImageUtilKt.convertBinary(BitmapExt.test(), 128)
@@ -88,7 +89,7 @@ class MainActivity2 :  ComponentActivity() {
 
     private fun initRecyclerView() {
         vb.listBle.layoutManager = LinearLayoutManager(this@MainActivity2)
-        //vb.listBle.adapter = bleScanAdapter
+        vb.listBle.adapter = bleScanAdapter
 
     }
 }

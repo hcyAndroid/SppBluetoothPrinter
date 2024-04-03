@@ -1,2 +1,15 @@
 
-_kotlin:S6310;"Avoid hardcoded dispatchers.(š˜’‰şÿÿÿÿJ$25a7a6a8-f08a-4bc9-8c05-e9c0a8c92d03
+hkotlin:S125/"Remove this commented out code.(“”éúÿÿÿÿ8Úßÿœè1J$84885dc1-ed25-4680-a312-547e883125d6
+hkotlin:S1256"Remove this commented out code.(î€Š°ûÿÿÿÿ8Øò«¡è1J$f2d21500-d965-4d1f-9bfc-a47a7795984f
+ckotlin:S125:"Remove this commented out code.(æî´½8í…¡è1J$c0a2c1dc-fea9-4b31-88a2-022152384168
+dkotlin:S125Ø"Remove this commented out code.(Å¡ü÷8Œ¶Á˜è1J$1fc3b2c0-e6a9-4078-b9eb-036f0537d028
+ikotlin:S125â"Remove this commented out code.(Á—¤ƒüÿÿÿÿ8Œ¶Á˜è1J$ea3e6e26-b596-4e49-a2f0-179dc472bd6f
+rkotlin:S108^")Either remove or fill this block of code.(±ß–ûÿÿÿÿ8¥ïüç1J$a08ab815-814b-4a16-a155-91d1ba0fd45c
+dkotlin:S1128"Remove this unused import.(¢âß±ıÿÿÿÿ8ÆÏÛ™è1J$bc9625db-0d0a-4b3b-8cde-6e81b390822b
+^kotlin:S1128"Remove this unused import.(âG8ÆÏÛ™è1J$802eda26-d721-4114-b251-113401fde9f5
+_kotlin:S1128"Remove this unused import.(üƒŠ¸8ÆÏÛ™è1J$ac29cf33-b377-4974-9d4e-9884f33432a7
+^kotlin:S1128"Remove this unused import.(Ş‚½8ÆÏÛ™è1J$3310575b-00fb-4937-b209-56fb8f7ec835
+_kotlin:S1128"Remove this unused import.(ï‡Û™8ßéÚ™è1J$c9b72cf7-db43-4337-bc71-c2c79d934c94
+dkotlin:S1128"Remove this unused import.(şÇç’ûÿÿÿÿ8åßÿœè1J$32899efb-7916-4fd2-ab9b-7cca6ca5c364
+—kotlin:S3776;"RRefactor this method to reduce its Cognitive Complexity from 35 to the 15 allowed.(áÃçº8™¶Á˜è1J$94979f93-8a84-4ee9-9e82-f944e08bffc1
+¤kotlin:S1186{"ZAdd a nested comment explaining why this function is empty or complete the implementation.(şøŠÖşÿÿÿÿ8¯ïüç1J$5a27aa0e-f78d-4040-968b-b8704addfe47

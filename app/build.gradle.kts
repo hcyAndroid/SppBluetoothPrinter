@@ -59,7 +59,7 @@ android {
 
 val libsDir = file("libs")
 val arrAar = fileTree(libsDir) {
-    include("syz-device-v1.0.4-alpha.aar")
+    include("jx800r18_sdk_release_1.0.5.aar")
 }
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
@@ -72,14 +72,17 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(project(mapOf("path" to ":BleLibs")))
+    implementation(project(mapOf("path" to ":classicBluLib")))
     testImplementation("junit:junit:4.13.2")
     //implementation(files(arrJars))
-    //implementation(files(arrAar))
+    implementation(files(arrAar))
 
    // api(libs.logger)
     api(libs.bundles.proto3)
    // implementation(files(fileTree(libsDir) { include("arr*.jar") }))
-    implementation(project(":BleLibs"))
+   // implementation(project(":BleLibs"))
+    //implementation(project(":classicBluLib"))
     implementation(libs.recyclerview)
      implementation(libs.logger)
   //  implementation(libs.baserecyclerviewadapterhelper4)
