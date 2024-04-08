@@ -12,7 +12,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = libs.versions.versionCode.get().toInt()
-        versionName =  libs.versions.versionName.get()
+        versionName = libs.versions.versionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -24,8 +24,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -48,7 +47,7 @@ android {
         }
     }
     viewBinding {
-        enable=true
+        enable = true
     }
 //    repositories {
 //        flatDir {
@@ -78,14 +77,14 @@ dependencies {
     //implementation(files(arrJars))
     implementation(files(arrAar))
 
-   // api(libs.logger)
+    // api(libs.logger)
     api(libs.bundles.proto3)
-   // implementation(files(fileTree(libsDir) { include("arr*.jar") }))
-   // implementation(project(":BleLibs"))
+    // implementation(files(fileTree(libsDir) { include("arr*.jar") }))
+    // implementation(project(":BleLibs"))
     //implementation(project(":classicBluLib"))
     implementation(libs.recyclerview)
-     implementation(libs.logger)
-  //  implementation(libs.baserecyclerviewadapterhelper4)
+    implementation(libs.logger)
+    //  implementation(libs.baserecyclerviewadapterhelper4)
     implementation(libs.appcompat)
     implementation(libs.page.runtime)
 //    implementation(libs.bundles.proto3)

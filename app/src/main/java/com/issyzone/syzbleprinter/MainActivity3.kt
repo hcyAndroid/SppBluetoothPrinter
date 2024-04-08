@@ -40,11 +40,14 @@ class MainActivity3 : ComponentActivity() {
 
 
         val lo2 = "DC:0D:30:00:02:E5"
+        val deviceMac="DC:0D:30:00:02:DB" //硬件那的mac
         vm.tvType.text = "4寸demo"
+        vm.etPicWidth.setText("102")
+        vm.etPicHeight.setText("152")
         // TEst.test()
         val localmac = SpUtils.readData("mac4")
         if (localmac.isNullOrEmpty()) {
-            vm.etMac.setText(lo2)
+            vm.etMac.setText(deviceMac)
         } else {
             vm.etMac.setText(localmac)
         }
@@ -112,7 +115,7 @@ class MainActivity3 : ComponentActivity() {
             })
         }
         vm.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0.bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(6).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -154,9 +157,12 @@ class MainActivity3 : ComponentActivity() {
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT22222")
             // val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
             val page = vm.etPrintPage.text.toString().toInt()
+            val width = vm.etPicWidth.text.toString().toInt()
+            val height = vm.etPicHeight.text.toString().toInt()
+            Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
             SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap,bitmap2),
-                102,
-                152,
+                width,
+                height,
                 page,
                 SyzPrinter.SYZFOURINCH,
                 object : BluPrinterInfoCall2 {

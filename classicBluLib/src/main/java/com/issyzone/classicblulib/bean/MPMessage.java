@@ -4194,6 +4194,12 @@ public final class MPMessage {
      * @return The height.
      */
     int getHeight();
+
+    /**
+     * <code>int32 compression = 8;</code>
+     * @return The compression.
+     */
+    int getCompression();
   }
   /**
    * <pre>
@@ -4204,6 +4210,7 @@ public final class MPMessage {
    *data: 图片data
    *width: 图片宽 mm
    *height: 图片高 mm
+   *compression : 是否是压缩数据 0:不压缩 1:压缩
    * </pre>
    *
    * Protobuf type {@code MPPrintMsg}
@@ -4318,6 +4325,17 @@ public final class MPMessage {
       return height_;
     }
 
+    public static final int COMPRESSION_FIELD_NUMBER = 8;
+    private int compression_ = 0;
+    /**
+     * <code>int32 compression = 8;</code>
+     * @return The compression.
+     */
+    @Override
+    public int getCompression() {
+      return compression_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @Override
     public final boolean isInitialized() {
@@ -4352,6 +4370,9 @@ public final class MPMessage {
       }
       if (height_ != 0) {
         output.writeInt32(7, height_);
+      }
+      if (compression_ != 0) {
+        output.writeInt32(8, compression_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -4390,6 +4411,10 @@ public final class MPMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(7, height_);
       }
+      if (compression_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, compression_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4419,6 +4444,8 @@ public final class MPMessage {
           != other.getWidth()) return false;
       if (getHeight()
           != other.getHeight()) return false;
+      if (getCompression()
+          != other.getCompression()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -4444,6 +4471,8 @@ public final class MPMessage {
       hash = (53 * hash) + getWidth();
       hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
       hash = (53 * hash) + getHeight();
+      hash = (37 * hash) + COMPRESSION_FIELD_NUMBER;
+      hash = (53 * hash) + getCompression();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4550,6 +4579,7 @@ public final class MPMessage {
      *data: 图片data
      *width: 图片宽 mm
      *height: 图片高 mm
+     *compression : 是否是压缩数据 0:不压缩 1:压缩
      * </pre>
      *
      * Protobuf type {@code MPPrintMsg}
@@ -4592,6 +4622,7 @@ public final class MPMessage {
         indexPackage_ = 0;
         width_ = 0;
         height_ = 0;
+        compression_ = 0;
         return this;
       }
 
@@ -4645,6 +4676,9 @@ public final class MPMessage {
         }
         if (((from_bitField0_ & 0x00000040) != 0)) {
           result.height_ = height_;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          result.compression_ = compression_;
         }
       }
 
@@ -4713,6 +4747,9 @@ public final class MPMessage {
         if (other.getHeight() != 0) {
           setHeight(other.getHeight());
         }
+        if (other.getCompression() != 0) {
+          setCompression(other.getCompression());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -4774,6 +4811,11 @@ public final class MPMessage {
                 bitField0_ |= 0x00000040;
                 break;
               } // case 56
+              case 64: {
+                compression_ = input.readInt32();
+                bitField0_ |= 0x00000080;
+                break;
+              } // case 64
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -5011,6 +5053,38 @@ public final class MPMessage {
       public Builder clearHeight() {
         bitField0_ = (bitField0_ & ~0x00000040);
         height_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int compression_ ;
+      /**
+       * <code>int32 compression = 8;</code>
+       * @return The compression.
+       */
+      @Override
+      public int getCompression() {
+        return compression_;
+      }
+      /**
+       * <code>int32 compression = 8;</code>
+       * @param value The compression to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCompression(int value) {
+
+        compression_ = value;
+        bitField0_ |= 0x00000080;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 compression = 8;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCompression() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        compression_ = 0;
         onChanged();
         return this;
       }
@@ -5985,19 +6059,20 @@ public final class MPMessage {
       "\030\002 \001(\t\022\023\n\013firmwareVer\030\003 \001(\t\022\023\n\013paperStat" +
       "us\030\004 \001(\005\022\014\n\004elec\030\005 \001(\005\022\025\n\rconcentration\030" +
       "\006 \001(\005\022\r\n\005speed\030\007 \001(\005\022\021\n\tpaperSize\030\010 \001(\005\022" +
-      "\023\n\013printStatus\030\t \001(\t\"\212\001\n\nMPPrintMsg\022\014\n\004p" +
+      "\023\n\013printStatus\030\t \001(\t\"\237\001\n\nMPPrintMsg\022\014\n\004p" +
       "age\030\001 \001(\005\022\017\n\007imgData\030\002 \001(\014\022\022\n\ndataLength" +
       "\030\003 \001(\021\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014indexPac" +
       "kage\030\005 \001(\005\022\r\n\005width\030\006 \001(\005\022\016\n\006height\030\007 \001(" +
-      "\005\"\207\001\n\rMPFirmwareMsg\022\017\n\007crcCode\030\001 \001(\005\022\022\n\n" +
-      "dataLength\030\002 \001(\021\022\017\n\007binData\030\003 \001(\014\022\024\n\014tot" +
-      "alPackage\030\004 \001(\005\022\024\n\014indexPackage\030\005 \001(\005\022\024\n" +
-      "\014firmwareType\030\006 \001(\005*\276\001\n\tEventType\022\013\n\007DEF" +
-      "AULT\020\000\022\016\n\nDEVICEINFO\020\001\022\014\n\010SELFTEST\020\002\022\r\n\t" +
-      "CLOSETIME\020\003\022\017\n\013DEVICEPRINT\020\004\022\022\n\016CANCELPR" +
-      "INTING\020\005\022\020\n\014DEVICEREPORT\020\006\022\023\n\017FIRMWAREUP" +
-      "GRADE\020\007\022\021\n\rPRINTINGSPEED\020\010\022\030\n\024PRINTINCON" +
-      "CENTRATION\020\tb\006proto3"
+      "\005\022\023\n\013compression\030\010 \001(\005\"\207\001\n\rMPFirmwareMsg" +
+      "\022\017\n\007crcCode\030\001 \001(\005\022\022\n\ndataLength\030\002 \001(\021\022\017\n" +
+      "\007binData\030\003 \001(\014\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014" +
+      "indexPackage\030\005 \001(\005\022\024\n\014firmwareType\030\006 \001(\005" +
+      "*\276\001\n\tEventType\022\013\n\007DEFAULT\020\000\022\016\n\nDEVICEINF" +
+      "O\020\001\022\014\n\010SELFTEST\020\002\022\r\n\tCLOSETIME\020\003\022\017\n\013DEVI" +
+      "CEPRINT\020\004\022\022\n\016CANCELPRINTING\020\005\022\020\n\014DEVICER" +
+      "EPORT\020\006\022\023\n\017FIRMWAREUPGRADE\020\007\022\021\n\rPRINTING" +
+      "SPEED\020\010\022\030\n\024PRINTINCONCENTRATION\020\tb\006proto" +
+      "3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6032,7 +6107,7 @@ public final class MPMessage {
     internal_static_MPPrintMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MPPrintMsg_descriptor,
-        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "Height", });
+        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "Height", "Compression", });
     internal_static_MPFirmwareMsg_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_MPFirmwareMsg_fieldAccessorTable = new

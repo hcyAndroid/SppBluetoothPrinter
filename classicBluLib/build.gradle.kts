@@ -54,7 +54,7 @@ dependencies {
     implementation(libs.material)
     //implementation(files(arrAar))
     implementation(libs.bundles.proto3)
-   // api(files("libs/feasyblue.jar"))
+    // api(files("libs/feasyblue.jar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -88,7 +88,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.issyzone.sdk"
                 artifactId = "syz-device"
-                version = "v1.3.0-alpha"
+                version = "v1.3.1-alpha"
 //                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
             }
         }

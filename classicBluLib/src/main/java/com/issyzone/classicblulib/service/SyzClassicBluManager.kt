@@ -28,6 +28,8 @@ import com.issyzone.classicblulib.tools.UUIDWrapper
 import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
 import com.issyzone.classicblulib.utils.PrintBimapUtils
+import com.issyzone.classicblulib.utils.QuickLZ
+
 import com.issyzone.classicblulib.utils.Upacker
 import com.issyzone.classicblulib.utils.fileToByteArray
 import com.issyzone.classicblulib.utils.isExtension
@@ -53,6 +55,10 @@ class SyzClassicBluManager {
     private var currentPrintStatusFlow: MutableSharedFlow<SyzPrinterState2>? = null
 
     companion object {
+//        init {
+//            System.loadLibrary("quicklz")
+//        }
+
         private var instance: SyzClassicBluManager? = null
         var isCancelPrinting = false  //是否取消打印
         fun getInstance(): SyzClassicBluManager {
@@ -134,6 +140,7 @@ class SyzClassicBluManager {
             result: Boolean
         ) {
             super.onWrite(device, wrapper, tag, value, result)
+            //这里监听写入
             Log.e(TAG, "${tag}========${value}======${result}")
         }
 
@@ -171,10 +178,10 @@ class SyzClassicBluManager {
                             mpRespondMsg.respondData.toByteArray()
                         )
                         when (mpCodeMsg.code) {
-                            300 -> {
-                                //打印任务回调(包括打印自检页
-
-                            }
+//                            300 -> {
+//                                //打印任务回调(包括打印自检页
+//
+//                            }
 
                             400 -> {
                                 //固件升级任务回调
@@ -188,9 +195,9 @@ class SyzClassicBluManager {
                                 )
                             }
 
-                            13 -> {
-                                //电量回调
-                            }
+//                            13 -> {
+//                                //电量回调
+//                            }
 
                             10 -> {
                                 //返回打印机的状态
@@ -269,6 +276,28 @@ class SyzClassicBluManager {
 
     }
 
+
+    //用quicklz压缩
+    private suspend fun quicklzCompress(bitmapDataArray: ByteArray): ByteArray {
+        return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
+            val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
+            cancellableContinuation.resume(yaSuoArray) {
+                Log.e(TAG, "压缩失败>>>>>")
+            }
+        }
+    }
+
+    //用quicklz解压缩
+    private suspend fun quicklzDecompress(bitmapDataArray: ByteArray): ByteArray {
+        return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
+            val yaSuoArray = QuickLZ.decompress(bitmapDataArray)
+            cancellableContinuation.resume(yaSuoArray) {
+                Log.e(TAG, "解压缩失败>>>>>")
+            }
+        }
+    }
+
+    //打印图片
     fun writeBitmaps(
         bipmaps: MutableList<Bitmap>,
         width: Int,
@@ -317,18 +346,39 @@ class SyzClassicBluManager {
             val chunkSize = if (printerType == SyzPrinter.SYZTWOINCH) {
                 //2寸最大的机器MTU为240
                 width * 4   //2寸是按4行发的
+                //1024
+            } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                width * 10   //四寸是按10行发的
             } else {
                 width * 10    //四寸是按10行发的
+                // 500
+            }
+            val isCompress =
+                printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+
+            val compressCode = if (isCompress) {
+                0
+            } else {
+                0
             }
             var startTime = System.currentTimeMillis()
             val totalBipmapsDataList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
             bipmaps.forEachIndexed { index, bitmap ->
-                val bitmapArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
-                //Log.d("$TAG", "print()之后第${index}张图片总字节数${bitmapArray.size}")
-                //对bitmaparray进行每100个字节分包
+                val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+                var bitmapArray = if (compressCode == 1) {
+                    Log.i(TAG, "压缩前bitmap大小==${bitmapPrintArray.size}")
+                    val quicklzCompressTask = async { quicklzCompress(bitmapPrintArray) }
+                    val bitmapCompress = quicklzCompressTask.await()
+                    Log.i(TAG, "压缩后bitmap大小==${bitmapCompress.size}")
+                    val quicklzDecompressTask = async { quicklzDecompress(bitmapCompress) }
+                    val bitmapOrgin = quicklzDecompressTask.await()
+                    Log.i(TAG, "解压缩后bitmap大小==${bitmapOrgin.size}")
+                    bitmapCompress
+                } else {
+                    bitmapPrintArray
+                }
                 val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(bitmapArray, chunkSize)
                 var total = aplitafter.size //总包数
-                // Log.d("$TAG", "第${index}张图片总包数${total}")
                 val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
                 aplitafter.forEachIndexed { index, bytes ->
                     val mPPrintMsg = if (index == 0) {
@@ -336,11 +386,12 @@ class SyzClassicBluManager {
                         MPMessage.MPPrintMsg.newBuilder().setPage(page)
                             .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
                             .setIndexPackage(index + 1).setTotalPackage(total).setWidth(width)
-                            .setHeight(height).build()
+                            .setCompression(compressCode).setHeight(height).build()
                     } else {
                         MPMessage.MPPrintMsg.newBuilder().setPage(page)
                             .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
-                            .setIndexPackage(index + 1).setTotalPackage(total).build()
+                            .setIndexPackage(index + 1).setTotalPackage(total)
+                            .setCompression(compressCode).build()
                     }
 
                     needSendDataList.add(
@@ -589,9 +640,9 @@ class SyzClassicBluManager {
                     )
                 }
                 Log.d(
-                    "$TAG", "=======第${index}包===字节数${dataArray.size}="
+                    "$TAG", "=======第${index}包===字节数${upackerData.size}="
                 )
-                LogLiveData.addLogs("=======第${index}包===字节数${dataArray.size}=")
+                LogLiveData.addLogs("=======第${index}包===字节数${upackerData.size}=")
                 delay(1)
             } catch (e: Exception) {
                 break
@@ -665,6 +716,7 @@ class SyzClassicBluManager {
                     })
                 }
     }
+
 
     fun onDestory() {
         BTManager.getInstance().destroy()

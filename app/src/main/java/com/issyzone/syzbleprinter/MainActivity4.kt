@@ -41,8 +41,8 @@ class MainActivity4 : ComponentActivity() {
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
-        val lo = "03:26:A0:AE:0B:57"
-        val lo2 = "03:22:55:BF:00:0F"
+        //val lo = "03:26:A0:AE:0B:57"
+         val lo2 = "03:22:55:BF:00:0F"
         vm.tvType.text = "2寸demo"
         // TEst.test()
         val localmac = SpUtils.readData("mac2")
@@ -117,7 +117,7 @@ class MainActivity4 : ComponentActivity() {
             })
         }
         vm.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(11).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(15).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -156,31 +156,32 @@ class MainActivity4 : ComponentActivity() {
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT111")
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test3), 128)
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test8), 128)
-
             // val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
             val page = vm.etPrintPage.text.toString().toInt()
-            Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}")
-            SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap, bitmap2),
-                48,
-                48,
-                page,
-                SyzPrinter.SYZTWOINCH,
-                object : BluPrinterInfoCall2 {
-                    override fun getBluNotifyInfo(
-                        isSuccess: Boolean, msg: SyzPrinterState2
-                    ) {
-                        if (isSuccess) {
-                            Log.d("2寸图片打印》》》", "打印图片成功>>>>${msg.toString()}")
-                        } else {
-                            Log.e("2寸图片打印》》》", "打印图片失败>>>>${msg.toString()}")
+            val width = vm.etPicWidth.text.toString().toInt()
+            val height = vm.etPicHeight.text.toString().toInt()
+            Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
+            SyzClassicBluManager.getInstance()
+                .writeBitmaps(mutableListOf(bitmap, bitmap, bitmap, bitmap2),
+                    width,
+                    height,
+                    page,
+                    SyzPrinter.SYZTWOINCH,
+                    object : BluPrinterInfoCall2 {
+                        override fun getBluNotifyInfo(
+                            isSuccess: Boolean, msg: SyzPrinterState2
+                        ) {
+                            if (isSuccess) {
+                                Log.d("2寸图片打印》》》", "打印图片成功>>>>${msg.toString()}")
+                            } else {
+                                Log.e("2寸图片打印》》》", "打印图片失败>>>>${msg.toString()}")
+                            }
                         }
-                    }
-
-                })
+                    })
         }
 
         vm.tvSetPrintSpeed.setOnClickListener {
-            SyzClassicBluManager.getInstance().writePrintSpeed(2, object : DeviceBleInfoCall {
+            SyzClassicBluManager.getInstance().writePrintSpeed(4, object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
                         Log.d("", "设置打印速度成功>>>>${msg.toString()}")
