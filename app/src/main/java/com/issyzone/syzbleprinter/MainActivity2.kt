@@ -11,6 +11,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.issyzone.blelibs.R
 import com.issyzone.blelibs.service.BleService
 import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
@@ -53,13 +54,17 @@ class MainActivity2 :  ComponentActivity() {
       //  Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
         val bitmapArray = BitmapUtils.print(bb, bb.width, bb.height)
        // Logger.d(">>>>>AAA${ bitmapArray.size}")
-        vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
-        //vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
-        vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapArray))
+//        vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
+//        //vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
+//        vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapArray))
+//
 
-        SyzBleManager.getInstance().setActivelyReportBack {
-           // Logger.v("主动上报的信息>>>>>>${it.toString()}")
-        }
+
+
+//
+//        SyzBleManager.getInstance().setActivelyReportBack {
+//           // Logger.v("主动上报的信息>>>>>>${it.toString()}")
+//        }
 //        lifecycleScope.launch {
 //            //delay(40000)
 //            BleService.getInstance().getScanResultFlow()
@@ -68,8 +73,11 @@ class MainActivity2 :  ComponentActivity() {
 //            }
 //        }
 
-
-
+//
+//        val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
+//        //val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+//        //vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapPrintArray))
+//        bitmap.by
 
 
 

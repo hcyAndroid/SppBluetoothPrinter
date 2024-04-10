@@ -250,7 +250,30 @@ object FmNotifyBeanUtils {
         }
     }
 
+    fun getByteAtPosition(value: Int, position: Int): Byte {
+        // 计算要获取的字节在整数中的位置
+        val shiftBits = position * 8
+        // 将整数右移相应的位数，然后与 0xFF 进行按位与运算，获取特定字节的值
+        val byteValue = (value shr shiftBits) and 0xFF
+        // 将获取到的值转换为字节类型并返回
+        return byteValue.toByte()
+    }
+
+    fun iterateBits(byteValue: Byte) {
+        // 使用一个循环逐一获取每个比特的值
+        for (i in 0..7) {  // 从最低位到最高位遍历
+            val bit = (byteValue.toInt() shr i) and 1
+            Log.i("iterateBits========", "====${bit}====")
+        }
+    }
+
     fun pasrsePrinterStatus(number: Int): BooleanArray {
+        //iterateBits()
+
+
+
+
+//
         val bytes = ByteArray(4)
         // 使用 ByteBuffer 将 int 转换为字节数组
         val buffer = ByteBuffer.allocate(4)
@@ -258,6 +281,7 @@ object FmNotifyBeanUtils {
         buffer.flip()
         buffer[bytes]
         val b = buffer[buffer.limit() - 1] // 要获取bit数组的字节
+       // val bits = BitSet.valueOf(byteArrayOf(getByteAtPosition(number,0)))
         val bits = BitSet.valueOf(byteArrayOf(b))
         val length = 8 // bit数组的长度
         val bitArray = BooleanArray(length)

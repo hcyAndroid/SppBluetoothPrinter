@@ -34,13 +34,19 @@ import com.issyzone.syzbleprinter.utils.invokeViewBinding
 
 class MainActivity3 : ComponentActivity() {
     private val vm: ActivityMain3Binding by invokeViewBinding()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SyzClassicBluManager.getInstance().onDestory()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
 
-
+        val lo1 = "DC:0D:30:00:02:E2"
         val lo2 = "DC:0D:30:00:02:E5"
-        val deviceMac="DC:0D:30:00:02:DB" //硬件那的mac
+        val deviceMac = "DC:0D:30:00:02:DB" //硬件那的mac
         vm.tvType.text = "4寸demo"
         vm.etPicWidth.setText("102")
         vm.etPicHeight.setText("152")
@@ -55,6 +61,9 @@ class MainActivity3 : ComponentActivity() {
         LogLiveData.showLogs(this, vm.tvLog)
 
         SyzClassicBluManager.getInstance().initClassicBlu()
+        SyzClassicBluManager.getInstance().setActivelyReportBack {
+            Log.i("2寸主动上报的》》》》",it.toString())
+        }
         SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
                 Log.i("SYZ>>>", "开始连接")
@@ -115,7 +124,7 @@ class MainActivity3 : ComponentActivity() {
             })
         }
         vm.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(6).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(12).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {

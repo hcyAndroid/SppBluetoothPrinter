@@ -35,24 +35,32 @@ import com.issyzone.syzbleprinter.utils.invokeViewBinding
  */
 class MainActivity4 : ComponentActivity() {
     private val vm: ActivityMain3Binding by invokeViewBinding()
+
+    override fun onDestroy() {
+        super.onDestroy()
+        SyzClassicBluManager.getInstance().onDestory()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
-        //val lo = "03:26:A0:AE:0B:57"
-         val lo2 = "03:22:55:BF:00:0F"
+        val lo = "03:26:A0:AE:0B:57"
+        // val lo2 = "03:22:55:BF:00:0F"
         vm.tvType.text = "2寸demo"
         // TEst.test()
         val localmac = SpUtils.readData("mac2")
         if (localmac.isNullOrEmpty()) {
-            vm.etMac.setText(lo2)
+            vm.etMac.setText(lo)
         } else {
             vm.etMac.setText(localmac)
         }
 
-
+        SyzClassicBluManager.getInstance().setActivelyReportBack {
+            Log.i("2寸主动上报的》》》》", it.toString())
+        }
         LogLiveData.showLogs(this, vm.tvLog)
 
         SyzClassicBluManager.getInstance().initClassicBlu()
@@ -65,7 +73,6 @@ class MainActivity4 : ComponentActivity() {
             override fun onConnectFail(msg: String?) {
                 Log.i("SYZ>>>", "onConnectFail")
                 LogLiveData.addLogs("经典蓝牙连接失败==${msg}")
-
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
@@ -117,7 +124,7 @@ class MainActivity4 : ComponentActivity() {
             })
         }
         vm.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(15).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(26).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -156,28 +163,33 @@ class MainActivity4 : ComponentActivity() {
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT111")
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test3), 128)
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test8), 128)
-            // val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
+             val bitmap3 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test11), 128)
+
+//            val bitmap3 = ImageUtilKt.convertBinary(
+//                ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test11)), 128
+//            )
+            // val bitmap4 = BitmapExt.decodeBitmap(R.drawable.test10)
+
             val page = vm.etPrintPage.text.toString().toInt()
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
-            SyzClassicBluManager.getInstance()
-                .writeBitmaps(mutableListOf(bitmap, bitmap, bitmap, bitmap2),
-                    width,
-                    height,
-                    page,
-                    SyzPrinter.SYZTWOINCH,
-                    object : BluPrinterInfoCall2 {
-                        override fun getBluNotifyInfo(
-                            isSuccess: Boolean, msg: SyzPrinterState2
-                        ) {
-                            if (isSuccess) {
-                                Log.d("2寸图片打印》》》", "打印图片成功>>>>${msg.toString()}")
-                            } else {
-                                Log.e("2寸图片打印》》》", "打印图片失败>>>>${msg.toString()}")
-                            }
+            SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap3,bitmap,bitmap2),
+                width,
+                height,
+                page,
+                SyzPrinter.SYZTWOINCH,
+                object : BluPrinterInfoCall2 {
+                    override fun getBluNotifyInfo(
+                        isSuccess: Boolean, msg: SyzPrinterState2
+                    ) {
+                        if (isSuccess) {
+                            Log.d("2寸图片打印》》》", "打印图片成功>>>>${msg.toString()}")
+                        } else {
+                            Log.e("2寸图片打印》》》", "打印图片失败>>>>${msg.toString()}")
                         }
-                    })
+                    }
+                })
         }
 
         vm.tvSetPrintSpeed.setOnClickListener {

@@ -27,6 +27,7 @@ import com.issyzone.classicblulib.tools.EventObserver
 import com.issyzone.classicblulib.tools.UUIDWrapper
 import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
+import com.issyzone.classicblulib.utils.HeatShrinkUtils
 import com.issyzone.classicblulib.utils.PrintBimapUtils
 import com.issyzone.classicblulib.utils.QuickLZ
 
@@ -50,6 +51,7 @@ import java.io.File
 
 class SyzClassicBluManager {
     private val TAG = "SyzClassicBluManager>>"
+
 
     //监听打印图片的flow
     private var currentPrintStatusFlow: MutableSharedFlow<SyzPrinterState2>? = null
@@ -141,7 +143,7 @@ class SyzClassicBluManager {
         ) {
             super.onWrite(device, wrapper, tag, value, result)
             //这里监听写入
-            Log.e(TAG, "${tag}========${value}======${result}")
+           // Log.e(TAG, "${tag}========${value}======${result}")
         }
 
         override fun onRead(device: BluetoothDevice, wrapper: UUIDWrapper, data: ByteArray) {
@@ -193,6 +195,13 @@ class SyzClassicBluManager {
                                         )
                                     )
                                 )
+                            }
+                            11->{
+                                if (mpCodeMsg.info=="1"){
+                                    PrintBimapUtils.getInstance().removePrintWhenSuccess() {
+                                        // currentPrintStatusFlow = null
+                                    }
+                                }
                             }
 
 //                            13 -> {
@@ -278,9 +287,10 @@ class SyzClassicBluManager {
 
 
     //用quicklz压缩
-    private suspend fun quicklzCompress(bitmapDataArray: ByteArray): ByteArray {
+    private suspend fun compress(bitmapDataArray: ByteArray): ByteArray {
         return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
-            val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
+            //val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
+            val yaSuoArray = HeatShrinkUtils.compress(bitmapDataArray)
             cancellableContinuation.resume(yaSuoArray) {
                 Log.e(TAG, "压缩失败>>>>>")
             }
@@ -288,9 +298,10 @@ class SyzClassicBluManager {
     }
 
     //用quicklz解压缩
-    private suspend fun quicklzDecompress(bitmapDataArray: ByteArray): ByteArray {
+    private suspend fun decompress(bitmapDataArray: ByteArray): ByteArray {
         return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
-            val yaSuoArray = QuickLZ.decompress(bitmapDataArray)
+            //val yaSuoArray = QuickLZ.decompress(bitmapDataArray)
+            val yaSuoArray = HeatShrinkUtils.decompress(bitmapDataArray)
             cancellableContinuation.resume(yaSuoArray) {
                 Log.e(TAG, "解压缩失败>>>>>")
             }
@@ -318,10 +329,10 @@ class SyzClassicBluManager {
 //                            //收到了取消打印的回调，同时打印结束,代表取消成功
 //                            cpb?.cancelSuccess()
 //                        }
-                        delay(5)
-                        PrintBimapUtils.getInstance().removePrintWhenSuccess() {
-                            // currentPrintStatusFlow = null
-                        }
+//                        delay(5)
+//                        PrintBimapUtils.getInstance().removePrintWhenSuccess() {
+//                            // currentPrintStatusFlow = null
+//                        }
                         if (PrintBimapUtils.getInstance().isCompleteBitmapPrinter()) {
                             callBack.getBluNotifyInfo(true, it)
                             currentPrintStatusFlow = null
@@ -343,21 +354,24 @@ class SyzClassicBluManager {
         bitListScope = CoroutineScope(Dispatchers.IO)
         bitListScope?.launch {
             //打印之前获取设备信息查询设备状态
-            val chunkSize = if (printerType == SyzPrinter.SYZTWOINCH) {
-                //2寸最大的机器MTU为240
-                width * 4   //2寸是按4行发的
-                //1024
-            } else if (printerType == SyzPrinter.SYZFOURINCH) {
-                width * 10   //四寸是按10行发的
-            } else {
-                width * 10    //四寸是按10行发的
-                // 500
-            }
             val isCompress =
                 printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
-
+            val chunkSize = if (isCompress) {
+               100
+            } else {
+                if (printerType == SyzPrinter.SYZTWOINCH) {
+                    //2寸最大的机器MTU为240
+                    width * 4   //2寸是按4行发的
+                    //1024
+                } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                    width * 10   //四寸是按10行发的
+                } else {
+                    width    //未0.5寸预留
+                    // 500
+                }
+            }
             val compressCode = if (isCompress) {
-                0
+                1
             } else {
                 0
             }
@@ -367,12 +381,22 @@ class SyzClassicBluManager {
                 val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
                 var bitmapArray = if (compressCode == 1) {
                     Log.i(TAG, "压缩前bitmap大小==${bitmapPrintArray.size}")
-                    val quicklzCompressTask = async { quicklzCompress(bitmapPrintArray) }
+                    val compressStartTime = System.currentTimeMillis()
+                    val quicklzCompressTask = async { compress(bitmapPrintArray) }
                     val bitmapCompress = quicklzCompressTask.await()
-                    Log.i(TAG, "压缩后bitmap大小==${bitmapCompress.size}")
-                    val quicklzDecompressTask = async { quicklzDecompress(bitmapCompress) }
+                    Log.i(
+                        TAG,
+                        "压缩后bitmap大小==${bitmapCompress.size}==压缩耗时==${System.currentTimeMillis() - compressStartTime}"
+                    )
+
+
+                    val deCompressStartTime = System.currentTimeMillis()
+                    val quicklzDecompressTask = async { decompress(bitmapCompress) }
                     val bitmapOrgin = quicklzDecompressTask.await()
-                    Log.i(TAG, "解压缩后bitmap大小==${bitmapOrgin.size}")
+                    Log.i(
+                        TAG,
+                        "解压缩后bitmap大小==${bitmapOrgin.size}==解压缩耗时==${System.currentTimeMillis() - deCompressStartTime}"
+                    )
                     bitmapCompress
                 } else {
                     bitmapPrintArray
@@ -719,6 +743,20 @@ class SyzClassicBluManager {
 
 
     fun onDestory() {
+        if (instance != null) {
+            instance = null;
+        }
+        if (currentPrintStatusFlow != null) {
+            currentPrintStatusFlow = null
+        }
+        if (bitListScope != null && bitListScope!!.isActive) {
+            bitListScope?.cancel()
+            bitListScope = null
+        }
+        if (dexScope != null && dexScope!!.isActive) {
+            dexScope!!.cancel()
+            dexScope = null
+        }
         BTManager.getInstance().destroy()
     }
 

@@ -1,6 +1,5 @@
 package com.issyzone.classicblulib.utils
 
-import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
 import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
@@ -67,7 +66,27 @@ class PrintBimapUtils {
                     SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
                 } else {
                     Log.e(TAG, "打印机状态异常不能打印")
+                   // release()//释放资源
                 }
+            }
+        }
+    }
+
+
+    fun doPrint2() {
+        if (bitMapPrintTaskList.isNullOrEmpty()) {
+            Log.d("$TAG", "PrintBimapUtils>>>所有图片打印成功》》》")
+            LogLiveData.addLogs("所有图片打印成功》》》")
+            return
+        }
+        if (serviceScope != null && serviceScope!!.isActive) {
+            serviceScope!!.cancel()
+        }
+        serviceScope = CoroutineScope(Dispatchers.IO)
+        serviceScope!!.launch {
+            val doFirst = bitMapPrintTaskList.firstOrNull()
+            if (doFirst != null) {
+                SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
             }
         }
     }
@@ -84,7 +103,7 @@ class PrintBimapUtils {
                 allDown.invoke()
             } else {
                 Log.d("$TAG", "没有收到取消打印的指令，开始下一张打印")
-                doPrint()
+                doPrint2()
             }
         } else {
             Log.d("$TAG", "bitmap全部成功")
@@ -94,9 +113,21 @@ class PrintBimapUtils {
     }
 
 
+   private  fun release() {
+        if (serviceScope != null && serviceScope!!.isActive) {
+            serviceScope!!.cancel()
+            serviceScope=null
+        }
+        if (bitmapCall!=null){
+            bitmapCall=null
+        }
+        if (instance != null) {
+            instance = null
+        }
+    }
+
     fun isCompleteBitmapPrinter(): Boolean {
         return bitMapPrintTaskList.isNullOrEmpty()
     }
-
 
 }

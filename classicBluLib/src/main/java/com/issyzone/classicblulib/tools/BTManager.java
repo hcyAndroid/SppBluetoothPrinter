@@ -671,7 +671,7 @@ public class BTManager {
             broadcastReceiver = null;
         }
         isInitialized = false;
-        if (bluetoothAdapter != null) {
+        if (bluetoothAdapter != null&&bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
         }
         discoveryListeners.clear();
