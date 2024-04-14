@@ -58,7 +58,7 @@ android {
 
 val libsDir = file("libs")
 val arrAar = fileTree(libsDir) {
-    include("jx800r18_sdk_release_1.0.5.aar")
+    include("jx800r18_sdk_release_1.0.6.aar")
 }
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")

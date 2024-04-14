@@ -25,6 +25,13 @@ interface BluPrinterInfoCall2 {
 
 }
 
+
+interface BluPrintingCallBack {
+    fun printing(currentPrintPage:Int,totalPage:Int)
+    fun getPrintResult(isSuccess: Boolean, msg: SyzPrinterState2)
+
+}
+
 interface SyzBluCallBack {
     fun onStartConnect()
     fun onConnectFail(msg: String?)

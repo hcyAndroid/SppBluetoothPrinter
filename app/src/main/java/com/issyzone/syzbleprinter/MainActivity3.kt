@@ -20,6 +20,7 @@ import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzFirmwareType
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrinterInfoCall2
+import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
 import com.issyzone.classicblulib.callback.DeviceBleInfoCall
 import com.issyzone.classicblulib.callback.DeviceInfoCall
@@ -62,7 +63,7 @@ class MainActivity3 : ComponentActivity() {
 
         SyzClassicBluManager.getInstance().initClassicBlu()
         SyzClassicBluManager.getInstance().setActivelyReportBack {
-            Log.i("2寸主动上报的》》》》",it.toString())
+            Log.i("2寸主动上报的》》》》", it.toString())
         }
         SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
@@ -169,23 +170,43 @@ class MainActivity3 : ComponentActivity() {
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
-            SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap,bitmap2),
-                width,
-                height,
-                page,
-                SyzPrinter.SYZFOURINCH,
-                object : BluPrinterInfoCall2 {
-                    override fun getBluNotifyInfo(
-                        isSuccess: Boolean, msg: SyzPrinterState2
-                    ) {
-                        if (isSuccess) {
-                            Log.d("", "打印图片成功>>>>${msg.toString()}")
-                        } else {
-                            Log.d("", "打印图片失败>>>>${msg.toString()}")
-                        }
-                    }
+//            SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap,bitmap2),
+//                width,
+//                height,
+//                page,
+//                SyzPrinter.SYZFOURINCH,
+//                object : BluPrinterInfoCall2 {
+//                    override fun getBluNotifyInfo(
+//                        isSuccess: Boolean, msg: SyzPrinterState2
+//                    ) {
+//                        if (isSuccess) {
+//                            Log.d("", "打印图片成功>>>>${msg.toString()}")
+//                        } else {
+//                            Log.d("", "打印图片失败>>>>${msg.toString()}")
+//                        }
+//                    }
+//
+//                })
 
-                })
+            SyzClassicBluManager.getInstance().writeBitmaps(mutableListOf(bitmap, bitmap2),
+                    width,
+                    height,
+                    page,
+                    SyzPrinter.SYZTWOINCH,
+                false,
+                    object : BluPrintingCallBack {
+                        override fun printing(currentPrintPage: Int, totalPage: Int) {
+                            Log.i("MAIN>>>", "printing=====${currentPrintPage}=====${totalPage}")
+                        }
+
+                        override fun getPrintResult(isSuccess: Boolean, msg: SyzPrinterState2) {
+                            if (isSuccess) {
+                                Log.i("MAIN>>>", "打印成功>>>>${isSuccess}===${msg}")
+                            } else {
+                                Log.i("MAIN>>>", "打印失败>>>>${isSuccess}===${msg}")
+                            }
+                        }
+                    })
         }
 
         vm.tvSetPrintSpeed.setOnClickListener {

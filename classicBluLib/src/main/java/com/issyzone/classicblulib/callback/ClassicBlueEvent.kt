@@ -13,9 +13,8 @@ enum class SyzPrinterState2(
     PRINTER_BATTERY_LOW(6, true, "电池电量低", 5),//低电量
     PRINTER_MOTOR_HIGH_TEMPERATURE(7, true, "马达过热", 6),//马达高温
     PRINTER_OK(1000, true, "打印机正常", 9),//马达高温
-
     PRINTER_STATUS_UNKNOWN(1001, true, "打印机状态无法通过获取设备信息获取", 10),//马达高温
-
+    PRINTER_CANCEL_PRINT(1002,true,"取消打印回调",11)
 //  PRINTER_LID_CLOSE(3, false),//关盖
 //    //开盖
 //    PRINTER_HAS_PAPER(11, "1"), PRINTER_NO_PAPER(11, "2"), PRINTER_STRUCK_PAPER(

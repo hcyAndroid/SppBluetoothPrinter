@@ -1,9 +1,7 @@
+/*
 package com.issyzone.classicblulib.utils
 
 import android.util.Log
-import com.issyzone.classicblulib.bean.LogLiveData
-import com.issyzone.classicblulib.bean.MPMessage
-import com.issyzone.classicblulib.callback.BluPrinterInfoCall2
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.SyzPrinterState2
 import com.issyzone.classicblulib.service.SyzClassicBluManager
@@ -15,7 +13,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 
-class PrintBimapUtils {
+class SyzPrintBimapUtils {
     private val TAG = "PrintBimapUtils"
     private var totalPage = 0;//打印的总页数
     private var currentPrintPage = 0
@@ -23,43 +21,34 @@ class PrintBimapUtils {
     private var isCancelPrinting=false
 
     companion object {
-        private var bitMapPrintTaskList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
-        private var instance: PrintBimapUtils? = null
+        private var bitMapPrintTaskList = mutableListOf<MutableList<SyzBitmapPackageData>>()
+        private var instance: SyzPrintBimapUtils? = null
         private var serviceScope: CoroutineScope? = null
-        fun getInstance(): PrintBimapUtils {
+        fun getInstance(): SyzPrintBimapUtils {
             if (instance == null) {
                 serviceScope = CoroutineScope(Dispatchers.IO)
-                instance = PrintBimapUtils()
+                instance = SyzPrintBimapUtils()
             }
             return instance!!
         }
     }
 
     private var bitmapCall: BluPrintingCallBack? = null //打印回调
-    fun setBimapCallBack(callBack: BluPrintingCallBack): PrintBimapUtils {
+    fun setBimapCallBack(callBack: BluPrintingCallBack): SyzPrintBimapUtils {
         this.bitmapCall = callBack
         return this
     }
 
-    fun setBitmapTask(
-        bitmapdataList: MutableList<MutableList<MPMessage.MPSendMsg>>, page: Int
-    ): PrintBimapUtils {
-        bitMapPrintTaskList.clear()
-        bitmapdataList.forEach {
-            bitMapPrintTaskList.add(it)
-        }
-        totalPage = bitMapPrintTaskList.size * page
-        return this
-    }
+
 
     fun setBitmapTask2(
-        bitmapdataList: MutableList<MutableList<MutableList<MPMessage.MPSendMsg>>>, page: Int
-    ): PrintBimapUtils {
+        bitmapdataList: MutableList<MutableList<MutableList<SyzBitmapPackageData>>>, page: Int
+    ): SyzPrintBimapUtils {
         bitMapPrintTaskList.clear()
 
         bitmapdataList.forEach {bitmap->
             //每张图
-            var eachBitmap= mutableListOf<MPMessage.MPSendMsg>()
+            var eachBitmap= mutableListOf<SyzBitmapPackageData>()
             bitmap.forEach {duanList->
                 //每段
                 duanList.forEach{
@@ -113,12 +102,11 @@ class PrintBimapUtils {
         serviceScope!!.launch {
             bitMapPrintTaskList.forEach {doFirst->
                 if (doFirst!=null){
-                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
+                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst.map {
+                        it.packdata
+                    }.toMutableList())
                 }
             }
-           // val doFirst = bitMapPrintTaskList.firstOrNull()
-
-
         }
     }
 
@@ -143,7 +131,9 @@ class PrintBimapUtils {
                     bitmapCall?.printing(currentPrintPage = currentPrintPage, totalPage = totalPage)
                     isPrintingState = true
                     isCancelPrinting=false
-                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
+                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst.map {
+                        it.packdata
+                    }.toMutableList())
                 } else {
                     Log.e(TAG, "打印机状态异常不能打印==${stateFlag}")
                     isPrintingState = false
@@ -173,7 +163,9 @@ class PrintBimapUtils {
                     bitMapPrintTaskList.clear()
                     isPrintingState = false
                 }else{
-                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
+                    SyzClassicBluManager.getInstance().fmWriteABF4(doFirst.map {
+                        it.packdata
+                    }.toMutableList())
                 }
             }
         }
@@ -252,4 +244,4 @@ class PrintBimapUtils {
 //        return bitMapPrintTaskList.isNullOrEmpty()
 //    }
 
-}
+}*/

@@ -38,7 +38,7 @@
                 android:id="@+id/et_print_page"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="输入page"
+                android:hint="输入速度"
                 android:inputType="number"
                 android:text="2" />
 
@@ -57,6 +57,9 @@
                 android:hint="输入高"
                 android:inputType="number"
                 android:text="48" />
+
+
+
 
             <TextView
                 android:id="@+id/tv_log"
@@ -198,7 +201,40 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
-            android:text="打印bitmap"
+            android:text="打印1张抖动"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img2"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="打印一张压缩"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img3"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="新算法打印压缩bitmap"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img4"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="测试发送下一段"
             android:textStyle="bold" />
 
         <TextView

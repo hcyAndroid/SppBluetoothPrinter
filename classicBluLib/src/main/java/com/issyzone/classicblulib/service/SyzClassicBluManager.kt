@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.google.protobuf.ByteString
 import com.issyzone.classicblulib.bean.FMPrinterOrder
-import com.issyzone.classicblulib.bean.FmBitmapOrDexPrinterUtils
 import com.issyzone.classicblulib.bean.FmNotifyBeanUtils
 import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
@@ -13,7 +12,7 @@ import com.issyzone.classicblulib.bean.NotifyResult
 import com.issyzone.classicblulib.bean.NotifyResult2
 import com.issyzone.classicblulib.bean.SyzFirmwareType
 import com.issyzone.classicblulib.bean.SyzPrinter
-import com.issyzone.classicblulib.callback.BluPrinterInfoCall2
+import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
 import com.issyzone.classicblulib.callback.DeviceBleInfoCall
 import com.issyzone.classicblulib.callback.DeviceInfoCall
@@ -27,9 +26,9 @@ import com.issyzone.classicblulib.tools.EventObserver
 import com.issyzone.classicblulib.tools.UUIDWrapper
 import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
+import com.issyzone.classicblulib.utils.FmPrintBimapUtils
 import com.issyzone.classicblulib.utils.HeatShrinkUtils
-import com.issyzone.classicblulib.utils.PrintBimapUtils
-import com.issyzone.classicblulib.utils.QuickLZ
+
 
 import com.issyzone.classicblulib.utils.Upacker
 import com.issyzone.classicblulib.utils.fileToByteArray
@@ -39,9 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -52,17 +48,10 @@ import java.io.File
 class SyzClassicBluManager {
     private val TAG = "SyzClassicBluManager>>"
 
-
-    //监听打印图片的flow
-    private var currentPrintStatusFlow: MutableSharedFlow<SyzPrinterState2>? = null
-
     companion object {
-//        init {
-//            System.loadLibrary("quicklz")
-//        }
-
         private var instance: SyzClassicBluManager? = null
-        var isCancelPrinting = false  //是否取消打印
+
+        //var isCancelPrinting = false  //是否取消打印
         fun getInstance(): SyzClassicBluManager {
             if (instance == null) {
                 instance = SyzClassicBluManager()
@@ -143,7 +132,7 @@ class SyzClassicBluManager {
         ) {
             super.onWrite(device, wrapper, tag, value, result)
             //这里监听写入
-           // Log.e(TAG, "${tag}========${value}======${result}")
+            // Log.e(TAG, "${tag}========${value}======${result}")
         }
 
         override fun onRead(device: BluetoothDevice, wrapper: UUIDWrapper, data: ByteArray) {
@@ -196,13 +185,24 @@ class SyzClassicBluManager {
                                     )
                                 )
                             }
-                            11->{
-                                if (mpCodeMsg.info=="1"){
-                                    PrintBimapUtils.getInstance().removePrintWhenSuccess() {
-                                        // currentPrintStatusFlow = null
-                                    }
+
+                            11 -> {
+                                if (mpCodeMsg.info == "1") {
+                                    //收到11.1代表打印机通知你下发下一张
+                                    /*           PrintBimapUtils.getInstance()
+                                                   .removePrintWhenSuccessAndPrintNext()*/
+                                }
+                                if (mpCodeMsg.info == "2") {
+                                    //收到11.2代表2寸打印机,你需要发下一段的数据
+                                    //Log.d(TAG,"收到11.2代表2寸打印机,你需要发下一段的数据")
+                                    FmPrintBimapUtils.getInstance()
+                                        .removePrintWhenSuccessAndPrintNext()
                                 }
                             }
+
+//                            11 -> {
+//
+//                            }
 
 //                            13 -> {
 //                                //电量回调
@@ -215,15 +215,35 @@ class SyzClassicBluManager {
                                         mpRespondMsg.respondData.toByteArray()
                                     )
                                 )
-                                //主动回调
-                                activelyReportCallBack?.invoke(
-                                    state
-                                )
-                                currentPrintStatusFlow?.let {
-                                    CoroutineScope(Dispatchers.IO).launch {
-                                        it.emit(state)
+                                if (state == SyzPrinterState2.PRINTER_OK) {
+                                    //代表一张图的打印成功
+                                    //Log.i(TAG,"一张图打印成功了")
+                                    if (FmPrintBimapUtils.getInstance().getPrinterState()) {
+                                        FmPrintBimapUtils.getInstance().updatePrintProcess()
+                                    } else {
+                                        activelyReportCallBack?.invoke(
+                                            state
+                                        )
                                     }
+
+                                } else {
+                                    if (FmPrintBimapUtils.getInstance().getPrinterState()) {
+                                        FmPrintBimapUtils.getInstance()
+                                            .handlePrintingMistakes(state)
+                                    } else {
+                                        activelyReportCallBack?.invoke(
+                                            state
+                                        )
+                                    }
+                                    //Log.e(TAG,"图片打印过程中出现异常${state}")
                                 }
+
+
+//                                currentPrintStatusFlow?.let {
+//                                    CoroutineScope(Dispatchers.IO).launch {
+//                                        it.emit(state)
+//                                    }
+//                                }
                             }
                         }
                     } else {
@@ -232,10 +252,11 @@ class SyzClassicBluManager {
 
                 } else {
                     //其他的回调
-
                     if (mpRespondMsg.eventType == MPMessage.EventType.CANCELPRINTING) {
                         //取消打印的命令的回调
                         cancelPrintCallBack?.invoke(data)
+                        //
+                        FmPrintBimapUtils.getInstance().setPrinterCancel()
                     } else {
                         bluNotifyCallBack?.invoke(data)
                     }
@@ -250,35 +271,34 @@ class SyzClassicBluManager {
     }
     private var bitListScope: CoroutineScope? = null
 
-    suspend fun getPrintStatus(callBack: BluPrinterInfoCall2?): Boolean {
+    suspend fun getPrintStatus(): SyzPrinterState2 {
         val result = withTimeoutOrNull(3000) {
-            val getDeviceStateTask = async { getDeviceState(callBack) }
+            val getDeviceStateTask = async { getDeviceState() }
             getDeviceStateTask.await()
-        } ?: false
+        } ?: SyzPrinterState2.PRINTER_STATUS_UNKNOWN
         return result
     }
 
-    private suspend fun getDeviceState(callBack: BluPrinterInfoCall2?): Boolean {
-        return suspendCancellableCoroutine<Boolean> { cancellableContinuation ->
+    private suspend fun getDeviceState(): SyzPrinterState2 {
+        return suspendCancellableCoroutine<SyzPrinterState2> { cancellableContinuation ->
             getDeviceInfo(object : DeviceInfoCall {
                 override fun getDeviceInfo(msg: MPMessage.MPDeviceInfoMsg) {
                     val printState = FmNotifyBeanUtils.getPrintStatus(msg)
-                    Log.i(TAG, "打印机状态===${printState}")
-                    if (printState == SyzPrinterState2.PRINTER_OK) {
-                        cancellableContinuation.resume(true) {}
-                    } else {
-                        callBack?.getBluNotifyInfo(false, printState)
-                        currentPrintStatusFlow = null
-                        cancellableContinuation.resume(false) {}
+                    Log.i(TAG, "打印前获取打印机状态===${printState}")
+                    cancellableContinuation.resume(printState) {
+                        Log.e(TAG, "打印前获取打印机状态异常===")
                     }
                 }
 
                 override fun getDeviceInfoError(errorMsg: MPMessage.MPCodeMsg) {
-                    callBack?.getBluNotifyInfo(false, SyzPrinterState2.PRINTER_STATUS_UNKNOWN)
-                    currentPrintStatusFlow = null
-                    cancellableContinuation.resume(false) {
-
+                    // callBack?.getBluNotifyInfo(false, SyzPrinterState2.PRINTER_STATUS_UNKNOWN)
+                    //currentPrintStatusFlow = null
+                    cancellableContinuation.resume(SyzPrinterState2.PRINTER_STATUS_UNKNOWN) {
+                        Log.e(TAG, "打印前获取打印机状态异常===")
                     }
+//                    cancellableContinuation.resume(false) {
+//
+//                    }
                 }
             })
         }
@@ -287,7 +307,7 @@ class SyzClassicBluManager {
 
 
     //用quicklz压缩
-    private suspend fun compress(bitmapDataArray: ByteArray): ByteArray {
+    suspend fun compress(bitmapDataArray: ByteArray): ByteArray {
         return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
             //val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
             val yaSuoArray = HeatShrinkUtils.compress(bitmapDataArray)
@@ -309,132 +329,504 @@ class SyzClassicBluManager {
     }
 
     //打印图片
+    /*
+        fun writeBitmaps(
+            bipmaps: MutableList<Bitmap>,
+            width: Int,
+            height: Int,
+            page: Int,
+            printerType: SyzPrinter,
+            callBack: BluPrinterInfoCall2
+        ) {
+            isCancelPrinting = false
+            Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
+            LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+            currentPrintStatusFlow = MutableSharedFlow<SyzPrinterState2>()
+            CoroutineScope(Dispatchers.IO).launch {
+                currentPrintStatusFlow?.apply {
+                    this.asSharedFlow().collectLatest {
+                        if (it == SyzPrinterState2.PRINTER_OK) {
+                            if (PrintBimapUtils.getInstance().isCompleteBitmapPrinter()) {
+                                callBack.getBluNotifyInfo(true, it)
+                                currentPrintStatusFlow = null
+                            }
+                        } else {
+                            if (it != SyzPrinterState2.PRINTER_PRINTING) {
+                                //打印中的状态没必要上报
+                                callBack.getBluNotifyInfo(false, it)
+                                currentPrintStatusFlow = null
+                            }
+                        }
+                    }
+                }
+
+            }
+            if (bitListScope != null && bitListScope!!.isActive) {
+                bitListScope?.cancel()
+            }
+            bitListScope = CoroutineScope(Dispatchers.IO)
+            bitListScope?.launch {
+                //打印之前获取设备信息查询设备状态
+                val isCompress =
+                    printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+                val chunkSize = if (isCompress) {
+                    if (printerType == SyzPrinter.SYZTWOINCH) {
+                        //2寸最大的机器MTU为240
+                        200
+                    } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                        width * 10   //四寸是按10行发的
+                    } else {
+                        width    //未0.5寸预留
+                        // 500
+                    }
+                } else {
+                    if (printerType == SyzPrinter.SYZTWOINCH) {
+                        //2寸最大的机器MTU为240
+                        width * 4   //2寸是按4行发的
+                        //1024
+                    } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                        width * 10   //四寸是按10行发的
+                    } else {
+                        width    //未0.5寸预留
+                        // 500
+                    }
+                }
+                val compressCode = if (isCompress) {
+                    1
+                } else {
+                    0
+                }
+                var startTime = System.currentTimeMillis()
+                val totalBipmapsDataList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
+                bipmaps.forEachIndexed { index, bitmap ->
+                    val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+                    var bitmapArray = if (compressCode == 1) {
+                        Log.i(TAG, "压缩前bitmap大小==${bitmapPrintArray.size}")
+                        val compressStartTime = System.currentTimeMillis()
+                        val quicklzCompressTask = async { compress(bitmapPrintArray) }
+                        val bitmapCompress = quicklzCompressTask.await()
+                        Log.i(
+                            TAG,
+                            "压缩后bitmap大小==${bitmapCompress.size}==压缩耗时==${System.currentTimeMillis() - compressStartTime}"
+                        )
+
+
+                        val deCompressStartTime = System.currentTimeMillis()
+                        val quicklzDecompressTask = async { decompress(bitmapCompress) }
+                        val bitmapOrgin = quicklzDecompressTask.await()
+                        Log.i(
+                            TAG,
+                            "解压缩后bitmap大小==${bitmapOrgin.size}==解压缩耗时==${System.currentTimeMillis() - deCompressStartTime}"
+                        )
+                        bitmapCompress
+                    } else {
+                        bitmapPrintArray
+                    }
+                    val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(bitmapArray, chunkSize)
+                    var total = aplitafter.size //总包数
+                    val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
+                    aplitafter.forEachIndexed { index, bytes ->
+                        val mPPrintMsg = if (index == 0) {
+                            //第一包设置宽高
+                            MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                                .setIndexPackage(index + 1).setTotalPackage(total).setWidth(width)
+                                .setCompression(compressCode).setHeight(height).build()
+                        } else {
+                            MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                                .setIndexPackage(index + 1).setTotalPackage(total)
+                                .setCompression(compressCode).build()
+                        }
+
+                        needSendDataList.add(
+                            MPMessage.MPSendMsg.newBuilder()
+                                .setEventType(MPMessage.EventType.DEVICEPRINT)
+                                .setSendData(mPPrintMsg.toByteString()).build()
+                        )
+                    }
+                    totalBipmapsDataList.add(needSendDataList)
+                }
+                Log.d("$TAG", "生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
+                LogLiveData.addLogs("打印图片生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
+                //开始打印
+                PrintBimapUtils.getInstance().setBimapCallBack(callBack)
+                    .setBitmapTask(totalBipmapsDataList,page).doPrint()
+
+            }
+        }
+    */
+
+    private fun splitByteArray(input: ByteArray, chunkSize: Int = 100): List<ByteArray> {
+        return input.toList().chunked(chunkSize).map { it.toByteArray() }
+    }
+
+    fun testNextDuan() {
+        FmPrintBimapUtils.getInstance().doTestNextPrint()
+    }
+
+    private var printerType: SyzPrinter = SyzPrinter.SYZTWOINCH
+
+
+    fun printBitmaps(
+        bipmaps: MutableList<Bitmap>,
+        width: Int,
+        height: Int,
+        page: Int,
+        printerType: SyzPrinter,
+        isShake: Boolean,
+        callBack: BluPrintingCallBack
+    ) {
+        //按4k,取段数
+        //每一段再分包
+        // isCancelPrinting = false
+        this.printerType = printerType
+        Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
+        LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+        if (bitListScope != null && bitListScope!!.isActive) {
+            bitListScope?.cancel()
+        }
+        bitListScope = CoroutineScope(Dispatchers.IO)
+        bitListScope?.launch {
+            val startTime = System.currentTimeMillis()
+            var isCompress = printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+            val compressCode = if (isCompress) {
+                1
+            } else {
+                0
+            }
+            val dataNeedSendList = mutableListOf<MutableList<MutableList<MPMessage.MPSendMsg>>>()
+            bipmaps.forEachIndexed { indexBitMap, bitmap ->
+                val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+                //按4k取段数
+                val bitMapFenDuanList = splitByteArray(bitmapPrintArray, 4 * 1024)
+                Log.i(
+                    TAG, "第${indexBitMap}张图片===分了${bitMapFenDuanList.size}段"
+                )
+                val dataDuanEachBitmapList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
+                var eachBitmapTotalBaoNums = 0
+                bitMapFenDuanList.forEachIndexed { indexDuan, duanBytes ->
+//                    Log.i(
+//                        TAG,
+//                        "第${indexBitMap}张图片===第${indexDuan}段压缩前的大小${duanBytes.size}"
+//                    )
+                    val duanByteArray = if (isCompress) {
+                        //
+                        val duanCompressTask = async { compress(duanBytes) }
+                        val duanCompress = duanCompressTask.await()
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress.size}"
+                        )
+                        /*                        val duanDecompressTask = async { decompress(duanCompress) }
+                                                val duanOrgin = duanDecompressTask.await()
+                                                Log.i(
+                                                    TAG,
+                                                    "第${indexBitMap}张图片===第${indexDuan}段解压缩后的大小${duanOrgin.size}"
+                                                )
+                                                */
+                        duanCompress
+                    } else {
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段不压缩的大小${duanBytes.size}"
+                        )
+                        duanBytes
+                    }
+
+
+                    //每一段再按200分包
+                    val chunkSizePack = 180
+                    val bitMapFenBaoList = splitByteArray(duanByteArray, chunkSizePack)
+                    val totalBaoEachDuan = bitMapFenBaoList.size
+                    eachBitmapTotalBaoNums += totalBaoEachDuan
+                    Log.i(
+                        TAG,
+                        "第${indexBitMap}张图片===第${indexDuan}段按${chunkSizePack}分了${bitMapFenBaoList.size}包"
+                    )
+                    val baoDataEachDuanList = mutableListOf<MPMessage.MPSendMsg>()
+                    bitMapFenBaoList.forEachIndexed { baoIndex, baoBytes ->
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段==第${baoIndex}包==数据大小==${baoBytes.size}"
+                        )
+                        if (baoIndex == 0) {
+                            //第一包传宽高
+                            val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapPrintArray.size)
+                                .setImgData(ByteString.copyFrom(baoBytes))
+                                .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
+                                .setWidth(width).setCompression(compressCode).setHeight(height)
+                                .setSectionLength(duanByteArray.size).build()
+                            val baoData = MPMessage.MPSendMsg.newBuilder()
+                                .setEventType(MPMessage.EventType.DEVICEPRINT)
+                                .setSendData(mPPrintMsg.toByteString()).build()
+                            baoDataEachDuanList.add(baoData)
+                        } else {
+                            //Log.i(TAG,">>>>sssss>>${baoIndex}")
+                            val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapPrintArray.size)
+                                .setImgData(ByteString.copyFrom(baoBytes))
+                                .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
+                                .setCompression(compressCode).setSectionLength(duanByteArray.size)
+                                .build()
+                            val baoData = MPMessage.MPSendMsg.newBuilder()
+                                .setEventType(MPMessage.EventType.DEVICEPRINT)
+                                .setSendData(mPPrintMsg.toByteString()).build()
+                            baoDataEachDuanList.add(baoData)
+                        }
+                    }
+                    dataDuanEachBitmapList.add(baoDataEachDuanList)
+                }
+                Log.i(TAG, "第${indexBitMap}张图片===总包数${eachBitmapTotalBaoNums}")
+                dataNeedSendList.add(dataDuanEachBitmapList)
+            }
+            Log.i(
+                TAG,
+                "当前需要处理几张图${dataNeedSendList.size}==生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}"
+            )
+            FmPrintBimapUtils.getInstance().setBimapCallBack(callBack)
+                .setBitmapTask(dataNeedSendList).doPrint()
+
+
+        }
+    }
+
+
+
+    fun testBitmaps(
+        bipmaps: MutableList<Bitmap>,
+        width: Int,
+        height: Int,
+        page: Int,
+        printerType: SyzPrinter,
+        isShake: Boolean,
+        callBack: BluPrintingCallBack
+    ) {
+        //按4k,取段数
+        //每一段再分包
+        // isCancelPrinting = false
+        this.printerType = printerType
+        Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
+        LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+        if (bitListScope != null && bitListScope!!.isActive) {
+            bitListScope?.cancel()
+        }
+        bitListScope = CoroutineScope(Dispatchers.IO)
+        bitListScope?.launch {
+            val startTime = System.currentTimeMillis()
+            //var isCompress = printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+            var isCompress = false
+            val compressCode = if (isCompress) {
+                1
+            } else {
+                0
+            }
+            val dataNeedSendList = mutableListOf<MutableList<MutableList<MPMessage.MPSendMsg>>>()
+            bipmaps.forEachIndexed { indexBitMap, bitmap ->
+                val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+                //按4k取段数
+                val bitMapFenDuanList = splitByteArray(bitmapPrintArray, 4 * 1024)
+                Log.i(
+                    TAG, "第${indexBitMap}张图片===分了${bitMapFenDuanList.size}段"
+                )
+                val dataDuanEachBitmapList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
+                var eachBitmapTotalBaoNums = 0
+                bitMapFenDuanList.forEachIndexed { indexDuan, duanBytes ->
+//                    Log.i(
+//                        TAG,
+//                        "第${indexBitMap}张图片===第${indexDuan}段压缩前的大小${duanBytes.size}"
+//                    )
+                    val duanByteArray = if (isCompress) {
+                        //
+                        val duanCompressTask = async { compress(duanBytes) }
+                        val duanCompress = duanCompressTask.await()
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress.size}"
+                        )
+                        /*                        val duanDecompressTask = async { decompress(duanCompress) }
+                                                val duanOrgin = duanDecompressTask.await()
+                                                Log.i(
+                                                    TAG,
+                                                    "第${indexBitMap}张图片===第${indexDuan}段解压缩后的大小${duanOrgin.size}"
+                                                )
+                                                */
+                        duanCompress
+                    } else {
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段不压缩的大小${duanBytes.size}"
+                        )
+                        duanBytes
+                    }
+
+
+                    //每一段再按200分包
+                    val chunkSizePack = 180
+                    val bitMapFenBaoList = splitByteArray(duanByteArray, chunkSizePack)
+                    val totalBaoEachDuan = bitMapFenBaoList.size
+                    eachBitmapTotalBaoNums += totalBaoEachDuan
+                    Log.i(
+                        TAG,
+                        "第${indexBitMap}张图片===第${indexDuan}段按${chunkSizePack}分了${bitMapFenBaoList.size}包"
+                    )
+                    val baoDataEachDuanList = mutableListOf<MPMessage.MPSendMsg>()
+                    bitMapFenBaoList.forEachIndexed { baoIndex, baoBytes ->
+                        Log.i(
+                            TAG,
+                            "第${indexBitMap}张图片===第${indexDuan}段==第${baoIndex}包==数据大小==${baoBytes.size}"
+                        )
+                        if (baoIndex == 0) {
+                            //第一包传宽高
+                            val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapPrintArray.size)
+                                .setImgData(ByteString.copyFrom(baoBytes))
+                                .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
+                                .setWidth(width).setCompression(compressCode).setHeight(height)
+                                .setSectionLength(duanByteArray.size).build()
+                            val baoData = MPMessage.MPSendMsg.newBuilder()
+                                .setEventType(MPMessage.EventType.DEVICEPRINT)
+                                .setSendData(mPPrintMsg.toByteString()).build()
+                            baoDataEachDuanList.add(baoData)
+                        } else {
+                            //Log.i(TAG,">>>>sssss>>${baoIndex}")
+                            val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                                .setDataLength(bitmapPrintArray.size)
+                                .setImgData(ByteString.copyFrom(baoBytes))
+                                .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
+                                .setCompression(compressCode).setSectionLength(duanByteArray.size)
+                                .build()
+                            val baoData = MPMessage.MPSendMsg.newBuilder()
+                                .setEventType(MPMessage.EventType.DEVICEPRINT)
+                                .setSendData(mPPrintMsg.toByteString()).build()
+                            baoDataEachDuanList.add(baoData)
+                        }
+                    }
+                    dataDuanEachBitmapList.add(baoDataEachDuanList)
+                }
+                Log.i(TAG, "第${indexBitMap}张图片===总包数${eachBitmapTotalBaoNums}")
+                dataNeedSendList.add(dataDuanEachBitmapList)
+            }
+            Log.i(
+                TAG,
+                "当前需要处理几张图${dataNeedSendList.size}==生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}"
+            )
+            FmPrintBimapUtils.getInstance().setBimapCallBack(callBack)
+                .setBitmapTask(dataNeedSendList).doTest()
+        }
+    }
+
+    /**
+     * @param isShake   是否抖动   要么图片全部抖动，要么不抖动
+     */
     fun writeBitmaps(
         bipmaps: MutableList<Bitmap>,
         width: Int,
         height: Int,
         page: Int,
         printerType: SyzPrinter,
-        callBack: BluPrinterInfoCall2
-    ) {
-        isCancelPrinting = false
-        Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
-        LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
-        currentPrintStatusFlow = MutableSharedFlow<SyzPrinterState2>()
-        CoroutineScope(Dispatchers.IO).launch {
-            currentPrintStatusFlow?.apply {
-                this.asSharedFlow().collectLatest {
-                    if (it == SyzPrinterState2.PRINTER_OK) {
-//                        if (isCancelPrinting) {
-//                            //收到了取消打印的回调，同时打印结束,代表取消成功
-//                            cpb?.cancelSuccess()
-//                        }
-//                        delay(5)
-//                        PrintBimapUtils.getInstance().removePrintWhenSuccess() {
-//                            // currentPrintStatusFlow = null
-//                        }
-                        if (PrintBimapUtils.getInstance().isCompleteBitmapPrinter()) {
-                            callBack.getBluNotifyInfo(true, it)
-                            currentPrintStatusFlow = null
-                        }
-                    } else {
-                        if (it != SyzPrinterState2.PRINTER_PRINTING) {
-                            //打印中的状态没必要上报
-                            callBack.getBluNotifyInfo(false, it)
-                            currentPrintStatusFlow = null
-                        }
-                    }
-                }
-            }
+        isShake: Boolean,
+        callBack: BluPrintingCallBack
+    ) {/* // isCancelPrinting = false
+          this.printerType=printerType
+          Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
+          LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+          if (bitListScope != null && bitListScope!!.isActive) {
+              bitListScope?.cancel()
+          }
+          bitListScope = CoroutineScope(Dispatchers.IO)
+          bitListScope?.launch {
+              //打印之前获取设备信息查询设备状态
+              var isCompress =
+                  printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+              if (isShake) {
+                  isCompress = false //抖动不压缩
+              }
+              val chunkSize = if (isCompress) {
+                  if (printerType == SyzPrinter.SYZTWOINCH) {
+                      //2寸最大的机器MTU为240
+                      200
+                  } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                      width * 10   //四寸是按10行发的
+                  } else {
+                      width    //未0.5寸预留
+                      // 500
+                  }
+              } else {
+                  if (printerType == SyzPrinter.SYZTWOINCH) {
+                      //2寸最大的机器MTU为240
+                      width * 4   //2寸是按4行发的
+                      //1024
+                  } else if (printerType == SyzPrinter.SYZFOURINCH) {
+                      width * 10   //四寸是按10行发的
+                  } else {
+                      width    //未0.5寸预留
+                      // 500
+                  }
+              }
+              val compressCode = if (isCompress) {
+                  1
+              } else {
+                  0
+              }
+              var startTime = System.currentTimeMillis()
+              val totalBipmapsDataList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
+              bipmaps.forEachIndexed { index, bitmap ->
+                  val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+                  var bitmapArray = if (compressCode == 1) {
+                      // Log.i(TAG, "压缩前bitmap大小==${bitmapPrintArray.size}")
+                      val compressStartTime = System.currentTimeMillis()
+                      val quicklzCompressTask = async { compress(bitmapPrintArray) }
+                      val bitmapCompress = quicklzCompressTask.await()
+                      Log.i(
+                          TAG,
+                          "第${index}张压缩后bitmap大小==${bitmapCompress.size}==压缩耗时==${System.currentTimeMillis() - compressStartTime}"
+                      )
+                      val deCompressStartTime = System.currentTimeMillis()
+                      val quicklzDecompressTask = async { decompress(bitmapCompress) }
+                      val bitmapOrgin = quicklzDecompressTask.await()
+  //                    Log.i(
+  //                        TAG,
+  //                        "解压缩后bitmap大小==${bitmapOrgin.size}==解压缩耗时==${System.currentTimeMillis() - deCompressStartTime}"
+  //                    )
+                      bitmapCompress
+                  } else {
+                      bitmapPrintArray
+                  }
+                  val aplitafter = splitByteArray(bitmapArray, chunkSize)
+                  var total = aplitafter.size //总包数
+                  val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
+                  aplitafter.forEachIndexed { index, bytes ->
+                      val mPPrintMsg = if (index == 0) {
+                          //第一包设置宽高
+                          MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                              .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                              .setIndexPackage(index + 1).setTotalPackage(total).setWidth(width)
+                              .setCompression(compressCode).setHeight(height).build()
+                      } else {
+                          MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                              .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
+                              .setIndexPackage(index + 1).setTotalPackage(total)
+                              .setCompression(compressCode).build()
+                      }
 
-        }
-        if (bitListScope != null && bitListScope!!.isActive) {
-            bitListScope?.cancel()
-        }
-        bitListScope = CoroutineScope(Dispatchers.IO)
-        bitListScope?.launch {
-            //打印之前获取设备信息查询设备状态
-            val isCompress =
-                printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
-            val chunkSize = if (isCompress) {
-               100
-            } else {
-                if (printerType == SyzPrinter.SYZTWOINCH) {
-                    //2寸最大的机器MTU为240
-                    width * 4   //2寸是按4行发的
-                    //1024
-                } else if (printerType == SyzPrinter.SYZFOURINCH) {
-                    width * 10   //四寸是按10行发的
-                } else {
-                    width    //未0.5寸预留
-                    // 500
-                }
-            }
-            val compressCode = if (isCompress) {
-                1
-            } else {
-                0
-            }
-            var startTime = System.currentTimeMillis()
-            val totalBipmapsDataList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
-            bipmaps.forEachIndexed { index, bitmap ->
-                val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
-                var bitmapArray = if (compressCode == 1) {
-                    Log.i(TAG, "压缩前bitmap大小==${bitmapPrintArray.size}")
-                    val compressStartTime = System.currentTimeMillis()
-                    val quicklzCompressTask = async { compress(bitmapPrintArray) }
-                    val bitmapCompress = quicklzCompressTask.await()
-                    Log.i(
-                        TAG,
-                        "压缩后bitmap大小==${bitmapCompress.size}==压缩耗时==${System.currentTimeMillis() - compressStartTime}"
-                    )
+                      needSendDataList.add(
+                          MPMessage.MPSendMsg.newBuilder()
+                              .setEventType(MPMessage.EventType.DEVICEPRINT)
+                              .setSendData(mPPrintMsg.toByteString()).build()
+                      )
+                  }
+                  totalBipmapsDataList.add(needSendDataList)
+              }
+              Log.d("$TAG", "生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
+              LogLiveData.addLogs("打印图片生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
+              //开始打印
+              PrintBimapUtils.getInstance().setBimapCallBack(callBack)
+                  .setBitmapTask(totalBipmapsDataList, page).doPrint()
 
-
-                    val deCompressStartTime = System.currentTimeMillis()
-                    val quicklzDecompressTask = async { decompress(bitmapCompress) }
-                    val bitmapOrgin = quicklzDecompressTask.await()
-                    Log.i(
-                        TAG,
-                        "解压缩后bitmap大小==${bitmapOrgin.size}==解压缩耗时==${System.currentTimeMillis() - deCompressStartTime}"
-                    )
-                    bitmapCompress
-                } else {
-                    bitmapPrintArray
-                }
-                val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(bitmapArray, chunkSize)
-                var total = aplitafter.size //总包数
-                val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
-                aplitafter.forEachIndexed { index, bytes ->
-                    val mPPrintMsg = if (index == 0) {
-                        //第一包设置宽高
-                        MPMessage.MPPrintMsg.newBuilder().setPage(page)
-                            .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
-                            .setIndexPackage(index + 1).setTotalPackage(total).setWidth(width)
-                            .setCompression(compressCode).setHeight(height).build()
-                    } else {
-                        MPMessage.MPPrintMsg.newBuilder().setPage(page)
-                            .setDataLength(bitmapArray.size).setImgData(ByteString.copyFrom(bytes))
-                            .setIndexPackage(index + 1).setTotalPackage(total)
-                            .setCompression(compressCode).build()
-                    }
-
-                    needSendDataList.add(
-                        MPMessage.MPSendMsg.newBuilder()
-                            .setEventType(MPMessage.EventType.DEVICEPRINT)
-                            .setSendData(mPPrintMsg.toByteString()).build()
-                    )
-                }
-                totalBipmapsDataList.add(needSendDataList)
-            }
-            Log.d("$TAG", "生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
-            LogLiveData.addLogs("打印图片生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}")
-            //开始打印
-            PrintBimapUtils.getInstance().setBimapCallBack(callBack)
-                .setBitmapTask(totalBipmapsDataList).doPrint()
-
-        }
+          }*/
     }
-
 
     /**
      * 获取设备信息
@@ -487,6 +879,10 @@ class SyzClassicBluManager {
                 is NotifyResult2.Error -> {
                     callBack.getBleNotifyInfo(false, result.errorMsg)
                 }
+
+                else -> {
+
+                }
             }
         }
         writeABF1(FMPrinterOrder.orderForGetFmSetShutdownTime(min), "${TAG}=writeShutdown>>>>")
@@ -501,7 +897,7 @@ class SyzClassicBluManager {
     fun writeCancelPrinter(callBack: CancelPrintCallBack) {
 //        isCancelPrinting = false
 //        this.cpb = callBack
-        isCancelPrinting = false
+        // isCancelPrinting = false
         cancelPrintCallBack = { dataArray ->
             val result = FmNotifyBeanUtils.getCancelPrintingInfo(dataArray)
             when (result) {
@@ -509,15 +905,17 @@ class SyzClassicBluManager {
                     //这里需要等待打印过程中的回调，
                     // isCancelPrinting = true//打印机收到了取消指令，同时需要判定打印机是否结束打印
                     Log.i(TAG, "打印机收到了取消指令")
-                    isCancelPrinting = true
+                    //isCancelPrinting = true
                     callBack.cancelSuccess()
                 }
 
                 is NotifyResult2.Error -> {
                     Log.i(TAG, "打印机收到了取消指令，但code！=200")
-                    isCancelPrinting = false
+                    // isCancelPrinting = false
                     callBack.cancelFail()
                 }
+
+                else -> {}
             }
         }
         writeABF1(FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>")
@@ -623,7 +1021,7 @@ class SyzClassicBluManager {
             val fileArray = file.fileToByteArray()
             Log.d("$TAG", "Dex文件总字节数${fileArray.size}")
             //分包
-            val aplitafter = FmBitmapOrDexPrinterUtils.splitByteArray(fileArray, 100)
+            val aplitafter = splitByteArray(fileArray, 100)
             //crc算法
             val crccode = CRC16_XMODEM(fileArray)
             var total = aplitafter.size //总包数
@@ -649,6 +1047,7 @@ class SyzClassicBluManager {
         }
     }
 
+    private var totalSize = 0
     suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
         var start = System.currentTimeMillis()
         Log.d("$TAG", "========总共要发${dataList.size}个包")
@@ -666,7 +1065,12 @@ class SyzClassicBluManager {
                 Log.d(
                     "$TAG", "=======第${index}包===字节数${upackerData.size}="
                 )
+                totalSize += upackerData.size
+                Log.d(
+                    "$TAG", "=======第${index}包===累计大小=${totalSize}"
+                )
                 LogLiveData.addLogs("=======第${index}包===字节数${upackerData.size}=")
+                LogLiveData.addLogs("====累计大小=${totalSize}")
                 delay(1)
             } catch (e: Exception) {
                 break
@@ -746,9 +1150,9 @@ class SyzClassicBluManager {
         if (instance != null) {
             instance = null;
         }
-        if (currentPrintStatusFlow != null) {
-            currentPrintStatusFlow = null
-        }
+//        if (currentPrintStatusFlow != null) {
+//            currentPrintStatusFlow = null
+//        }
         if (bitListScope != null && bitListScope!!.isActive) {
             bitListScope?.cancel()
             bitListScope = null
