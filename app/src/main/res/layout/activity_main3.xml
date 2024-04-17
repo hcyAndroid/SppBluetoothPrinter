@@ -192,7 +192,16 @@
             android:text="设置打印浓度"
             android:textStyle="bold" />
 
-
+        <TextView
+            android:id="@+id/tv_set_print_img0"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="打印1张48*200"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/tv_set_print_img"
             style="@style/text_30_54c727"
@@ -212,7 +221,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:padding="8dp"
-            android:text="打印一张压缩"
+            android:text="打印一张压缩48*48"
             android:textStyle="bold" />
 
         <TextView

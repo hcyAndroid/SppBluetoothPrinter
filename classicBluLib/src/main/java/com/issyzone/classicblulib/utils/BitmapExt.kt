@@ -7,7 +7,7 @@ import com.issyzone.classicblulib.R
 import java.io.ByteArrayOutputStream
 
 object BitmapExt {
-    fun test(drawableId: Int = R.drawable.test3): Bitmap {
+    fun test(drawableId: Int): Bitmap {
         val drawable = AppGlobels.getApplication().getDrawable(drawableId)
 //        Logger.d(
 //            "bitmap===宽${drawable?.intrinsicWidth}===高==${
@@ -20,7 +20,7 @@ object BitmapExt {
         return BitmapFactory.decodeResource(AppGlobels.getApplication().resources, drawableId)
     }
 
-    fun decodeBitmap(drawableId: Int = R.drawable.test5): Bitmap {
+    fun decodeBitmap(drawableId: Int ): Bitmap {
         // 通过资源 ID 获取原始图片的字节数组
         val inputStream = AppGlobels.getApplication().resources.openRawResource(drawableId)
         val byteArray = inputStream.readBytes()

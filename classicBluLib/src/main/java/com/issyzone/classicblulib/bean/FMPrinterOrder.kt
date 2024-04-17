@@ -1,7 +1,7 @@
 package com.issyzone.classicblulib.bean
 
 import android.util.Log
-
+import com.issyzone.classicblulib.utils.Upacker
 
 
 object FMPrinterOrder {
@@ -11,7 +11,7 @@ object FMPrinterOrder {
     fun orderForGetFmDevicesInfo(): ByteArray {
         var mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.DEVICEINFO).build()
 
-        Log.d("$TAG","发送检查设备的命令${mSendMsg.toString()}")
+        Log.d("$TAG","发送检查设备的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}")
         return mSendMsg.toByteArray()
     }
 

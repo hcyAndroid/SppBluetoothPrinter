@@ -120,6 +120,18 @@ public class HsOutputStream extends FilterOutputStream {
         super.flush();
     }
 
+    // 在类的最后添加 finish 方法
+    public void finish() throws IOException {
+        flushOutputBuffer(true);
+
+        if (currentBytePos != 0x80) {
+            flushCurrentByte();
+        }
+
+        // 如果你的压缩算法需要写结束符，那么在这里添加。例如：
+        // writeBits(FINAL_SEQ_BITS, FINAL_SEQ_VALUE);
+    }
+
     private boolean fillOutputBuffer(Result wr) {
         int rem = windowSize - windowPos;
         if(rem > 0) {

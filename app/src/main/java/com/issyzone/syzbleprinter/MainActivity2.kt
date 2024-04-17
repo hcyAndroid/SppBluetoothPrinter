@@ -3,6 +3,7 @@ package com.issyzone.syzbleprinter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,7 @@ import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 //import com.issyzone.syzbleprinter.adapter.BlueScanAdapter
 import com.issyzone.syzbleprinter.databinding.ActivityMain2Binding
+import com.issyzone.syzbleprinter.utils.OpenCVUtils
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
 import com.issyzone.syzbleprinter.utils.invokeViewModel
 import com.issyzone.syzbleprinter.viewmodel.ScanBleViewModel
@@ -32,33 +34,35 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.opencv.android.OpenCVLoader
 
-class MainActivity2 :  ComponentActivity() {
-    private val vb:ActivityMain2Binding by invokeViewBinding()
-    private val vm:ScanBleViewModel by invokeViewModel()
-    val bleScanAdapter = BlueScanAdapter(){
+class MainActivity2 : ComponentActivity() {
+    private val vb: ActivityMain2Binding by invokeViewBinding()
+    private val vm: ScanBleViewModel by invokeViewModel()
+    val bleScanAdapter = BlueScanAdapter() {
         vm.connectBleDevice(it)
     }
+
     fun byteArrayToBitmap(byteArray: ByteArray): Bitmap? {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vb.root)
         vm.startBleService()
         initRecyclerView()
         vm.getScanBleDevice(bleScanAdapter)
-       // ImageUtilKt.convertBinary(BitmapExt.test(), 128)
+        // ImageUtilKt.convertBinary(BitmapExt.test(), 128)
         SyzBleManager.getInstance().initBle()
-        var bb=ImageUtilKt.convertBinary(BitmapExt.test(), 128)
-      //  Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
+        var bb = ImageUtilKt.convertBinary(BitmapExt.test(), 128)
+        //  Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
         val bitmapArray = BitmapUtils.print(bb, bb.width, bb.height)
-       // Logger.d(">>>>>AAA${ bitmapArray.size}")
+        // Logger.d(">>>>>AAA${ bitmapArray.size}")
 //        vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
 //        //vb.iv.setImageBitmap(ImageUtilKt.convertBinary(BitmapExt.test(), 128))
 //        vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapArray))
 //
-
 
 
 //
@@ -74,13 +78,13 @@ class MainActivity2 :  ComponentActivity() {
 //        }
 
 //
-//        val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
-//        //val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
-//        //vb.iv2.setImageBitmap(byteArrayToBitmap(bitmapPrintArray))
-//        bitmap.by
 
 
-
+        val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
+        //val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
+        vb.iv.setImageBitmap(BitmapExt.decodeBitmap(R.drawable.test6))
+        //vb.iv2.setImageBitmap(OpenCVUtils.testOpencv2(R.drawable.test6))
+        // bitmap.by
 
 
 //        BleService.getInstance().getScanResultFlow2().observe(this, Observer {

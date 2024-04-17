@@ -30,7 +30,7 @@ public class Upacker {
 
     private MsgCallback msgCallback;
 
-    Upacker(final MsgCallback cb) {
+    public  Upacker(final MsgCallback cb) {
         msgCallback = cb;
     }
 

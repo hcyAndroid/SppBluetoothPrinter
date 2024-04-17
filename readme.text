@@ -79,4 +79,49 @@ delay时间延长，概率就越低。估计还是spp发数据过快,硬件接�
 2.单张图片，打印第一次正确，第二次出现图片的错乱。无论抖动和不抖动，不回复code10 info0
 3.调低速度，会出现打印不回复，打印乱码，不知道是不是到时把速度一刀切
 4.打印单张图片，概率性卡死
-
+二寸0414
+1.打印48*200时发生code4  info: "indexpackage err"，接下来打印，图片必乱码，必须重启。图片包发完，只回code11 info2， 不回code10 info0
+  2024-04-14 16:26:18.934 29653-29653 SyzClassicBluManager>>  com.syz.mprint  D   NOTIFY返回的信息 eventType: DEVICEPRINT                                                                                              code: 4                                                                                                   respondData: "\b\001\022\020indexpackage err"
+  2024-04-14 16:26:18.934 29653-29653 SyzClassicBluManager>>  com.syz.mprint  D   NOTIFY返回respondData code: 1                                                                                                  info: "indexpackage err"
+  2024-04-14 16:26:18.935 29653-29653 FmNotifyBeanUtils>>>    com.syz.mprint  D   设备问题>>>>
+  2024-04-14 16:26:18.937 29653-29653 SyzClassicBluManager>>  com.syz.mprint  D   SyzClassicBluManager>> NOTIFY解析数据出错[8, 4, 16, 4, 26, 20, 8, 1, 18, 16, 105, 110, 100, 101, 120, 112, 97, 99, 107, 97, 103, 101, 32, 101, 114, 114]==Already resumed, but proposed with update PRINTER_STATUS_UNKNOWN
+  2024-04-14 17:42:57.691 12023-12023 SyzClassicBluManager>>  com.syz.mprint                       D   NOTIFY返回的信息 eventType: DEVICEREPORT
+                                                                                                    code: 200
+                                                                                                    respondData: "\b\v\022\0012"
+  2024-04-14 17:42:57.691 12023-12023 SyzClassicBluManager>>  com.syz.mprint                       D   NOTIFY返回respondData code: 11                                                                                                   info: "2"
+  2024-04-14 17:42:57.695 12023-13272 FmPrintBimapUtils       com.syz.mprint                       I  TTTTYYYYYYYYY
+  2024-04-14 17:42:57.695 12023-13272 FmPrintBimapUtils       com.syz.mprint                       I  所有图片已经发完
+2.打印48*200 多次打印，经常卡死，设备死机
+3.打印48*200 概率性分段发送后不回复信息了,直接死机了
+  2024-04-14 16:38:54.769 31248-31248 SyzClassicBluManager>>  com.syz.mprint                       D  NOTIFY返回respondData code: 11                                                                                                    info: "2"
+  2024-04-14 16:38:54.771 31248-3885  FmPrintBimapUtils       com.syz.mprint                       E  向蓝牙设备写入第0图=====第3段的数据
+  2024-04-14 16:38:54.771 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  ========总共要发7个包
+  2024-04-14 16:38:54.772 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第0包===字节数212=
+  2024-04-14 16:38:54.772 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第0包===累计大小=51771
+  2024-04-14 16:38:54.773 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第1包===字节数207=
+  2024-04-14 16:38:54.774 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第1包===累计大小=51978
+  2024-04-14 16:38:54.775 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第2包===字节数207=
+  2024-04-14 16:38:54.775 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第2包===累计大小=52185
+  2024-04-14 16:38:54.777 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第3包===字节数207=
+  2024-04-14 16:38:54.777 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第3包===累计大小=52392
+  2024-04-14 16:38:54.778 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第4包===字节数207=
+  2024-04-14 16:38:54.778 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第4包===累计大小=52599
+  2024-04-14 16:38:54.780 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第5包===字节数207=
+  2024-04-14 16:38:54.780 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第5包===累计大小=52806
+  2024-04-14 16:38:54.782 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第6包===字节数153=
+  2024-04-14 16:38:54.782 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======第6包===累计大小=52959
+  2024-04-14 16:38:54.783 31248-3885  SyzClassicBluManager>>  com.syz.mprint                       D  =======发包耗时12
+4.不能自检页打印
+5.经常打着打着，设备就报打印中状态 ，获取设备信息，printstatus=1,导致无法打印
+二寸0415(15:59固件）
+1.code10 info0 的数量和打印数量对不上
+2.单张图片概率性不回code10 info0
+3.打印出的图片如果出现乱码，接下来发包的图片必定全是乱码，需要重启才正常
+4.打印图片过程中，如果出现code11 info2 不返回（此时段没有全发完）。下次打印，第一张必定错乱，然后乱码，需要重启
+5.升级固件会出code400 info2 ，需要重启机器才能升级成功code400 info1
+6.抖动的图片概率性出现白色条纹
+二寸0416(19:45固件）
+1.多图打印还是有不回复的情况(demo，偶现),app测试貌似都可以稳定打印
+2.取消打印，取消打印指令在打印过程中不回复
+3.充电过程中，固件更新，不回复（概率大）
+4.打印自检页之后，图片也打不出了

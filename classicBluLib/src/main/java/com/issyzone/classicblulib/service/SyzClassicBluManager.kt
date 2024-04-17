@@ -6,7 +6,6 @@ import android.util.Log
 import com.google.protobuf.ByteString
 import com.issyzone.classicblulib.bean.FMPrinterOrder
 import com.issyzone.classicblulib.bean.FmNotifyBeanUtils
-import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.NotifyResult
 import com.issyzone.classicblulib.bean.NotifyResult2
@@ -19,30 +18,39 @@ import com.issyzone.classicblulib.callback.DeviceInfoCall
 import com.issyzone.classicblulib.callback.SyzBluCallBack
 import com.issyzone.classicblulib.callback.SyzPrinterState
 import com.issyzone.classicblulib.callback.SyzPrinterState2
+import com.issyzone.classicblulib.common.StringUtils
 import com.issyzone.classicblulib.tools.BTManager
 import com.issyzone.classicblulib.tools.ConnectCallback
 import com.issyzone.classicblulib.tools.Connection
 import com.issyzone.classicblulib.tools.EventObserver
+import com.issyzone.classicblulib.tools.FmArrayUtils
 import com.issyzone.classicblulib.tools.UUIDWrapper
 import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
 import com.issyzone.classicblulib.utils.FmPrintBimapUtils
 import com.issyzone.classicblulib.utils.HeatShrinkUtils
+import com.issyzone.classicblulib.utils.MsgCallback
 
 
 import com.issyzone.classicblulib.utils.Upacker
 import com.issyzone.classicblulib.utils.fileToByteArray
 import com.issyzone.classicblulib.utils.isExtension
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
+import java.io.IOException
+import kotlin.coroutines.resumeWithException
 
 
 class SyzClassicBluManager {
@@ -50,11 +58,16 @@ class SyzClassicBluManager {
 
     companion object {
         private var instance: SyzClassicBluManager? = null
-
-        //var isCancelPrinting = false  //是否取消打印
+        private var sppReadScope: CoroutineScope? = null
+        private var sppBitmapScope: CoroutineScope? = null
+        private var bluetoothDataProcessor: BluetoothDataProcessor? = null
+        private var bluetoothBitmapProcessor: BluetoothDataProcessor2? = null
         fun getInstance(): SyzClassicBluManager {
             if (instance == null) {
                 instance = SyzClassicBluManager()
+                sppReadScope = CoroutineScope(Dispatchers.IO)
+                sppBitmapScope = CoroutineScope(Dispatchers.IO)
+
             }
             return instance!!
         }
@@ -82,6 +95,8 @@ class SyzClassicBluManager {
 
     fun initClassicBlu() {
         BTManager.getInstance().initialize(AppGlobels.getApplication())
+        bluetoothDataProcessor = BluetoothDataProcessor(sppReadScope!!)
+        bluetoothBitmapProcessor = BluetoothDataProcessor2(sppBitmapScope!!)
         BTManager.getInstance().setSyzBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
 
@@ -122,23 +137,81 @@ class SyzClassicBluManager {
 
     //
     private var cancelPrintCallBack: ((dataArray: ByteArray) -> Unit)? = null
-    private val reciver = object : EventObserver {
-        override fun onWrite(
-            device: BluetoothDevice,
-            wrapper: UUIDWrapper,
-            tag: String,
-            value: ByteArray,
-            result: Boolean
-        ) {
-            super.onWrite(device, wrapper, tag, value, result)
-            //这里监听写入
-            // Log.e(TAG, "${tag}========${value}======${result}")
+
+//    private suspend fun getReadInfo(data: ByteArray?): ByteArray? {
+//        return suspendCancellableCoroutine { continuation ->
+//            Upacker(object : MsgCallback {
+//                override fun onMsgPrased(data: ByteArray?, len: Int) {
+//                    Log.e(TAG, "Upacker>>>>解包成功")
+//                    if (continuation.isActive) {
+//                        continuation.resume(data) {
+//                            Log.e(TAG, "Upacker>>>>解包成功异常111111${it.message}")
+//                        }
+//                    }
+//                }
+//
+//                override fun onMsgFailed() {
+//                    Log.e(TAG, "Upacker>>>>解包失败")
+//                    if (continuation.isActive) {
+//                        continuation.resumeWithException(Exception("Unpacking failed"))
+//                    }
+//                }
+//            }).unpack(data)
+//        }
+//    }
+
+//    private suspend fun getReadInfo(data: ByteArray?): ByteArray? {
+//        val deferred = CompletableDeferred<ByteArray?>()
+//
+//        Upacker(object : MsgCallback {
+//            override fun onMsgPrased(prasedData: ByteArray?, len: Int) {
+//                Log.i(TAG, "Upacker>>>>解包成功")
+//                deferred.complete(prasedData)
+//            }
+//
+//            override fun onMsgFailed() {
+//                Log.e(TAG, "Upacker>>>>解包失败")
+//                deferred.completeExceptionally(Exception("Unpacking failed"))
+//            }
+//        }).unpack(data)
+//        return deferred.await()
+//    }
+
+//    private val readMutex = Mutex()
+//    private suspend fun spp_upacker(upackerData: ByteArray?): ByteArray? = readMutex.withLock {
+//        //不让它并发执行，加了互斥锁
+//        return getReadInfo(upackerData)
+//    }
+
+    private inner class BluetoothDataProcessor2(private val scope: CoroutineScope) {
+        private val dataChannel = Channel<MPMessage.MPCodeMsg>(Channel.UNLIMITED)
+
+        init {
+            // 启动一个单独的协程，专门用来按顺序处理数据
+            scope.launch {
+                for (data in dataChannel) {
+                    //打印下一段
+                    FmPrintBimapUtils.getInstance().removePrintWhenSuccessAndPrintNext()
+                }
+            }
         }
 
-        override fun onRead(device: BluetoothDevice, wrapper: UUIDWrapper, data: ByteArray) {
-            super.onRead(device, wrapper, data)
+        fun onRead(data: MPMessage.MPCodeMsg) {
+            // 向Channel发送数据，而不是直接处理它
+            dataChannel.trySend(data)
+        }
+
+        // 记得在不需要时关闭Channel，释放资源
+        fun close() {
+            dataChannel.close()
+        }
+    }
+
+
+    private fun spp_read(readData: ByteArray?) {
+        readData?.apply {
             try {
-                val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(data)
+                val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(this)
                 Log.d(
                     "$TAG", " NOTIFY返回的信息 ${
                         mpRespondMsg.toString()
@@ -151,18 +224,18 @@ class SyzClassicBluManager {
                         ).toString()
                     }"
                 )
-                LogLiveData.addLogs(
-                    "蓝牙返回的信息 ${
-                        mpRespondMsg.toString()
-                    }"
-                )
-                LogLiveData.addLogs(
-                    "蓝牙返回respondData ${
-                        MPMessage.MPCodeMsg.parseFrom(
-                            mpRespondMsg.respondData.toByteArray()
-                        ).toString()
-                    }"
-                )
+//                LogLiveData.addLogs(
+//                    "蓝牙返回的信息 ${
+//                        mpRespondMsg.toString()
+//                    }"
+//                )
+//                LogLiveData.addLogs(
+//                    "蓝牙返回respondData ${
+//                        MPMessage.MPCodeMsg.parseFrom(
+//                            mpRespondMsg.respondData.toByteArray()
+//                        ).toString()
+//                    }"
+//                )
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
                     if (mpRespondMsg.code == 200) {
                         val mpCodeMsg = MPMessage.MPCodeMsg.parseFrom(
@@ -186,17 +259,17 @@ class SyzClassicBluManager {
                                 )
                             }
 
-                            11 -> {
-                                if (mpCodeMsg.info == "1") {
-                                    //收到11.1代表打印机通知你下发下一张
-                                    /*           PrintBimapUtils.getInstance()
-                                                   .removePrintWhenSuccessAndPrintNext()*/
-                                }
+                            11 -> {/*       if (mpCodeMsg.info == "1") {
+                                           //收到11.1代表打印机通知你下发下一张
+                                           *//*           PrintBimapUtils.getInstance()
+                                                   .removePrintWhenSuccessAndPrintNext()*//*
+                                }*/
                                 if (mpCodeMsg.info == "2") {
                                     //收到11.2代表2寸打印机,你需要发下一段的数据
                                     //Log.d(TAG,"收到11.2代表2寸打印机,你需要发下一段的数据")
-                                    FmPrintBimapUtils.getInstance()
-                                        .removePrintWhenSuccessAndPrintNext()
+//                                    FmPrintBimapUtils.getInstance()
+//                                        .removePrintWhenSuccessAndPrintNext()
+                                    bluetoothBitmapProcessor?.onRead(mpCodeMsg)
                                 }
                             }
 
@@ -253,22 +326,109 @@ class SyzClassicBluManager {
                 } else {
                     //其他的回调
                     if (mpRespondMsg.eventType == MPMessage.EventType.CANCELPRINTING) {
-                        //取消打印的命令的回调
-                        cancelPrintCallBack?.invoke(data)
-                        //
-                        FmPrintBimapUtils.getInstance().setPrinterCancel()
+                        if (printerType != SyzPrinter.SYZTWOINCH) {
+                            //二寸不处理
+                            //取消打印的命令的回调
+                            cancelPrintCallBack?.invoke(this)
+                            //
+                            FmPrintBimapUtils.getInstance().setPrinterCancel()
+                        }
+
                     } else {
-                        bluNotifyCallBack?.invoke(data)
+                        bluNotifyCallBack?.invoke(this)
                     }
 
                 }
             } catch (e: Exception) {
-                Log.d("$TAG", "$TAG NOTIFY解析数据出错${data.contentToString()}")
-                LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
+                Log.d(
+                    "$TAG",
+                    "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}"
+                )
+                // LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
+            }
+        }
+    }
+
+
+    private val reciver = object : EventObserver {
+        override fun onWrite(
+            device: BluetoothDevice,
+            wrapper: UUIDWrapper,
+            tag: String,
+            value: ByteArray,
+            result: Boolean
+        ) {
+            super.onWrite(device, wrapper, tag, value, result)
+            //这里监听写入
+            // Log.e(TAG, "${tag}========${value}======${result}")
+        }
+
+        override fun onRead(device: BluetoothDevice, wrapper: UUIDWrapper, updatasdata: ByteArray) {
+            super.onRead(device, wrapper, updatasdata)
+            Log.i(TAG, ">>>>>>>>>onRead>>>>>>")
+            bluetoothDataProcessor?.onRead(updatasdata)
+        }
+    }
+
+
+    private inner class BluetoothDataProcessor(private val mySppReadScope: CoroutineScope) {
+        private val dataChannel = Channel<ByteArray>(Channel.UNLIMITED)
+
+        init {
+            // 启动一个单独的协程，专门用来按顺序处理数据
+            mySppReadScope.launch {
+                for (data in dataChannel) {
+                    try {
+                        //val processedData = spp_upacker(data)  //解包
+                        //spp_read(processedData)
+                        spp_read(data)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "解包异常>>>>${e.message.toString()}")
+                    }
+                }
             }
         }
 
+        private val upacker = Upacker(object : MsgCallback {
+            override fun onMsgPrased(prasedData: ByteArray?, len: Int) {
+                Log.i(TAG, "Upacker>>>>解包成功")
+                prasedData?.apply {
+                    dataChannel.trySend(this)
+                }
+            }
+
+            override fun onMsgFailed() {
+                Log.e(TAG, "Upacker>>>>解包失败==")
+                FmPrintBimapUtils.getInstance().upackerFaiLed()
+                //deferred.completeExceptionally(Exception("Unpacking failed"))
+            }
+        })
+
+        fun onRead(updatasdata: ByteArray) {
+            upacker.unpack(updatasdata)
+            // 向Channel发送数据，而不是直接处理它
+            /*    val targetDataFlag=FmArrayUtils.startsWith(updatasdata)
+                Log.i(TAG,">>>>>>>目标分割数据>>>${targetDataFlag}")
+                if (targetDataFlag){
+                   val result= FmArrayUtils.splitByteArrayBySequence(updatasdata)
+                    result.forEachIndexed { index, bytes ->
+                        Log.i(TAG,">>>>>>>目标分割数据${index}>>>${StringUtils.toHex(bytes)}")
+                        dataChannel.trySend(bytes)
+                       // delay(1)
+                    }
+                }else{
+                    dataChannel.trySend(updatasdata)
+                }*/
+        }
+
+        // 记得在不需要时关闭Channel，释放资源
+        fun close() {
+            dataChannel.close()
+        }
+
     }
+
+
     private var bitListScope: CoroutineScope? = null
 
     suspend fun getPrintStatus(): SyzPrinterState2 {
@@ -307,13 +467,28 @@ class SyzClassicBluManager {
 
 
     //用quicklz压缩
-    suspend fun compress(bitmapDataArray: ByteArray): ByteArray {
-        return suspendCancellableCoroutine<ByteArray> { cancellableContinuation ->
-            //val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
-            val yaSuoArray = HeatShrinkUtils.compress(bitmapDataArray)
-            cancellableContinuation.resume(yaSuoArray) {
-                Log.e(TAG, "压缩失败>>>>>")
-            }
+//    suspend fun compress(bitmapDataArray: ByteArray): ByteArray? {
+//        return suspendCancellableCoroutine<ByteArray?> { cancellableContinuation ->
+//            //val yaSuoArray = QuickLZ.compress(bitmapDataArray, 1)
+//            val yaSuoArray = HeatShrinkUtils.compress(bitmapDataArray)
+//            cancellableContinuation.resume(yaSuoArray) {
+//                Log.e(TAG, "压缩失败>>>>>")
+//            }
+//        }
+//    }
+
+    private suspend fun compress(bitmapDataArray: ByteArray): ByteArray? {
+        return try {
+            // 直接调用 HeatShrinkUtils.compress 挂起函数
+            HeatShrinkUtils.compress(bitmapDataArray)
+        } catch (e: IOException) {
+            //处理IOException异常
+            Log.e(TAG, "压缩失败: ${e.localizedMessage}")
+            null
+        } catch (e: Exception) {
+            // 处理其他类型的异常
+            Log.e(TAG, "压缩失败: ${e.localizedMessage}")
+            null
         }
     }
 
@@ -338,7 +513,7 @@ class SyzClassicBluManager {
             printerType: SyzPrinter,
             callBack: BluPrinterInfoCall2
         ) {
-            isCancelPrinting = false
+
             Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
             LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
             currentPrintStatusFlow = MutableSharedFlow<SyzPrinterState2>()
@@ -474,22 +649,21 @@ class SyzClassicBluManager {
         height: Int,
         page: Int,
         printerType: SyzPrinter,
-        isShake: Boolean,
         callBack: BluPrintingCallBack
     ) {
         //按4k,取段数
         //每一段再分包
-        // isCancelPrinting = false
         this.printerType = printerType
         Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
-        LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+        //LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
         if (bitListScope != null && bitListScope!!.isActive) {
             bitListScope?.cancel()
         }
         bitListScope = CoroutineScope(Dispatchers.IO)
         bitListScope?.launch {
             val startTime = System.currentTimeMillis()
-            var isCompress = printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
+            var isCompress =
+                printerType == SyzPrinter.SYZFOURINCH || printerType == SyzPrinter.SYZTWOINCH
             val compressCode = if (isCompress) {
                 1
             } else {
@@ -503,29 +677,35 @@ class SyzClassicBluManager {
                 Log.i(
                     TAG, "第${indexBitMap}张图片===分了${bitMapFenDuanList.size}段"
                 )
+                //存放一张图片所有的段数据
                 val dataDuanEachBitmapList = mutableListOf<MutableList<MPMessage.MPSendMsg>>()
                 var eachBitmapTotalBaoNums = 0
                 bitMapFenDuanList.forEachIndexed { indexDuan, duanBytes ->
-//                    Log.i(
-//                        TAG,
-//                        "第${indexBitMap}张图片===第${indexDuan}段压缩前的大小${duanBytes.size}"
-//                    )
+                    Log.i(
+                        TAG,
+                        "第${indexBitMap}张图片===第${indexDuan}段压缩前的大小${duanBytes.size}"
+                    )
                     val duanByteArray = if (isCompress) {
                         //
                         val duanCompressTask = async { compress(duanBytes) }
                         val duanCompress = duanCompressTask.await()
                         Log.i(
                             TAG,
-                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress.size}"
-                        )
-                        /*                        val duanDecompressTask = async { decompress(duanCompress) }
+                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress?.size}"
+                        )/*                        val duanDecompressTask = async { decompress(duanCompress) }
                                                 val duanOrgin = duanDecompressTask.await()
                                                 Log.i(
                                                     TAG,
                                                     "第${indexBitMap}张图片===第${indexDuan}段解压缩后的大小${duanOrgin.size}"
                                                 )
                                                 */
-                        duanCompress
+
+                        if (duanCompress != null) {
+                            duanCompress
+                        } else {
+                            //希望这永远不要执行
+                            duanBytes
+                        }
                     } else {
                         Log.i(
                             TAG,
@@ -533,8 +713,6 @@ class SyzClassicBluManager {
                         )
                         duanBytes
                     }
-
-
                     //每一段再按200分包
                     val chunkSizePack = 180
                     val bitMapFenBaoList = splitByteArray(duanByteArray, chunkSizePack)
@@ -563,7 +741,6 @@ class SyzClassicBluManager {
                                 .setSendData(mPPrintMsg.toByteString()).build()
                             baoDataEachDuanList.add(baoData)
                         } else {
-                            //Log.i(TAG,">>>>sssss>>${baoIndex}")
                             val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
                                 .setDataLength(bitmapPrintArray.size)
                                 .setImgData(ByteString.copyFrom(baoBytes))
@@ -586,12 +763,11 @@ class SyzClassicBluManager {
                 "当前需要处理几张图${dataNeedSendList.size}==生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}"
             )
             FmPrintBimapUtils.getInstance().setBimapCallBack(callBack)
-                .setBitmapTask(dataNeedSendList).doPrint()
+                .setBitmapTask(dataNeedSendList, page).doPrintFirst()
 
 
         }
     }
-
 
 
     fun testBitmaps(
@@ -605,10 +781,9 @@ class SyzClassicBluManager {
     ) {
         //按4k,取段数
         //每一段再分包
-        // isCancelPrinting = false
         this.printerType = printerType
         Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
-        LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
+        //  LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
         if (bitListScope != null && bitListScope!!.isActive) {
             bitListScope?.cancel()
         }
@@ -643,16 +818,20 @@ class SyzClassicBluManager {
                         val duanCompress = duanCompressTask.await()
                         Log.i(
                             TAG,
-                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress.size}"
-                        )
-                        /*                        val duanDecompressTask = async { decompress(duanCompress) }
+                            "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress?.size}"
+                        )/*                        val duanDecompressTask = async { decompress(duanCompress) }
                                                 val duanOrgin = duanDecompressTask.await()
                                                 Log.i(
                                                     TAG,
                                                     "第${indexBitMap}张图片===第${indexDuan}段解压缩后的大小${duanOrgin.size}"
                                                 )
                                                 */
-                        duanCompress
+                        // duanCompress
+                        if (duanCompress != null) {
+                            duanCompress
+                        } else {
+                            duanBytes
+                        }
                     } else {
                         Log.i(
                             TAG,
@@ -713,7 +892,7 @@ class SyzClassicBluManager {
                 "当前需要处理几张图${dataNeedSendList.size}==生成数据需要的时间>>>>${System.currentTimeMillis() - startTime}"
             )
             FmPrintBimapUtils.getInstance().setBimapCallBack(callBack)
-                .setBitmapTask(dataNeedSendList).doTest()
+                .setBitmapTask(dataNeedSendList, page).doTest()
         }
     }
 
@@ -728,7 +907,7 @@ class SyzClassicBluManager {
         printerType: SyzPrinter,
         isShake: Boolean,
         callBack: BluPrintingCallBack
-    ) {/* // isCancelPrinting = false
+    ) {/*
           this.printerType=printerType
           Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
           LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
@@ -852,6 +1031,10 @@ class SyzClassicBluManager {
     }
 
 
+    fun test() {
+
+    }
+
     //检查自检页
     fun writeSelfCheck() {
         writeABF1(FMPrinterOrder.orderForGetFmSelfcheckingPage(), "${TAG}=writeSelfCheck>>>>")
@@ -888,37 +1071,47 @@ class SyzClassicBluManager {
         writeABF1(FMPrinterOrder.orderForGetFmSetShutdownTime(min), "${TAG}=writeShutdown>>>>")
     }
 
-    //private var isCancelPrinting = false;//是否收到取消打印的指令
-    // private var cpb: CancelPrintCallBack? = null
 
     /**
      * 取消打印
      */
-    fun writeCancelPrinter(callBack: CancelPrintCallBack) {
-//        isCancelPrinting = false
-//        this.cpb = callBack
-        // isCancelPrinting = false
-        cancelPrintCallBack = { dataArray ->
-            val result = FmNotifyBeanUtils.getCancelPrintingInfo(dataArray)
-            when (result) {
-                is NotifyResult2.Success -> {
-                    //这里需要等待打印过程中的回调，
-                    // isCancelPrinting = true//打印机收到了取消指令，同时需要判定打印机是否结束打印
-                    Log.i(TAG, "打印机收到了取消指令")
-                    //isCancelPrinting = true
-                    callBack.cancelSuccess()
-                }
+    fun writeCancelPrinter(printerType: SyzPrinter, callBack: CancelPrintCallBack) {
+        this.printerType = printerType
+        if (FmPrintBimapUtils.getInstance().getPrinterState()) {
+            Log.d(TAG, "当前是打印中的状态，可以去取消打印")
+            cancelPrintCallBack = { dataArray ->
+                val result = FmNotifyBeanUtils.getCancelPrintingInfo(dataArray)
+                when (result) {
+                    is NotifyResult2.Success -> {
+                        //这里需要等待打印过程中的回调，
+                        Log.i(TAG, "打印机收到了取消指令")
+                        callBack.cancelSuccess()
+                    }
 
-                is NotifyResult2.Error -> {
-                    Log.i(TAG, "打印机收到了取消指令，但code！=200")
-                    // isCancelPrinting = false
-                    callBack.cancelFail()
-                }
+                    is NotifyResult2.Error -> {
+                        Log.i(TAG, "打印机收到了取消指令，但code！=200")
+                        callBack.cancelFail()
+                    }
 
-                else -> {}
+                    else -> {}
+                }
             }
+            writeABF1(
+                FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>"
+            )
+            if (printerType == SyzPrinter.SYZTWOINCH) {
+                //二寸不发指令直接回复
+                FmPrintBimapUtils.getInstance().setPrinterCancel()
+                //cancelPrintCallBack?.invoke()
+                callBack.cancelSuccess()
+            } else {
+
+
+            }
+
+        } else {
+            Log.e(TAG, "当前不是打印中的状态，不可以去取消打印")
         }
-        writeABF1(FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>")
     }
 
     /**
@@ -1026,11 +1219,11 @@ class SyzClassicBluManager {
             val crccode = CRC16_XMODEM(fileArray)
             var total = aplitafter.size //总包数
             Log.d("$TAG", "Dex文件总包数${total}")
-            LogLiveData.addLogs("Dex文件总包数${total}")
+            // LogLiveData.addLogs("Dex文件总包数${total}")
             val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()
             aplitafter.forEachIndexed { index, bytes ->
-                Log.d("$TAG", "第${index}的字节数据${bytes.toString()}")
-                Log.d("$TAG", "第${index}的字节数据${ByteString.copyFrom(bytes)}")
+                // Log.d("$TAG", "第${index}的字节数据${bytes.toString()}")
+                // Log.d("$TAG", "第${index}的字节数据${ByteString.copyFrom(bytes)}")
                 val mpFirmwareMsg = MPMessage.MPFirmwareMsg.newBuilder()
                     .setBinData(ByteString.copyFrom(bytes))//分包数据
                     .setDataLength(fileArray.size)//
@@ -1047,44 +1240,41 @@ class SyzClassicBluManager {
         }
     }
 
-    private var totalSize = 0
+
+    private val mutex = Mutex()
+    private suspend fun spp_write(upackerData: ByteArray, connection: Connection) = mutex.withLock {
+        //不让它并发执行，加了互斥锁
+        connection.write("${TAG}=spp_write>>>>", upackerData, null)
+    }
+
     suspend fun fmWriteABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
-        var start = System.currentTimeMillis()
         Log.d("$TAG", "========总共要发${dataList.size}个包")
-        LogLiveData.addLogs("========单张图总共要发${dataList.size}个包")
         for (index in 0 until dataList.size) {
             try {
                 val data = dataList[index]
                 val dataArray = data.toByteArray()
                 val upackerData = Upacker.frameEncode(dataArray)
                 connection?.apply {
-                    write(
-                        "${TAG}=writeBitmaps>>>>", upackerData, null
-                    )
+                    spp_write(upackerData, this)
                 }
                 Log.d(
                     "$TAG", "=======第${index}包===字节数${upackerData.size}="
                 )
-                totalSize += upackerData.size
-                Log.d(
-                    "$TAG", "=======第${index}包===累计大小=${totalSize}"
-                )
-                LogLiveData.addLogs("=======第${index}包===字节数${upackerData.size}=")
-                LogLiveData.addLogs("====累计大小=${totalSize}")
                 delay(1)
             } catch (e: Exception) {
+                Log.d("$TAG", "fmWriteABF4异常>>>>${e.message}")
                 break
             }
         }
-        Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
-        LogLiveData.addLogs("=======发包耗时${System.currentTimeMillis() - start}")
+        //Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
+        // LogLiveData.addLogs("=======发包耗时${System.currentTimeMillis() - start}")
     }
 
     private suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
         // var success = true
-        var start = System.currentTimeMillis()
+        // var start = System.currentTimeMillis()
         Log.d("$TAG", "========总共要发${dataList.size}个包")
-        LogLiveData.addLogs("========总共要发${dataList.size}个包")
+        // LogLiveData.addLogs("========总共要发${dataList.size}个包")
         var writeCount = 0
         for (index in 0 until dataList.size) {
             try {
@@ -1092,12 +1282,13 @@ class SyzClassicBluManager {
                 val dataArray = data.toByteArray()
                 val upackerData = Upacker.frameEncode(dataArray)
                 connection?.apply {
-                    write(
-                        "${TAG}=writeDex>>>>", upackerData, null
-                    )
+//                    write(
+//                        "${TAG}=writeDex>>>>", upackerData, null
+//                    )
+                    spp_write(upackerData, this)
                 }
                 Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
-                LogLiveData.addLogs("========第${index}包===字节数${dataArray.size}")
+                // LogLiveData.addLogs("========第${index}包===字节数${dataArray.size}")
                 writeCount += 100  //这里指原始数据累加，而不是包装的数据
                 if (writeCount >= 4 * 1024) {
                     Log.d(
@@ -1107,7 +1298,7 @@ class SyzClassicBluManager {
                     writeCount = writeCount - (4 * 1024)//重新计算,有4k减去继续累加
                 } else {
                     Log.d(
-                        "$TAG", "abf4写入delay========第${index}包===delay1==${writeCount}"
+                        "$TAG", "abf4写入delay========第${index}包===delay6==${writeCount}"
                     )
                     delay(6)
                 }
@@ -1116,17 +1307,13 @@ class SyzClassicBluManager {
                 break
             }
         }
-        Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
-        LogLiveData.addLogs("=======发包耗时${System.currentTimeMillis() - start}")
+        //Log.d("$TAG", "=======发包耗时${System.currentTimeMillis() - start}")
+        // LogLiveData.addLogs("=======发包耗时${System.currentTimeMillis() - start}")
     }
 
 
     private var connection: Connection? = null
     fun connect(address: String) {
-//
-//        val sFscSppCentralApi = FscSppCentralApiImp.getInstance();
-//        sFscSppCentralApi.setCallbacks(FscSppCentralCallbacksImp());
-//        sFscSppCentralApi.connect(address);
         bluCallBack?.onStartConnect()
         connection =
             BTManager.getInstance().createConnection(address, UUIDWrapper.useDefault(), reciver)
@@ -1147,12 +1334,6 @@ class SyzClassicBluManager {
 
 
     fun onDestory() {
-        if (instance != null) {
-            instance = null;
-        }
-//        if (currentPrintStatusFlow != null) {
-//            currentPrintStatusFlow = null
-//        }
         if (bitListScope != null && bitListScope!!.isActive) {
             bitListScope?.cancel()
             bitListScope = null
@@ -1161,10 +1342,28 @@ class SyzClassicBluManager {
             dexScope!!.cancel()
             dexScope = null
         }
+        if (sppReadScope != null && sppReadScope!!.isActive) {
+            sppReadScope!!.cancel()
+            sppReadScope = null
+        }
+        if (sppBitmapScope != null && sppBitmapScope!!.isActive) {
+            sppBitmapScope!!.cancel()
+            sppBitmapScope = null
+        }
+        if (bluetoothDataProcessor != null) {
+            bluetoothDataProcessor?.close()
+            bluetoothDataProcessor = null
+        }
+        if (bluetoothBitmapProcessor != null) {
+            bluetoothBitmapProcessor?.close()
+            bluetoothBitmapProcessor = null
+        }
         BTManager.getInstance().destroy()
+        if (instance != null) {
+            instance = null;
+        }
+
     }
-
-
 }
 
 

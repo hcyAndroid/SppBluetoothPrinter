@@ -33,6 +33,17 @@
             android:padding="8dp"
             android:text="四寸"
             android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_pic"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="测试双线性/三线性采样"
+            android:textStyle="bold" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

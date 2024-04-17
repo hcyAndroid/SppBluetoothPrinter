@@ -235,7 +235,7 @@ class MainActivity3 : ComponentActivity() {
         }
 
         vm.tvCancelPrinter.setOnClickListener {
-            SyzClassicBluManager.getInstance().writeCancelPrinter(object : CancelPrintCallBack {
+            SyzClassicBluManager.getInstance().writeCancelPrinter(SyzPrinter.SYZFOURINCH,object : CancelPrintCallBack {
                 override fun cancelSuccess() {
                     Log.d("", "取消打印成功>>>>}")
                 }

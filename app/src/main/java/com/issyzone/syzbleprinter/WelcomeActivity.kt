@@ -19,5 +19,9 @@ class WelcomeActivity : ComponentActivity() {
         vm.tvFour.setOnClickListener {
             startActivity(Intent(WelcomeActivity@ this, MainActivity3::class.java))
         }
+        vm.tvPic.setOnClickListener {
+            startActivity(Intent(WelcomeActivity@ this, MainActivity5::class.java))
+
+        }
     }
 }
