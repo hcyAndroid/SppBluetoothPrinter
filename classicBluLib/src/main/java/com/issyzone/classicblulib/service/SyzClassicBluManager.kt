@@ -18,12 +18,12 @@ import com.issyzone.classicblulib.callback.DeviceInfoCall
 import com.issyzone.classicblulib.callback.SyzBluCallBack
 import com.issyzone.classicblulib.callback.SyzPrinterState
 import com.issyzone.classicblulib.callback.SyzPrinterState2
-import com.issyzone.classicblulib.common.StringUtils
+
 import com.issyzone.classicblulib.tools.BTManager
 import com.issyzone.classicblulib.tools.ConnectCallback
 import com.issyzone.classicblulib.tools.Connection
 import com.issyzone.classicblulib.tools.EventObserver
-import com.issyzone.classicblulib.tools.FmArrayUtils
+
 import com.issyzone.classicblulib.tools.UUIDWrapper
 import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
@@ -50,7 +50,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.io.IOException
-import kotlin.coroutines.resumeWithException
 
 
 class SyzClassicBluManager {
@@ -135,7 +134,7 @@ class SyzClassicBluManager {
     //ble连接状态的回调
     private var bluNotifyCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
-    //
+    //blu取消打印的回调
     private var cancelPrintCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
 //    private suspend fun getReadInfo(data: ByteArray?): ByteArray? {
@@ -183,6 +182,7 @@ class SyzClassicBluManager {
 //        return getReadInfo(upackerData)
 //    }
 
+    //专门处理图片打印中分段发送的逻辑
     private inner class BluetoothDataProcessor2(private val scope: CoroutineScope) {
         private val dataChannel = Channel<MPMessage.MPCodeMsg>(Channel.UNLIMITED)
 
@@ -370,6 +370,9 @@ class SyzClassicBluManager {
         }
     }
 
+    /**
+     * 专门用来梳理接收的消息
+     */
 
     private inner class BluetoothDataProcessor(private val mySppReadScope: CoroutineScope) {
         private val dataChannel = Channel<ByteArray>(Channel.UNLIMITED)
@@ -379,8 +382,6 @@ class SyzClassicBluManager {
             mySppReadScope.launch {
                 for (data in dataChannel) {
                     try {
-                        //val processedData = spp_upacker(data)  //解包
-                        //spp_read(processedData)
                         spp_read(data)
                     } catch (e: Exception) {
                         Log.e(TAG, "解包异常>>>>${e.message.toString()}")
@@ -399,26 +400,16 @@ class SyzClassicBluManager {
 
             override fun onMsgFailed() {
                 Log.e(TAG, "Upacker>>>>解包失败==")
-                FmPrintBimapUtils.getInstance().upackerFaiLed()
-                //deferred.completeExceptionally(Exception("Unpacking failed"))
+                if (FmPrintBimapUtils.getInstance().getPrinterState()) {
+                    FmPrintBimapUtils.getInstance().upackerFaiLed()
+                } else {
+                    activelyReportCallBack?.invoke(SyzPrinterState2.PRINTER_UPACKER_FAILED)
+                }
             }
         })
 
         fun onRead(updatasdata: ByteArray) {
             upacker.unpack(updatasdata)
-            // 向Channel发送数据，而不是直接处理它
-            /*    val targetDataFlag=FmArrayUtils.startsWith(updatasdata)
-                Log.i(TAG,">>>>>>>目标分割数据>>>${targetDataFlag}")
-                if (targetDataFlag){
-                   val result= FmArrayUtils.splitByteArrayBySequence(updatasdata)
-                    result.forEachIndexed { index, bytes ->
-                        Log.i(TAG,">>>>>>>目标分割数据${index}>>>${StringUtils.toHex(bytes)}")
-                        dataChannel.trySend(bytes)
-                       // delay(1)
-                    }
-                }else{
-                    dataChannel.trySend(updatasdata)
-                }*/
         }
 
         // 记得在不需要时关闭Channel，释放资源
@@ -673,7 +664,14 @@ class SyzClassicBluManager {
             bipmaps.forEachIndexed { indexBitMap, bitmap ->
                 val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
                 //按4k取段数
-                val bitMapFenDuanList = splitByteArray(bitmapPrintArray, 4 * 1024)
+                val fenDuanChunkSize = if (printerType == SyzPrinter.SYZFOURINCH) {
+                    10 * 1024
+                } else if (printerType == SyzPrinter.SYZTWOINCH) {
+                    4 * 1024
+                } else {
+                    4 * 1024
+                }
+                val bitMapFenDuanList = splitByteArray(bitmapPrintArray, fenDuanChunkSize)
                 Log.i(
                     TAG, "第${indexBitMap}张图片===分了${bitMapFenDuanList.size}段"
                 )
@@ -714,7 +712,13 @@ class SyzClassicBluManager {
                         duanBytes
                     }
                     //每一段再按200分包
-                    val chunkSizePack = 180
+                    val chunkSizePack = if (printerType == SyzPrinter.SYZFOURINCH) {
+                        1 * 1024
+                    } else if (printerType == SyzPrinter.SYZTWOINCH) {
+                        180
+                    } else {
+                        180
+                    }
                     val bitMapFenBaoList = splitByteArray(duanByteArray, chunkSizePack)
                     val totalBaoEachDuan = bitMapFenBaoList.size
                     eachBitmapTotalBaoNums += totalBaoEachDuan
@@ -733,6 +737,7 @@ class SyzClassicBluManager {
                             val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
                                 .setDataLength(bitmapPrintArray.size)
                                 .setImgData(ByteString.copyFrom(baoBytes))
+                                .setTotalSection(bitMapFenDuanList.size)
                                 .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
                                 .setWidth(width).setCompression(compressCode).setHeight(height)
                                 .setSectionLength(duanByteArray.size).build()
@@ -743,6 +748,7 @@ class SyzClassicBluManager {
                         } else {
                             val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
                                 .setDataLength(bitmapPrintArray.size)
+                                .setTotalSection(bitMapFenDuanList.size)
                                 .setImgData(ByteString.copyFrom(baoBytes))
                                 .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
                                 .setCompression(compressCode).setSectionLength(duanByteArray.size)
@@ -770,7 +776,7 @@ class SyzClassicBluManager {
     }
 
 
-    fun testBitmaps(
+   /* fun testBitmaps(
         bipmaps: MutableList<Bitmap>,
         width: Int,
         height: Int,
@@ -819,13 +825,13 @@ class SyzClassicBluManager {
                         Log.i(
                             TAG,
                             "第${indexBitMap}张图片===第${indexDuan}段压缩后的大小${duanCompress?.size}"
-                        )/*                        val duanDecompressTask = async { decompress(duanCompress) }
+                        )*//*                        val duanDecompressTask = async { decompress(duanCompress) }
                                                 val duanOrgin = duanDecompressTask.await()
                                                 Log.i(
                                                     TAG,
                                                     "第${indexBitMap}张图片===第${indexDuan}段解压缩后的大小${duanOrgin.size}"
                                                 )
-                                                */
+                                                *//*
                         // duanCompress
                         if (duanCompress != null) {
                             duanCompress
@@ -896,9 +902,9 @@ class SyzClassicBluManager {
         }
     }
 
-    /**
+    *//**
      * @param isShake   是否抖动   要么图片全部抖动，要么不抖动
-     */
+     *//*
     fun writeBitmaps(
         bipmaps: MutableList<Bitmap>,
         width: Int,
@@ -907,7 +913,7 @@ class SyzClassicBluManager {
         printerType: SyzPrinter,
         isShake: Boolean,
         callBack: BluPrintingCallBack
-    ) {/*
+    ) {*//*
           this.printerType=printerType
           Log.i(TAG, "打印图片的张图::${bipmaps.size}===${page}")
           LogLiveData.addLogs("打印图片的张图::${bipmaps.size}==每张图片的page=${page}")
@@ -1004,8 +1010,8 @@ class SyzClassicBluManager {
               PrintBimapUtils.getInstance().setBimapCallBack(callBack)
                   .setBitmapTask(totalBipmapsDataList, page).doPrint()
 
-          }*/
-    }
+          }*//*
+    }*/
 
     /**
      * 获取设备信息

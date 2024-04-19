@@ -554,7 +554,7 @@ class MainActivity4 : ComponentActivity() {
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test8), 128)
             val bitmap3 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test11), 128)
             val bitmap4 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test13), 128)
-            SyzClassicBluManager.getInstance().testBitmaps(mutableListOf(
+            SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
                 bitmap4,
 //                bitmap2,
 //                bitmap3,
@@ -565,7 +565,7 @@ class MainActivity4 : ComponentActivity() {
 //                bitmap3,
 //                bitmap4,
 //                bitmap5
-            ), width, height, 1, SyzPrinter.SYZTWOINCH, true, object : BluPrintingCallBack {
+            ), width, height, 1, SyzPrinter.SYZTWOINCH, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }
