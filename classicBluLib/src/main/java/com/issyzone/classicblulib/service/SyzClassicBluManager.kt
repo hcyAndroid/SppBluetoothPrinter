@@ -102,7 +102,7 @@ class SyzClassicBluManager {
             }
 
             override fun onConnectFail(msg: String?) {
-
+              //这里不会走
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
@@ -111,6 +111,8 @@ class SyzClassicBluManager {
 
             override fun onDisConnected() {
                 bluCallBack?.onDisConnected()
+                //取消注册广播
+                BTManager.getInstance().unRegisterBroadCaster()
 
             }
         })
@@ -728,9 +730,11 @@ class SyzClassicBluManager {
                     )
                     val baoDataEachDuanList = mutableListOf<MPMessage.MPSendMsg>()
                     bitMapFenBaoList.forEachIndexed { baoIndex, baoBytes ->
+
+                        //val duanNums=bitMapFenDuanList.size
                         Log.i(
                             TAG,
-                            "第${indexBitMap}张图片===第${indexDuan}段==第${baoIndex}包==数据大小==${baoBytes.size}"
+                            "第${indexBitMap}张图片===第${indexDuan}段==第${baoIndex}包==数据大小==${baoBytes.size}==当前图片分段数>>>${bitMapFenDuanList.size}"
                         )
                         if (baoIndex == 0) {
                             //第一包传宽高
@@ -739,11 +743,12 @@ class SyzClassicBluManager {
                                 .setImgData(ByteString.copyFrom(baoBytes))
                                 .setTotalSection(bitMapFenDuanList.size)
                                 .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
-                                .setWidth(width).setCompression(compressCode).setHeight(height)
+                                .setWidth(width).setCompression(compressCode)
                                 .setSectionLength(duanByteArray.size).build()
                             val baoData = MPMessage.MPSendMsg.newBuilder()
                                 .setEventType(MPMessage.EventType.DEVICEPRINT)
                                 .setSendData(mPPrintMsg.toByteString()).build()
+                           // Log.d(TAG,">>>>>>>${mPPrintMsg.toString()}===${mPPrintMsg.totalSection}=====${mPPrintMsg.totalPackage}")
                             baoDataEachDuanList.add(baoData)
                         } else {
                             val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
@@ -753,9 +758,11 @@ class SyzClassicBluManager {
                                 .setIndexPackage(baoIndex + 1).setTotalPackage(totalBaoEachDuan)
                                 .setCompression(compressCode).setSectionLength(duanByteArray.size)
                                 .build()
+                            //Log.d(TAG,">>>>>>>${mPPrintMsg.toString()}===${mPPrintMsg.totalSection}=====${mPPrintMsg.totalPackage}")
                             val baoData = MPMessage.MPSendMsg.newBuilder()
                                 .setEventType(MPMessage.EventType.DEVICEPRINT)
                                 .setSendData(mPPrintMsg.toByteString()).build()
+
                             baoDataEachDuanList.add(baoData)
                         }
                     }
@@ -1124,8 +1131,9 @@ class SyzClassicBluManager {
      * 设置打印速度
      */
     fun writePrintSpeed(
-        speed: Int, callBack: DeviceBleInfoCall
+        speed: Int, printerType: SyzPrinter,callBack: DeviceBleInfoCall
     ) {
+        this.printerType=printerType
         bluNotifyCallBack = { dataArray ->
             val result = FmNotifyBeanUtils.getSetSpeedPrinterResult(dataArray)
             when (result) {
@@ -1138,7 +1146,7 @@ class SyzClassicBluManager {
                 }
             }
         }
-        writeABF1(FMPrinterOrder.orderForGetFmSetPrintSpeed(speed), "${TAG}=writePrintSpeed>>>>")
+        writeABF1(FMPrinterOrder.orderForGetFmSetPrintSpeed(speed,printerType), "${TAG}=writePrintSpeed>>>>")
     }
 
 
@@ -1146,8 +1154,9 @@ class SyzClassicBluManager {
      * 设置打印浓度
      */
     fun writePrintConcentration(
-        Concentration: Int, callBack: DeviceBleInfoCall
+        Concentration: Int,printerType: SyzPrinter, callBack: DeviceBleInfoCall
     ) {
+        this.printerType=printerType
         bluNotifyCallBack = { dataArray ->
             val result = FmNotifyBeanUtils.getSetConcentrationPrinterResult(dataArray)
             when (result) {
@@ -1161,7 +1170,7 @@ class SyzClassicBluManager {
             }
         }
         writeABF1(
-            FMPrinterOrder.orderForGetFmSetPrintConcentration(Concentration),
+            FMPrinterOrder.orderForGetFmSetPrintConcentration(Concentration,printerType),
             "${TAG}=设置打印浓度>>>>"
         )
     }
@@ -1321,6 +1330,8 @@ class SyzClassicBluManager {
     private var connection: Connection? = null
     fun connect(address: String) {
         bluCallBack?.onStartConnect()
+        //连接的时候再注册
+        BTManager.getInstance().registerBluReciver()
         connection =
             BTManager.getInstance().createConnection(address, UUIDWrapper.useDefault(), reciver)
                 .apply {
@@ -1333,6 +1344,8 @@ class SyzClassicBluManager {
                         override fun onFail(errMsg: String, e: Throwable?) {
                             Log.e(TAG, "经典蓝牙连接失败${e?.message}")
                             bluCallBack?.onConnectFail(msg = e?.message)
+                            //取消注册广播
+                            BTManager.getInstance().unRegisterBroadCaster()
                         }
                     })
                 }

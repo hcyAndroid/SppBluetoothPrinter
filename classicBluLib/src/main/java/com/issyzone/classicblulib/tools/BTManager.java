@@ -243,21 +243,26 @@ public class BTManager {
         this.application = application;
         //获取蓝牙配置器
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        //注册蓝牙开关状态广播接收者
-        if (broadcastReceiver == null) {
-            broadcastReceiver = new InnerBroadcastReceiver();
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
-            filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-            filter.addAction(BluetoothDevice.ACTION_FOUND);
-            filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-            filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
-            filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-            filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-            application.registerReceiver(broadcastReceiver, filter);
-        }
         isInitialized = true;
+    }
+
+    public void registerBluReciver(){
+        if (broadcastReceiver!=null){
+            broadcastReceiver=null;
+        }
+        //注册蓝牙开关状态广播接收者
+        broadcastReceiver = new InnerBroadcastReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        filter.addAction(BluetoothDevice.ACTION_PAIRING_REQUEST);
+        filter.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+        filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        application.registerReceiver(broadcastReceiver, filter);
+        Log.i("blue>>>>","监听蓝牙的广播");
     }
 
     private synchronized boolean checkStatus() {
@@ -658,6 +663,14 @@ public class BTManager {
             if (connection != null) {
                 connection.release();
             }
+        }
+    }
+
+    public  void unRegisterBroadCaster(){
+        if (broadcastReceiver != null) {
+            application.unregisterReceiver(broadcastReceiver);
+            broadcastReceiver = null;
+            Log.i("blue>>>>","取消监听蓝牙的广播");
         }
     }
 

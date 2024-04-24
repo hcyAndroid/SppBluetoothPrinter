@@ -4252,10 +4252,10 @@ public final class MPMessage {
     int getWidth();
 
     /**
-     * <code>int32 height = 7;</code>
-     * @return The height.
+     * <code>int32 totalSection = 7;</code>
+     * @return The totalSection.
      */
-    int getHeight();
+    int getTotalSection();
 
     /**
      * <code>int32 compression = 8;</code>
@@ -4274,12 +4274,6 @@ public final class MPMessage {
      * @return The sectionLength.
      */
     int getSectionLength();
-
-    /**
-     * <code>int32 totalSection = 11;</code>
-     * @return The totalSection.
-     */
-    int getTotalSection();
   }
   /**
    * <pre>
@@ -4373,7 +4367,7 @@ public final class MPMessage {
             }
             case 56: {
 
-              height_ = input.readInt32();
+              totalSection_ = input.readInt32();
               break;
             }
             case 64: {
@@ -4389,11 +4383,6 @@ public final class MPMessage {
             case 80: {
 
               sectionLength_ = input.readSInt32();
-              break;
-            }
-            case 88: {
-
-              totalSection_ = input.readInt32();
               break;
             }
             default: {
@@ -4496,15 +4485,15 @@ public final class MPMessage {
       return width_;
     }
 
-    public static final int HEIGHT_FIELD_NUMBER = 7;
-    private int height_;
+    public static final int TOTALSECTION_FIELD_NUMBER = 7;
+    private int totalSection_;
     /**
-     * <code>int32 height = 7;</code>
-     * @return The height.
+     * <code>int32 totalSection = 7;</code>
+     * @return The totalSection.
      */
     @Override
-    public int getHeight() {
-      return height_;
+    public int getTotalSection() {
+      return totalSection_;
     }
 
     public static final int COMPRESSION_FIELD_NUMBER = 8;
@@ -4540,17 +4529,6 @@ public final class MPMessage {
       return sectionLength_;
     }
 
-    public static final int TOTALSECTION_FIELD_NUMBER = 11;
-    private int totalSection_;
-    /**
-     * <code>int32 totalSection = 11;</code>
-     * @return The totalSection.
-     */
-    @Override
-    public int getTotalSection() {
-      return totalSection_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @Override
     public final boolean isInitialized() {
@@ -4583,8 +4561,8 @@ public final class MPMessage {
       if (width_ != 0) {
         output.writeInt32(6, width_);
       }
-      if (height_ != 0) {
-        output.writeInt32(7, height_);
+      if (totalSection_ != 0) {
+        output.writeInt32(7, totalSection_);
       }
       if (compression_ != 0) {
         output.writeInt32(8, compression_);
@@ -4594,9 +4572,6 @@ public final class MPMessage {
       }
       if (sectionLength_ != 0) {
         output.writeSInt32(10, sectionLength_);
-      }
-      if (totalSection_ != 0) {
-        output.writeInt32(11, totalSection_);
       }
       unknownFields.writeTo(output);
     }
@@ -4631,9 +4606,9 @@ public final class MPMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(6, width_);
       }
-      if (height_ != 0) {
+      if (totalSection_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(7, height_);
+          .computeInt32Size(7, totalSection_);
       }
       if (compression_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -4646,10 +4621,6 @@ public final class MPMessage {
       if (sectionLength_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeSInt32Size(10, sectionLength_);
-      }
-      if (totalSection_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(11, totalSection_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4678,16 +4649,14 @@ public final class MPMessage {
           != other.getIndexPackage()) return false;
       if (getWidth()
           != other.getWidth()) return false;
-      if (getHeight()
-          != other.getHeight()) return false;
+      if (getTotalSection()
+          != other.getTotalSection()) return false;
       if (getCompression()
           != other.getCompression()) return false;
       if (getLastPage()
           != other.getLastPage()) return false;
       if (getSectionLength()
           != other.getSectionLength()) return false;
-      if (getTotalSection()
-          != other.getTotalSection()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4711,16 +4680,14 @@ public final class MPMessage {
       hash = (53 * hash) + getIndexPackage();
       hash = (37 * hash) + WIDTH_FIELD_NUMBER;
       hash = (53 * hash) + getWidth();
-      hash = (37 * hash) + HEIGHT_FIELD_NUMBER;
-      hash = (53 * hash) + getHeight();
+      hash = (37 * hash) + TOTALSECTION_FIELD_NUMBER;
+      hash = (53 * hash) + getTotalSection();
       hash = (37 * hash) + COMPRESSION_FIELD_NUMBER;
       hash = (53 * hash) + getCompression();
       hash = (37 * hash) + LASTPAGE_FIELD_NUMBER;
       hash = (53 * hash) + getLastPage();
       hash = (37 * hash) + SECTIONLENGTH_FIELD_NUMBER;
       hash = (53 * hash) + getSectionLength();
-      hash = (37 * hash) + TOTALSECTION_FIELD_NUMBER;
-      hash = (53 * hash) + getTotalSection();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4880,15 +4847,13 @@ public final class MPMessage {
 
         width_ = 0;
 
-        height_ = 0;
+        totalSection_ = 0;
 
         compression_ = 0;
 
         lastPage_ = 0;
 
         sectionLength_ = 0;
-
-        totalSection_ = 0;
 
         return this;
       }
@@ -4922,11 +4887,10 @@ public final class MPMessage {
         result.totalPackage_ = totalPackage_;
         result.indexPackage_ = indexPackage_;
         result.width_ = width_;
-        result.height_ = height_;
+        result.totalSection_ = totalSection_;
         result.compression_ = compression_;
         result.lastPage_ = lastPage_;
         result.sectionLength_ = sectionLength_;
-        result.totalSection_ = totalSection_;
         onBuilt();
         return result;
       }
@@ -4993,8 +4957,8 @@ public final class MPMessage {
         if (other.getWidth() != 0) {
           setWidth(other.getWidth());
         }
-        if (other.getHeight() != 0) {
-          setHeight(other.getHeight());
+        if (other.getTotalSection() != 0) {
+          setTotalSection(other.getTotalSection());
         }
         if (other.getCompression() != 0) {
           setCompression(other.getCompression());
@@ -5004,9 +4968,6 @@ public final class MPMessage {
         }
         if (other.getSectionLength() != 0) {
           setSectionLength(other.getSectionLength());
-        }
-        if (other.getTotalSection() != 0) {
-          setTotalSection(other.getTotalSection());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5226,33 +5187,33 @@ public final class MPMessage {
         return this;
       }
 
-      private int height_ ;
+      private int totalSection_ ;
       /**
-       * <code>int32 height = 7;</code>
-       * @return The height.
+       * <code>int32 totalSection = 7;</code>
+       * @return The totalSection.
        */
       @Override
-      public int getHeight() {
-        return height_;
+      public int getTotalSection() {
+        return totalSection_;
       }
       /**
-       * <code>int32 height = 7;</code>
-       * @param value The height to set.
+       * <code>int32 totalSection = 7;</code>
+       * @param value The totalSection to set.
        * @return This builder for chaining.
        */
-      public Builder setHeight(int value) {
+      public Builder setTotalSection(int value) {
         
-        height_ = value;
+        totalSection_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int32 height = 7;</code>
+       * <code>int32 totalSection = 7;</code>
        * @return This builder for chaining.
        */
-      public Builder clearHeight() {
+      public Builder clearTotalSection() {
         
-        height_ = 0;
+        totalSection_ = 0;
         onChanged();
         return this;
       }
@@ -5346,37 +5307,6 @@ public final class MPMessage {
       public Builder clearSectionLength() {
         
         sectionLength_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int totalSection_ ;
-      /**
-       * <code>int32 totalSection = 11;</code>
-       * @return The totalSection.
-       */
-      @Override
-      public int getTotalSection() {
-        return totalSection_;
-      }
-      /**
-       * <code>int32 totalSection = 11;</code>
-       * @param value The totalSection to set.
-       * @return This builder for chaining.
-       */
-      public Builder setTotalSection(int value) {
-        
-        totalSection_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 totalSection = 11;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearTotalSection() {
-        
-        totalSection_ = 0;
         onChanged();
         return this;
       }
@@ -6347,21 +6277,21 @@ public final class MPMessage {
       "\030\002 \001(\t\022\023\n\013firmwareVer\030\003 \001(\t\022\023\n\013paperStat" +
       "us\030\004 \001(\005\022\014\n\004elec\030\005 \001(\005\022\025\n\rconcentration\030" +
       "\006 \001(\005\022\r\n\005speed\030\007 \001(\005\022\021\n\tpaperSize\030\010 \001(\005\022" +
-      "\023\n\013printStatus\030\t \001(\t\"\336\001\n\nMPPrintMsg\022\014\n\004p" +
+      "\023\n\013printStatus\030\t \001(\t\"\316\001\n\nMPPrintMsg\022\014\n\004p" +
       "age\030\001 \001(\005\022\017\n\007imgData\030\002 \001(\014\022\022\n\ndataLength" +
       "\030\003 \001(\021\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014indexPac" +
-      "kage\030\005 \001(\005\022\r\n\005width\030\006 \001(\005\022\016\n\006height\030\007 \001(" +
-      "\005\022\023\n\013compression\030\010 \001(\005\022\020\n\010lastPage\030\t \001(\005" +
-      "\022\025\n\rsectionLength\030\n \001(\021\022\024\n\014totalSection\030" +
-      "\013 \001(\005\"\207\001\n\rMPFirmwareMsg\022\017\n\007crcCode\030\001 \001(\005" +
-      "\022\022\n\ndataLength\030\002 \001(\021\022\017\n\007binData\030\003 \001(\014\022\024\n" +
-      "\014totalPackage\030\004 \001(\005\022\024\n\014indexPackage\030\005 \001(" +
-      "\005\022\024\n\014firmwareType\030\006 \001(\005*\276\001\n\tEventType\022\013\n" +
-      "\007DEFAULT\020\000\022\016\n\nDEVICEINFO\020\001\022\014\n\010SELFTEST\020\002" +
-      "\022\r\n\tCLOSETIME\020\003\022\017\n\013DEVICEPRINT\020\004\022\022\n\016CANC" +
-      "ELPRINTING\020\005\022\020\n\014DEVICEREPORT\020\006\022\023\n\017FIRMWA" +
-      "REUPGRADE\020\007\022\021\n\rPRINTINGSPEED\020\010\022\030\n\024PRINTI" +
-      "NCONCENTRATION\020\tb\006proto3"
+      "kage\030\005 \001(\005\022\r\n\005width\030\006 \001(\005\022\024\n\014totalSectio" +
+      "n\030\007 \001(\005\022\023\n\013compression\030\010 \001(\005\022\020\n\010lastPage" +
+      "\030\t \001(\005\022\025\n\rsectionLength\030\n \001(\021\"\207\001\n\rMPFirm" +
+      "wareMsg\022\017\n\007crcCode\030\001 \001(\005\022\022\n\ndataLength\030\002" +
+      " \001(\021\022\017\n\007binData\030\003 \001(\014\022\024\n\014totalPackage\030\004 " +
+      "\001(\005\022\024\n\014indexPackage\030\005 \001(\005\022\024\n\014firmwareTyp" +
+      "e\030\006 \001(\005*\276\001\n\tEventType\022\013\n\007DEFAULT\020\000\022\016\n\nDE" +
+      "VICEINFO\020\001\022\014\n\010SELFTEST\020\002\022\r\n\tCLOSETIME\020\003\022" +
+      "\017\n\013DEVICEPRINT\020\004\022\022\n\016CANCELPRINTING\020\005\022\020\n\014" +
+      "DEVICEREPORT\020\006\022\023\n\017FIRMWAREUPGRADE\020\007\022\021\n\rP" +
+      "RINTINGSPEED\020\010\022\030\n\024PRINTINCONCENTRATION\020\t" +
+      "b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -6396,7 +6326,7 @@ public final class MPMessage {
     internal_static_MPPrintMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MPPrintMsg_descriptor,
-        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "Height", "Compression", "LastPage", "SectionLength", "TotalSection", });
+        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "TotalSection", "Compression", "LastPage", "SectionLength", });
     internal_static_MPFirmwareMsg_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_MPFirmwareMsg_fieldAccessorTable = new

@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.activity.ComponentActivity
 
 
@@ -49,8 +50,8 @@ class MainActivity3 : ComponentActivity() {
 
 //        val lo = "DC:0D:30:00:02:E2"
 //        val lo = "DC:0D:30:00:02:E5"
-//        val lo = "DC:0D:30:00:02:DB"
-        val lo = "DC:0D:30:00:02:DC" //硬件那的mac
+        val lo = "DC:0D:30:00:02:DE"
+       // val lo = "DC:0D:30:00:02:DC" //硬件那的mac
         vm.tvType.text = "4寸demo"
         vm.etPicWidth.setText("102")
         vm.etPicHeight.setText("152")
@@ -128,7 +129,7 @@ class MainActivity3 : ComponentActivity() {
             })
         }
         vm.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(14).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(19).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -169,7 +170,7 @@ class MainActivity3 : ComponentActivity() {
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT22222")
-            val bitmap5 =ImageUtilKt.convertBinary(
+            val bitmap5 = ImageUtilKt.convertBinary(
                 ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test6)), 128
             )
             val page = vm.etPrintPage.text.toString().toInt()
@@ -179,7 +180,7 @@ class MainActivity3 : ComponentActivity() {
             LogLiveData.clearLog(vm.tvLog)
             SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
                 bitmap5,
-            ), width, height, 1, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
+            ), width, height, page, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }
@@ -208,7 +209,6 @@ class MainActivity3 : ComponentActivity() {
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
 
 
-
             val page = vm.etPrintPage.text.toString().toInt()
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()
@@ -219,7 +219,7 @@ class MainActivity3 : ComponentActivity() {
 //            }
             SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
                 bitmap, bitmap2
-            ), width, height, 1, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
+            ), width, height, page, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }
@@ -247,10 +247,10 @@ class MainActivity3 : ComponentActivity() {
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT111")
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
-            val bitmap3 =ImageUtilKt.convertBinary(
+            val bitmap3 = ImageUtilKt.convertBinary(
                 ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test6)), 128
             )
-            val bitmap4 =ImageUtilKt.convertBinary(
+            val bitmap4 = ImageUtilKt.convertBinary(
                 ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test7)), 128
             )
 
@@ -268,15 +268,8 @@ class MainActivity3 : ComponentActivity() {
 //                data.add(bitmap4)
 //            }
             SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
-                bitmap,
-                bitmap2,
-                bitmap3,
-                bitmap4,
-                bitmap2,
-                bitmap3,
-                bitmap4,
-                bitmap
-            ), width, height, 1, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
+                bitmap, bitmap2, bitmap3, bitmap4, bitmap2, bitmap3, bitmap4, bitmap
+            ), width, height, page, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }
@@ -291,6 +284,7 @@ class MainActivity3 : ComponentActivity() {
             })
         }
 
+        vm.tvSetPrintImg0.visibility = View.GONE
         vm.tvSetPrintImg0.setOnClickListener {
             /*Log.d(
                 "${TAG}", "FmBitmapPrinterUtils》》》bitmap字节数${
@@ -353,10 +347,20 @@ class MainActivity3 : ComponentActivity() {
         vm.tvSetPrintImg4.setOnClickListener {
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()
-            val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test3), 128)
-            val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test8), 128)
-            val bitmap3 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test11), 128)
-            val bitmap4 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test13), 128)
+            val bitmap = ImageUtilKt.convertBinary(
+                BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test3), 128
+            )
+            val bitmap2 = ImageUtilKt.convertBinary(
+                BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test8), 128
+            )
+            val bitmap3 = ImageUtilKt.convertBinary(
+                BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test11), 128
+            )
+            val bitmap4 = ImageUtilKt.convertBinary(
+                BitmapExt.decodeBitmap(com.issyzone.syzbleprinter.R.drawable.test13), 128
+            )
+            val page = vm.etPrintPage.text.toString().toInt()
+
             SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
                 bitmap4,
 //                bitmap2,
@@ -368,7 +372,7 @@ class MainActivity3 : ComponentActivity() {
 //                bitmap3,
 //                bitmap4,
 //                bitmap5
-            ), width, height, 1, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
+            ), width, height, page, SyzPrinter.SYZFOURINCH, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }
@@ -388,7 +392,7 @@ class MainActivity3 : ComponentActivity() {
 
 
         vm.tvSetPrintSpeed.setOnClickListener {
-            SyzClassicBluManager.getInstance().writePrintSpeed(2, object : DeviceBleInfoCall {
+            SyzClassicBluManager.getInstance().writePrintSpeed(2, SyzPrinter.SYZFOURINCH,object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                     if (isSuccess) {
                         Log.d("", "设置打印速度成功>>>>${msg.toString()}")
@@ -401,7 +405,7 @@ class MainActivity3 : ComponentActivity() {
 
         vm.tvSetPrintConcentration.setOnClickListener {
             SyzClassicBluManager.getInstance()
-                .writePrintConcentration(4, object : DeviceBleInfoCall {
+                .writePrintConcentration(4,SyzPrinter.SYZFOURINCH, object : DeviceBleInfoCall {
                     override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                         if (isSuccess) {
                             Log.d("", "设置打印浓度成功>>>>${msg.toString()}")
@@ -413,16 +417,17 @@ class MainActivity3 : ComponentActivity() {
         }
 
         vm.tvCancelPrinter.setOnClickListener {
-            SyzClassicBluManager.getInstance().writeCancelPrinter(SyzPrinter.SYZFOURINCH,object : CancelPrintCallBack {
-                override fun cancelSuccess() {
-                    Log.d("", "取消打印成功>>>>}")
-                }
+            SyzClassicBluManager.getInstance()
+                .writeCancelPrinter(SyzPrinter.SYZFOURINCH, object : CancelPrintCallBack {
+                    override fun cancelSuccess() {
+                        Log.d("", "取消打印成功>>>>}")
+                    }
 
-                override fun cancelFail() {
-                    Log.d("", "取消打印失败>>>>}")
-                }
+                    override fun cancelFail() {
+                        Log.d("", "取消打印失败>>>>}")
+                    }
 
-            })
+                })
         }
 
         vm.tvDexZitiupdate.setOnClickListener {

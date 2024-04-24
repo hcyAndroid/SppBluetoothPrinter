@@ -68,8 +68,8 @@ class MainActivity4 : ComponentActivity() {
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
-        //val lo = "03:22:90:23:D4:28"  //硬件的机器
-         val lo = "03:26:A0:AE:0B:57"// ios
+        val lo = "03:22:90:23:D4:28"  //硬件的机器
+        // val lo = "03:26:A0:AE:0B:57"// ios
         // val lo = "03:25:70:6A:BF:45"
         // 03:25:70:6A:BF:45
         //val lo = "03:26:14:57:DF:7C"//android
@@ -583,7 +583,7 @@ class MainActivity4 : ComponentActivity() {
         vm.tvSetPrintSpeed.setOnClickListener {
 
             SyzClassicBluManager.getInstance().writePrintSpeed(
-                vm.etPrintPage.text.toString().toInt(),
+                vm.etPrintPage.text.toString().toInt(),SyzPrinter.SYZTWOINCH,
                 object : DeviceBleInfoCall {
                     override fun getBleNotifyInfo(
                         isSuccess: Boolean, msg: MPMessage.MPCodeMsg?
@@ -599,7 +599,7 @@ class MainActivity4 : ComponentActivity() {
 
         vm.tvSetPrintConcentration.setOnClickListener {
             SyzClassicBluManager.getInstance()
-                .writePrintConcentration(1, object : DeviceBleInfoCall {
+                .writePrintConcentration(1, SyzPrinter.SYZTWOINCH,object : DeviceBleInfoCall {
                     override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
                         if (isSuccess) {
                             Log.d("${TAG}", "设置打印浓度成功>>>>${msg.toString()}")

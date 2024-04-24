@@ -50,12 +50,16 @@ object FMPrinterOrder {
 
     /**
      * 设置打印速度
-     * @param speed (设置速度 1- 4)
+     * @param speed (设置速度 1- 4)  2寸1到4 4寸的1到8
      *
      */
-    fun orderForGetFmSetPrintSpeed(speed: Int): ByteArray {
-
-        if (speed in 1..4) {
+    fun orderForGetFmSetPrintSpeed(speed: Int,printer: SyzPrinter): ByteArray {
+        val speedTarget=if (printer==SyzPrinter.SYZTWOINCH){
+            4
+        }else{
+            8
+        }
+        if (speed in 1..speedTarget) {
             var mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
                 .setSendInt(speed).build()
             Log.d("$TAG","设置打印速度的命令${mSendMsg.toString()}")
@@ -75,13 +79,18 @@ object FMPrinterOrder {
 
     /**
      * 设置打印浓度
-     * @param concentration 1到8
+     * @param concentration 1到8 四寸的1..16
      */
 
     fun orderForGetFmSetPrintConcentration(
-        concentration: Int
+        concentration: Int,printer: SyzPrinter
     ): ByteArray {
-        if (concentration in 1..8) {
+        val concentrationTarget=if (printer==SyzPrinter.SYZTWOINCH){
+            8
+        }else{
+            16
+        }
+        if (concentration in 1..concentrationTarget) {
             var mSendMsg =
                 MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINCONCENTRATION)
                     .setSendInt(
