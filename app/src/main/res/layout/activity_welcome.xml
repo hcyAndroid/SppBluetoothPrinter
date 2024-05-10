@@ -23,6 +23,18 @@
             android:text="二寸"
             android:textStyle="bold" />
 
+
+        <TextView
+            android:id="@+id/tv_two_new"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="新版二寸"
+            android:textStyle="bold" />
+
         <TextView
             android:id="@+id/tv_four"
             android:textSize="18sp"
@@ -32,6 +44,19 @@
             android:gravity="center"
             android:padding="8dp"
             android:text="四寸"
+            android:textStyle="bold" />
+
+
+
+        <TextView
+            android:id="@+id/tv_four_new"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="新版四寸"
             android:textStyle="bold" />
 
         <TextView

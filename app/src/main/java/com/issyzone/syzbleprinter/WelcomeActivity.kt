@@ -16,12 +16,20 @@ class WelcomeActivity : ComponentActivity() {
             startActivity(Intent(WelcomeActivity@ this, MainActivity4::class.java))
         }
 
+        vm.tvTwoNew.setOnClickListener {
+            startActivity(Intent(WelcomeActivity@ this, MainActivity6::class.java))
+        }
+
         vm.tvFour.setOnClickListener {
             startActivity(Intent(WelcomeActivity@ this, MainActivity3::class.java))
+        }
+        vm.tvFourNew.setOnClickListener {
+            startActivity(Intent(WelcomeActivity@ this, MainActivity7::class.java))
         }
         vm.tvPic.setOnClickListener {
             startActivity(Intent(WelcomeActivity@ this, MainActivity5::class.java))
 
         }
+
     }
 }

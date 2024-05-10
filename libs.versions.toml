@@ -134,6 +134,8 @@ protobuf-javalite = { group = "com.google.protobuf", name = "protobuf-javalite",
 protobuf-java-util = { group = "com.google.protobuf", name = "protobuf-java-util", version = "4.26.0" }
 
 
+blutooth-lib = { group = "com.gitee.xmingjie", name = "syz-editor", version = "v1.4.3-alpha" }
+
 
 [bundles]
 androidx = ["lifecycle", "navigation-fragment-ktx", "navigation-ui-ktx", "page-runtime", "kotlin-std-lib", "swiperefreshlayout", "palette"]

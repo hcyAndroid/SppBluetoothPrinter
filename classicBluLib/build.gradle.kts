@@ -91,13 +91,13 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.issyzone.sdk"
                 artifactId = "syz-device"
-                version = "v1.4.7-alpha"
+                version = "v1.5.0-alpha"
 //                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
             }
         }
         repositories {
             maven {
-                url = uri("file:///D:\\BleLib")
+                url = uri("file:///D:\\syz-blu-lib")
             }
         }
     }

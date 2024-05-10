@@ -1,8 +1,15 @@
 package com.issyzone.blelibs.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Matrix
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.VectorDrawable
+import android.util.DisplayMetrics
+import androidx.core.content.ContextCompat
 import com.issyzone.blelibs.R
 import java.io.ByteArrayOutputStream
 
@@ -29,6 +36,46 @@ object BitmapExt {
         // 通过原始图片的字节数组创建 Bitmap 对象
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
     }
+
+
+
+    fun getBitmapFromDrawable(context: Context, drawableId: Int): Bitmap? {
+        val drawable = ContextCompat.getDrawable(context, drawableId)
+        if (drawable is BitmapDrawable) {
+            return drawable.bitmap
+        }
+        else if (drawable is VectorDrawable || drawable is GradientDrawable) {
+            val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            return bitmap
+        } else {
+            throw IllegalArgumentException("Unsupported drawable type")
+        }
+    }
+
+
+    fun testBitmap(context: Context, drawableId: Int):Bitmap?{
+        getBitmapFromDrawable(context,drawableId)?.apply {
+           return scaleBitmap(this, 48, 200, context)
+        }
+        return null
+    }
+
+
+    fun mmToPx(mm: Int, context: Context): Int {
+        val metrics = context.resources.displayMetrics
+        return Math.round(mm * (metrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
+    }
+
+    fun scaleBitmap(bitmap: Bitmap, widthMM: Int, heightMM: Int, context: Context): Bitmap {
+        val widthPx = mmToPx(widthMM, context)
+        val heightPx = mmToPx(heightMM, context)
+        return Bitmap.createScaledBitmap(bitmap, widthPx, heightPx, true)
+    }
+
+
 
 
 

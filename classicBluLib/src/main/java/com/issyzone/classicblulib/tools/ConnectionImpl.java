@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.issyzone.classicblulib.callback.SyzBluCallBack;
 import com.issyzone.classicblulib.common.MethodInfo;
 import com.issyzone.classicblulib.common.Observable;
 import com.issyzone.classicblulib.common.PosterDispatcher;
@@ -33,13 +34,15 @@ class ConnectionImpl extends Connection {
     private final List<SocketConnection.WriteData> writeQueue = new ArrayList<>();//请求队列
     private volatile boolean writeRunning;
     private final UUIDWrapper uuidWrapper;
+    private SyzBluCallBack syzBluCallBack;
 
-    ConnectionImpl(BTManager btManager, BluetoothAdapter bluetoothAdapter, BluetoothDevice device, UUIDWrapper uuidWrapper, EventObserver observer) {
+    ConnectionImpl(BTManager btManager, BluetoothAdapter bluetoothAdapter, BluetoothDevice device, UUIDWrapper uuidWrapper, EventObserver observer,SyzBluCallBack syzBluCallBack) {
         this.btManager = btManager;
         this.bluetoothAdapter = bluetoothAdapter;
         this.device = device;
         this.uuidWrapper = uuidWrapper;
         this.observer = observer;
+        this.syzBluCallBack=syzBluCallBack;
         observable = btManager.getObservable();
         posterDispatcher = btManager.getPosterDispatcher();
     }
@@ -149,25 +152,35 @@ class ConnectionImpl extends Connection {
             setState(Connection.STATE_PAIRED);
         }
         this.state = state;
-        BTLogger.instance.d(BTManager.DEBUG_TAG, "Connection state changed: " + getStateDesc(state));
+        getStateDesc(state,noEvent);
         if (!noEvent) {
             callback(MethodInfoGenerator.onConnectionStateChanged(device, uuidWrapper, state));
         }
     }
 
-    private String getStateDesc(int state) {
+    private String getStateDesc(int state,boolean noEvent) {
         switch (state) {
             case Connection.STATE_CONNECTED:
+                Log.e("Spp>>>>>>>", "已经连接"+noEvent);
+                syzBluCallBack.onConnectSuccess(getDevice());
                 return "connected";
+            case Connection.STATE_CONNECTFAILED:
+                Log.e("Spp>>>>>>>", "连接失败"+noEvent);
+                return "connect_failed";
             case Connection.STATE_CONNECTING:
+                Log.e("Spp>>>>>>>", "连接ing"+noEvent);
+                syzBluCallBack.onStartConnect();
                 return "connecting";
             case Connection.STATE_DISCONNECTED:
+                Log.e("Spp>>>>>>>", "断开连接"+noEvent);
+                syzBluCallBack.onDisConnected();
                 return "disconnected";
             case Connection.STATE_PAIRED:
                 return "paired";
             case Connection.STATE_PAIRING:
                 return "pairing";
             case Connection.STATE_RELEASED:
+                Log.e("Spp>>>>>>>", "资源释放"+noEvent);
                 return "released";
             default:
                 return "unknown state";

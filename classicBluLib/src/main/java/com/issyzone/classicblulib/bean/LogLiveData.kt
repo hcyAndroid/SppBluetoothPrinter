@@ -12,26 +12,29 @@ import kotlinx.coroutines.launch
 object LogLiveData {
     private val liveData = MutableSharedFlow<String>()
     private var log = ""
-    private var isTest=true
+    private var isTest = true
 
 
     fun addLogs(value: String) {
-        if (isTest){
+        if (isTest) {
             CoroutineScope(Dispatchers.IO).launch {
                 liveData.emit(value)
             }
         }
 
     }
-    fun clearLog(view: TextView){
-        if (isTest){
-            log=""
-            view.text = log
+
+    fun clearLog(view: TextView) {
+        if (isTest) {
+            CoroutineScope(Dispatchers.Main).launch {
+                log = ""
+                view.text = log
+            }
         }
     }
 
     fun showLogs(lifecycleOwner: LifecycleOwner, view: TextView) {
-        if (isTest){
+        if (isTest) {
             CoroutineScope(Dispatchers.Main).launch {
                 liveData?.apply {
                     this.asSharedFlow().collectLatest {

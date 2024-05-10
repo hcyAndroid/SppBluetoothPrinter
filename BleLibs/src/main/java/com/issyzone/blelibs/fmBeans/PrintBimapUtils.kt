@@ -3,7 +3,7 @@ package com.issyzone.blelibs.fmBeans
 import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
 import com.issyzone.blelibs.bluetooth.BleBluetooth
-import com.issyzone.blelibs.service.SyzBleManager
+//import com.issyzone.blelibs.service.SyzBleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -56,7 +56,7 @@ class PrintBimapUtils {
         serviceScope!!.launch {
             val doFirst = bitMapPrintTaskList.firstOrNull()
             if (doFirst != null) {
-                SyzBleManager.getInstance().fmWriteABF4(doFirst, bleBlue!!, bleCharac!!)
+                //SyzBleManager.getInstance().fmWriteABF4(doFirst, bleBlue!!, bleCharac!!)
             }
         }
     }

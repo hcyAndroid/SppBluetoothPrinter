@@ -14,7 +14,7 @@ import androidx.paging.cachedIn
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.issyzone.blelibs.R
 import com.issyzone.blelibs.service.BleService
-import com.issyzone.blelibs.service.SyzBleManager
+//import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.BitmapUtils
 import com.issyzone.blelibs.utils.ImageUtilKt
@@ -54,7 +54,7 @@ class MainActivity2 : ComponentActivity() {
         initRecyclerView()
         vm.getScanBleDevice(bleScanAdapter)
         // ImageUtilKt.convertBinary(BitmapExt.test(), 128)
-        SyzBleManager.getInstance().initBle()
+       // SyzBleManager.getInstance().initBle()
         var bb = ImageUtilKt.convertBinary(BitmapExt.test(), 128)
         //  Logger.d(">>>>>${ BitmapExt.bitmapToByteArray(bb).size}")
         val bitmapArray = BitmapUtils.print(bb, bb.width, bb.height)

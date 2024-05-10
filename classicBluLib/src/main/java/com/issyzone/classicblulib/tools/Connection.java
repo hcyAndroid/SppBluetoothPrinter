@@ -16,6 +16,11 @@ public abstract class Connection {
      * 连接中
      */
     public static final int STATE_CONNECTING = 1;
+
+    /**
+     * 连接失败
+     */
+    public static final int STATE_CONNECTFAILED = 6;
     /**
      * 配对中
      */

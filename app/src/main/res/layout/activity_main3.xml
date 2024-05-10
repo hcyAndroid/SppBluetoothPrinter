@@ -43,6 +43,21 @@
                 android:text="2" />
 
             <EditText
+                android:id="@+id/et_print_speed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="请输入速度"
+                android:inputType="number"
+                android:text="4" />
+            <EditText
+                android:id="@+id/et_print_concentration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:hint="请输入浓度"
+                android:inputType="number"
+                android:text="4" />
+
+            <EditText
                 android:id="@+id/et_pic_width"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

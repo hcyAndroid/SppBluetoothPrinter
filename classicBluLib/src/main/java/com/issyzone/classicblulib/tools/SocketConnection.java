@@ -66,8 +66,10 @@ class SocketConnection {
 
         return byteArrays;
     }
-   private  byte[] delimiter = new byte[]{(byte)0x55, (byte)0x0C, (byte)0x80};
-    public  boolean startsWith(byte[] array, byte[] prefix) {
+
+    private byte[] delimiter = new byte[]{(byte) 0x55, (byte) 0x0C, (byte) 0x80};
+
+    public boolean startsWith(byte[] array, byte[] prefix) {
         if (array.length < prefix.length) {
             return false;
         }
@@ -78,6 +80,7 @@ class SocketConnection {
         }
         return true;
     }
+
     @SuppressLint("MissingPermission")
     SocketConnection(ConnectionImpl connection, BTManager btManager, BluetoothDevice device, UUIDWrapper uuidWrapper, ConnectCallback callback) {
         this.device = device;
@@ -104,13 +107,15 @@ class SocketConnection {
                 if (btManager.isDiscovering()) {
                     btManager.stopDiscovery();//停止搜索
                 }
-                if (socket != null && !socket.isConnected()) {
-                    socket.connect();
-                    inputStream = socket.getInputStream();
-                    tmpOut = socket.getOutputStream();
-                } else {
-                    tmpOut = null;
-                    inputStream = null;
+                synchronized (this) {
+                    if (socket != null && !socket.isConnected()) {
+                        socket.connect();
+                        inputStream = socket.getInputStream();
+                        tmpOut = socket.getOutputStream();
+                    } else {
+                        tmpOut = null;
+                        inputStream = null;
+                    }
                 }
 
             } catch (IOException e) {
@@ -135,21 +140,7 @@ class SocketConnection {
                         Log.i("SPP_Read>>>>", "Receive data =>> " + StringUtils.toHex(data));
                         // BTLogger.instance.d(BTManager.DEBUG_TAG, "Receive data =>> " + StringUtils.toHex(data));
                         connection.callback(MethodInfoGenerator.onRead(device, uuidWrapper, data));
-                      /*  boolean isFlag=startsWith(data,delimiter);
-                        if (isFlag){
-                            //如何截取byte数组
-                            List<byte[]> bytes = splitByteArray(data, delimiter);
-                            for (int i=0;i<bytes.size();i++){
-                                byte[] bytesData = bytes.get(i);
-                                if (bytesData.length!=0){
-                                    Log.i("SPP_Read1111>>>>", "Receive data =>> " + StringUtils.toHex(bytesData));
-                                    connection.callback(MethodInfoGenerator.onRead(device, uuidWrapper, bytesData));
-                                }
-                          }
-                        }else {
-                            Log.i("SPP_Read>>>>", "Receive data =>> " + StringUtils.toHex(data));
 
-                        }*/
 
                     }
                 } catch (IOException e) {
@@ -164,7 +155,9 @@ class SocketConnection {
     }
 
     private void onConnectFail(ConnectionImpl connection, ConnectCallback callback, String errMsg, IOException e) {
-        connection.changeState(Connection.STATE_DISCONNECTED, true);
+        //connection.changeState(Connection.STATE_DISCONNECTED, true);
+        connection.changeState(Connection.STATE_CONNECTFAILED, false);
+
         if (BTManager.isDebugMode) {
             Log.w(BTManager.DEBUG_TAG, errMsg);
         }
@@ -172,7 +165,8 @@ class SocketConnection {
         if (callback != null) {
             callback.onFail(errMsg, e);
         }
-        connection.callback(MethodInfoGenerator.onConnectionStateChanged(device, uuidWrapper, Connection.STATE_DISCONNECTED));
+        // connection.callback(MethodInfoGenerator.onConnectionStateChanged(device, uuidWrapper, Connection.STATE_DISCONNECTED));
+        connection.callback(MethodInfoGenerator.onConnectionStateChanged(device, uuidWrapper, Connection.STATE_CONNECTFAILED));
     }
 
     void write(WriteData data) {
@@ -218,6 +212,7 @@ class SocketConnection {
     boolean isConnected() {
         return socket != null && socket.isConnected();
     }
+
 
     static class WriteData {
         String tag;

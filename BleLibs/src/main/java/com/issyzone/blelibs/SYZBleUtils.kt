@@ -141,6 +141,11 @@ object SYZBleUtils {
         return null
     }
 
+    fun findChannel(characteristicList: List<BluetoothGattCharacteristic>,fmPrinter: FMPrinter): BluetoothGattCharacteristic? {
+        return characteristicList.firstOrNull { characteristic ->
+            characteristic.uuid.toString().lowercase().startsWith(fmPrinter.characterid.lowercase())
+        }
+    }
 
     fun getABF4Charac(gatt: BluetoothGatt?):Pair<UUID, BluetoothGattCharacteristic>?{
         val serviceList= gatt?.services?.filter {

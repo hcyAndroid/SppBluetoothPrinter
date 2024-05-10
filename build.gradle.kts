@@ -8,6 +8,10 @@ buildscript {
     repositories {
         google()  // Google Maven 仓库
         jcenter() // JCenter Maven 仓库
+        maven { url = uri("https://jitpack.io") }
+        maven { url = uri("https://zendesk.jfrog.io/zendesk/repo") }
+        maven { url = uri("https://zendesk.jfrog.io/ui/native/repo") }
+        maven { url = uri("https://zendesk.jfrog.io/artifactory/repo") }
     }
     dependencies {
         classpath("com.android.tools.build:gradle:8.1.2")

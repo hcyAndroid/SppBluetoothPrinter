@@ -68,7 +68,7 @@ object FMPrinterOrder {
             val mySpeed = if (speed < 1) {
                 1
             } else {
-                4
+                speedTarget
             }
             var mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
                 .setSendInt(mySpeed).build()
@@ -102,7 +102,7 @@ object FMPrinterOrder {
             val myConcentration = if (concentration < 1) {
                 1
             } else {
-                8
+                concentrationTarget
             }
             var mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
                 .setSendInt(myConcentration).build()

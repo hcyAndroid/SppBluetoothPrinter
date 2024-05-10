@@ -12,7 +12,7 @@ import com.issyzone.blelibs.databinding.ItemScanBleBinding
 import com.issyzone.blelibs.fmBeans.FMPrinterOrder
 import com.issyzone.blelibs.fmBeans.FmBitmapOrDexPrinterUtils
 import com.issyzone.blelibs.service.BleService
-import com.issyzone.blelibs.service.SyzBleManager
+//import com.issyzone.blelibs.service.SyzBleManager
 import com.issyzone.blelibs.utils.BitmapExt
 import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.blelibs.utils.SYZFileUtils

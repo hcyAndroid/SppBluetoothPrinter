@@ -161,15 +161,13 @@ public class BTManager {
                 switch (action) {
                     case BluetoothDevice.ACTION_ACL_CONNECTED:
                         Log.i("blue>>>>", "ACTION_ACL_CONNECTED");
-                        if (syzBluCallBack != null) {
-                            // syzBluCallBack.onConnectSuccess();
-                        }
                         break;
                     case BluetoothDevice.ACTION_ACL_DISCONNECTED:
+                        /**
+                         * 在Android中，使用BluetoothDevice.ACTION_ACL_DISCONNECTED广播来监听蓝牙断开可能会有一些延迟
+                         * ，这是因为系统需要一些时间来处理断开事件。
+                         */
                         Log.e("blue>>>>", "ACTION_ACL_DISCONNECTED");
-                        if (syzBluCallBack != null) {
-                            syzBluCallBack.onDisConnected();
-                        }
                         break;
                     case BluetoothDevice.ACTION_PAIRING_REQUEST:
 //                        try {
@@ -522,7 +520,7 @@ public class BTManager {
                 connection.releaseNoEvent();
             }
 
-            currentConnectionImpl = new ConnectionImpl(this, bluetoothAdapter, device, uuidWrapper, observer);
+            currentConnectionImpl = new ConnectionImpl(this, bluetoothAdapter, device, uuidWrapper, observer,syzBluCallBack);
             connection = currentConnectionImpl;
             connectionMap.put(key, connection);
             addressList.add(key);
