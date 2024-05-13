@@ -313,6 +313,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         bitmapCall?.getPrintResult(false, SyzPrinterState2.PRINTER_CANCEL_PRINT)
     }
 
+    //解包失败
     fun upackerFaiLed() {
         bitmapCall?.getPrintResult(false, SyzPrinterState2.PRINTER_UPACKER_FAILED)
     }

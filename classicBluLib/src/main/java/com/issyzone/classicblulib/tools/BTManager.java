@@ -21,8 +21,10 @@ import androidx.annotation.Nullable;
 import com.issyzone.classicblulib.callback.SyzBluCallBack;
 import com.issyzone.classicblulib.common.MethodInfo;
 import com.issyzone.classicblulib.common.Observable;
+import com.issyzone.classicblulib.common.Observe;
 import com.issyzone.classicblulib.common.PosterDispatcher;
 import com.issyzone.classicblulib.common.ThreadMode;
+import com.issyzone.classicblulib.utils.AppGlobels;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -104,7 +106,8 @@ public class BTManager {
 
     @SuppressLint("PrivateApi")
     private void tryGetApplication() {
-        try {
+        application= AppGlobels.INSTANCE.getApplication();
+/*        try {
             Class<?> cls = Class.forName("android.app.ActivityThread");
             Method method = cls.getMethod("currentActivityThread");
             method.setAccessible(true);
@@ -113,7 +116,7 @@ public class BTManager {
             application = (Application) appMethod.invoke(acThread);
         } catch (Throwable e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     @Nullable

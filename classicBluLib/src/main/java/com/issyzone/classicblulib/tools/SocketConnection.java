@@ -11,9 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+
 
 
 class SocketConnection {
@@ -31,55 +30,6 @@ class SocketConnection {
      * UUID缓存
      */
     private final UUIDWrapper uuidWrapper;
-
-    public List<byte[]> splitByteArray(byte[] input, byte[] delimiter) {
-        List<byte[]> byteArrays = new ArrayList<>();
-
-        int from = 0;
-        int matchIndex = 0;
-
-        for (int i = 0; i < input.length; i++) {
-            if (input[i] == delimiter[matchIndex]) {
-                // 如果当前字节匹配，则移到下一个匹配字节上
-                matchIndex++;
-                if (matchIndex == delimiter.length) { // 找到完全匹配的分隔符
-                    // 从上一个分割点到当前找到分隔符之前的位置才是子数组
-                    int to = i + 1 - delimiter.length;
-                    byte[] subArray = new byte[to - from];
-                    System.arraycopy(input, from, subArray, 0, subArray.length);
-                    byteArrays.add(subArray);
-
-                    // 更新下次搜索的起始点，并重置匹配索引
-                    from = i + 1;
-                    matchIndex = 0;
-                }
-            } else {
-                matchIndex = 0; // 如果当前字节不匹配，立即重置匹配索引
-            }
-        }
-        // 截取最后一个匹配后到数组结束的部分
-        if (from < input.length) {
-            byte[] subArray = new byte[input.length - from];
-            System.arraycopy(input, from, subArray, 0, subArray.length);
-            byteArrays.add(subArray);
-        }
-
-        return byteArrays;
-    }
-
-    private byte[] delimiter = new byte[]{(byte) 0x55, (byte) 0x0C, (byte) 0x80};
-
-    public boolean startsWith(byte[] array, byte[] prefix) {
-        if (array.length < prefix.length) {
-            return false;
-        }
-        for (int i = 0; i < prefix.length; i++) {
-            if (array[i] != prefix[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     @SuppressLint("MissingPermission")
     SocketConnection(ConnectionImpl connection, BTManager btManager, BluetoothDevice device, UUIDWrapper uuidWrapper, ConnectCallback callback) {

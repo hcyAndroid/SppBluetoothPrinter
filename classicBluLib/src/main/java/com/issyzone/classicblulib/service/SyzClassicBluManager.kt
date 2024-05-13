@@ -11,6 +11,7 @@ import com.issyzone.classicblulib.bean.NotifyResult
 import com.issyzone.classicblulib.bean.NotifyResult2
 import com.issyzone.classicblulib.bean.SyzFirmwareType
 import com.issyzone.classicblulib.bean.SyzPrinter
+import com.issyzone.classicblulib.bean.SyzPrinterPaper
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
 import com.issyzone.classicblulib.callback.DeviceBleInfoCall
@@ -116,11 +117,19 @@ class SyzClassicBluManager {
     //主动回调
     private var activelyReportCallBack: ((msg: SyzPrinterState2) -> Unit)? = null
 
+
+    //打印机纸张尺寸回调
+    private var paperReportCallBack: ((paper: SyzPrinterPaper) -> Unit)? = null
+
     /**
      * 主动上报的回调
      */
     fun setActivelyReportBack(activelyReport: ((msg: SyzPrinterState2) -> Unit)) {
         this.activelyReportCallBack = activelyReport
+    }
+
+    fun setPaperReportCallBack(paperReportCallBack: ((msg: SyzPrinterPaper) -> Unit)) {
+        this.paperReportCallBack = paperReportCallBack
     }
 
     /**
@@ -135,6 +144,7 @@ class SyzClassicBluManager {
     private var cancelPrintCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
 
+    //处理蓝牙发来的数据,保证线程的安全
     private suspend fun spp_read(readData: ByteArray?) {
         readData?.apply {
             try {
@@ -168,14 +178,30 @@ class SyzClassicBluManager {
                         val mpCodeMsg = MPMessage.MPCodeMsg.parseFrom(
                             mpRespondMsg.respondData.toByteArray()
                         )
+
                         when (mpCodeMsg.code) {
 //                            300 -> {
 //                                //打印任务回调(包括打印自检页
 //
 //                            }
+                            500->{
+                                //纸张尺寸上报,code 500 info:宽*高（mm）
+                                val paperSizeStr= mpCodeMsg.info
+                                Log.i(TAG,"打印机上报尺寸::${paperSizeStr}")
+                                try {
+                                    val paperList=paperSizeStr.split("*").toMutableList()
+                                    if (paperList.isNotEmpty()&&paperList.size==2){
+                                        val paper= SyzPrinterPaper(paper_width = paperList[0], pager_height = paperList[1])
+                                        paperReportCallBack?.invoke(paper)
+                                    }else{
+                                        Log.e(TAG,"打印机上报尺寸出错::${paperSizeStr}")
+                                    }
+                                }catch (e:Exception){
+                                    Log.e(TAG,"打印机上报尺寸出错::${paperSizeStr}====${e.message.toString()}")
+                                }
+                            }
 
                             400 -> {
-                                //固件升级任务回调
                                 //固件升级任务回调
                                 dexUpdateCallBack?.invoke(
                                     FmNotifyBeanUtils.getDexUpdateReport(
@@ -187,17 +213,15 @@ class SyzClassicBluManager {
                             }
 
                             11 -> {
-
                                 if (mpCodeMsg.info == "2") {
-                                    //消费下一段数据
+                                    //消费下一段数据,图片打印
                                     bitmapPrintHandler?.consumeDuansOneBitmap()
-
                                 }
                             }
 
                             12 -> {
                                 if (mpCodeMsg.info == "2") {
-                                    //消费下一个4k
+                                    //消费下一个4k,固件升级
                                     dexUploadHandler?.consumeOne4K()
                                 }
                             }
