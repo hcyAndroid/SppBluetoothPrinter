@@ -84,6 +84,9 @@ class MainActivity4 : ComponentActivity() {
         SyzClassicBluManager.getInstance().setActivelyReportBack {
             Log.i("${TAG}主动上报的》》》》", it.toString())
         }
+        SyzClassicBluManager.getInstance().setPaperReportCallBack {
+            Log.i("${TAG}纸张尺寸上报的》》》》", "width==${it.paper_width}===height==${it.pager_height}")
+        }
         LogLiveData.showLogs(this, vm.tvLog)
 
         SyzClassicBluManager.getInstance().initClassicBlu()

@@ -48,7 +48,8 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        val lo = "DC:0D:30:98:95:E4"
+        //val lo = "DC:0D:30:98:95:E4"
+        val lo = "DC:0D:30:98:95:C5"
         // val lo = "DC:0D:30:98:95:DB"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
         vm.tvType.text = "4寸demo"
@@ -66,7 +67,10 @@ class MainActivity3 : ComponentActivity() {
 
         SyzClassicBluManager.getInstance().initClassicBlu()
         SyzClassicBluManager.getInstance().setActivelyReportBack {
-            Log.i("2寸主动上报的》》》》", it.toString())
+            Log.i("${TAG}四寸主动上报的》》》》", it.toString())
+        }
+        SyzClassicBluManager.getInstance().setPaperReportCallBack {
+            Log.i("${TAG}纸张尺寸上报的》》》》", "width==${it.paper_width}===height==${it.pager_height}")
         }
         SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
@@ -131,7 +135,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(2).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(36).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -455,7 +459,7 @@ class MainActivity3 : ComponentActivity() {
 
         vm.tvDexZitiupdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("font(1).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("font(2).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance()
                     .writeDex(this, type = SyzFirmwareType.SYZFIRMWARETYPE02) {
