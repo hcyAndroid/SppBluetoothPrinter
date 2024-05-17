@@ -2930,6 +2930,22 @@ public final class MPMessage implements Serializable {
       printStatus_ = "";
     }
 
+
+    public String deviceinfo() {
+      return "MPDeviceInfoMsg{" +
+              "mac_=" + mac_ +
+              ", sn_=" + sn_ +
+              ", firmwareVer_=" + firmwareVer_ +
+              ", paperStatus_=" + paperStatus_ +
+              ", elec_=" + elec_ +
+              ", concentration_=" + concentration_ +
+              ", speed_=" + speed_ +
+              ", paperSize_=" + paperSize_ +
+              ", printStatus_=" + printStatus_ +
+              ", memoizedIsInitialized=" + memoizedIsInitialized +
+              '}';
+    }
+
     @Override
     @SuppressWarnings({"unused"})
     protected Object newInstance(

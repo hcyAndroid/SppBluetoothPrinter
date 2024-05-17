@@ -196,7 +196,9 @@ object ImageUtilKt {
     }
 
 
-
+    /**
+     * 图片二值化
+     */
     fun bitmap2OTSUBitmap(srcBitmap: Bitmap,isReverse:Boolean=false): Bitmap?{
         val width = srcBitmap.width
         val height = srcBitmap.height

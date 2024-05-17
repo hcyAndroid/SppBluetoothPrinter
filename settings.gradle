@@ -28,3 +28,4 @@ include(":BleLibs")
 include(":classicBluLib")
 include(":opencvsdk")
 include(":syzlivechat")
+include ':common_work'

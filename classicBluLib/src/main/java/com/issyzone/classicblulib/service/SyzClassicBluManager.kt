@@ -42,12 +42,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 
-
 class SyzClassicBluManager {
     private val TAG = "SyzClassicBluManager>>"
 
     companion object {
         private var instance: SyzClassicBluManager? = null
+        private var bluScope: CoroutineScope? = null
         private var sppReadScope: CoroutineScope? = null
         private var sppBitmapScope: CoroutineScope? = null
         private var blueNotifyDataProcessor: BlueNotifyDataProcessor? = null
@@ -56,6 +56,7 @@ class SyzClassicBluManager {
                 instance = SyzClassicBluManager()
                 sppReadScope = CoroutineScope(Dispatchers.IO)
                 sppBitmapScope = CoroutineScope(Dispatchers.IO)
+                bluScope = CoroutineScope(Dispatchers.IO)
             }
             return instance!!
         }
@@ -102,6 +103,20 @@ class SyzClassicBluManager {
                 } else {
                     currentPrintType = findType
                     Log.i(TAG, "蓝牙连接成功,SYZ设备>>>${device.name}==${currentPrintType}")
+                    //连接成功获取设备信息
+                    bluScope = CoroutineScope(Dispatchers.IO)
+                    bluScope?.launch {
+                        //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
+                        delay(500)
+                        writeABF1(
+                            FMPrinterOrder.orderForGetFmDevicesInfo(),
+                            "${TAG}=getDeviceInfo>>>>"
+                        )
+//                        activelyReportCallBack?.invoke(
+//                            getPrintStatus()
+//                        )
+                    }
+
                 }
                 bluCallBack?.onConnectSuccess(device)
             }
@@ -161,18 +176,18 @@ class SyzClassicBluManager {
                         ).toString()
                     }"
                 )
-//                LogLiveData.addLogs(
-//                    "蓝牙返回的信息 ${
-//                        mpRespondMsg.toString()
-//                    }"
-//                )
-//                LogLiveData.addLogs(
-//                    "蓝牙返回respondData ${
-//                        MPMessage.MPCodeMsg.parseFrom(
-//                            mpRespondMsg.respondData.toByteArray()
-//                        ).toString()
-//                    }"
-//                )
+                LogLiveData.addLogs(
+                    "蓝牙返回的信息 ${
+                        mpRespondMsg.toString()
+                    }"
+                )
+                LogLiveData.addLogs(
+                    "蓝牙返回respondData ${
+                        MPMessage.MPCodeMsg.parseFrom(
+                            mpRespondMsg.respondData.toByteArray()
+                        ).toString()
+                    }"
+                )
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
                     if (mpRespondMsg.code == 200) {
                         val mpCodeMsg = MPMessage.MPCodeMsg.parseFrom(
@@ -184,20 +199,40 @@ class SyzClassicBluManager {
 //                                //打印任务回调(包括打印自检页
 //
 //                            }
-                            500->{
+                            500 -> {
                                 //纸张尺寸上报,code 500 info:宽*高（mm）
-                                val paperSizeStr= mpCodeMsg.info
-                                Log.i(TAG,"打印机上报尺寸::${paperSizeStr}")
+                                val paperSizeStr = mpCodeMsg.info
+
                                 try {
-                                    val paperList=paperSizeStr.split("*").toMutableList()
-                                    if (paperList.isNotEmpty()&&paperList.size==2){
-                                        val paper= SyzPrinterPaper(paper_width = paperList[0], pager_height = paperList[1])
-                                        paperReportCallBack?.invoke(paper)
-                                    }else{
-                                        Log.e(TAG,"打印机上报尺寸出错::${paperSizeStr}")
+                                    val paperList = paperSizeStr.split("*").toMutableList()
+                                    if (paperList.isNotEmpty() && paperList.size == 2) {
+                                        if (paperList[0] != "0" && paperList[1] != "0") {
+                                            //只有宽高都没0的时候才上报
+                                            val paper = SyzPrinterPaper(
+                                                printerState2 = SyzPrinterState2.PRINTER_HAS_STUDY_PAPER,
+                                                paper_width = paperList[0],
+                                                pager_height = paperList[1]
+                                            )
+                                            paperReportCallBack?.invoke(paper)
+                                            Log.i(TAG, "打印机上报尺寸::${paperSizeStr}")
+                                        } else {
+                                            val paper = SyzPrinterPaper(
+                                                printerState2 = SyzPrinterState2.PRINTER_NO_STUDY_PAPER,
+                                                paper_width = paperList[0],
+                                                pager_height = paperList[1]
+                                            )
+                                            paperReportCallBack?.invoke(paper)
+                                            Log.e(TAG, "打印机上报尺寸：没学纸::${paperSizeStr}")
+                                        }
+
+                                    } else {
+                                        Log.e(TAG, "打印机上报尺寸出错::${paperSizeStr}")
                                     }
-                                }catch (e:Exception){
-                                    Log.e(TAG,"打印机上报尺寸出错::${paperSizeStr}====${e.message.toString()}")
+                                } catch (e: Exception) {
+                                    Log.e(
+                                        TAG,
+                                        "打印机上报尺寸出错::${paperSizeStr}====${e.message.toString()}"
+                                    )
                                 }
                             }
 
@@ -577,30 +612,30 @@ class SyzClassicBluManager {
         )
     }
 
-/*
-    private fun CRC16_XMODEM(buffer: ByteArray): Int {
-        var wCRCin = 0x0000
-        val wCPoly = 0x1021
-        for (b in buffer) {
-            for (i in 0..7) {
-                val bit = b.toInt() shr 7 - i and 1 == 1
-                val c15 = wCRCin shr 15 and 1 == 1
-                wCRCin = wCRCin shl 1
-                if (c15 xor bit) wCRCin = wCRCin xor wCPoly
+    /*
+        private fun CRC16_XMODEM(buffer: ByteArray): Int {
+            var wCRCin = 0x0000
+            val wCPoly = 0x1021
+            for (b in buffer) {
+                for (i in 0..7) {
+                    val bit = b.toInt() shr 7 - i and 1 == 1
+                    val c15 = wCRCin shr 15 and 1 == 1
+                    wCRCin = wCRCin shl 1
+                    if (c15 xor bit) wCRCin = wCRCin xor wCPoly
+                }
             }
+            wCRCin = wCRCin and 0xffff
+            return 0x0000.let { wCRCin = wCRCin xor it; wCRCin }
         }
-        wCRCin = wCRCin and 0xffff
-        return 0x0000.let { wCRCin = wCRCin xor it; wCRCin }
-    }
-*/
+    */
 
 
     private var dexScope: CoroutineScope? = null
-/*
-    private fun splitByteArray(input: ByteArray, chunkSize: Int = 100): List<ByteArray> {
-        return input.toList().chunked(chunkSize).map { it.toByteArray() }
-    }
-*/
+    /*
+        private fun splitByteArray(input: ByteArray, chunkSize: Int = 100): List<ByteArray> {
+            return input.toList().chunked(chunkSize).map { it.toByteArray() }
+        }
+    */
 
 
     /**
@@ -670,53 +705,56 @@ class SyzClassicBluManager {
         }
 
     //private val dexMutex= Mutex()
-/*
-    private suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>, chunkSize: Int) {
-        // var success = true
-        // var start = System.currentTimeMillis()
-        val delaySize = 4 * 1024
-        Log.d("$TAG", "========总共要发${dataList.size}个包")
-        // LogLiveData.addLogs("========总共要发${dataList.size}个包")
-        var writeCount = 0
-        for (index in 0 until dataList.size) {
-            //  dexMutex.withLock {
-            try {
-                val data = dataList[index]
-                val dataArray = data.toByteArray()
-                val upackerData = Upacker.frameEncode(dataArray)
-                connection?.apply {
-                    spp_write(upackerData, this)
+    /*
+        private suspend fun fmWriteDexABF4(dataList: MutableList<MPMessage.MPSendMsg>, chunkSize: Int) {
+            // var success = true
+            // var start = System.currentTimeMillis()
+            val delaySize = 4 * 1024
+            Log.d("$TAG", "========总共要发${dataList.size}个包")
+            // LogLiveData.addLogs("========总共要发${dataList.size}个包")
+            var writeCount = 0
+            for (index in 0 until dataList.size) {
+                //  dexMutex.withLock {
+                try {
+                    val data = dataList[index]
+                    val dataArray = data.toByteArray()
+                    val upackerData = Upacker.frameEncode(dataArray)
+                    connection?.apply {
+                        spp_write(upackerData, this)
+                    }
+                    Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
+                    LogLiveData.addLogs("========第${index}包===字节数${dataArray.size}")
+                    writeCount += chunkSize  //这里指原始数据累加，而不是包装的数据
+                    if (writeCount >= delaySize) {
+                        Log.d(
+                            "$TAG", "abf4写入delay========第${index}包===delay400==${writeCount}"
+                        )
+                        delay(400)
+                        writeCount = writeCount - (delaySize)//重新计算,有4k减去继续累加
+                    } else {
+                        Log.d(
+                            "$TAG", "abf4写入delay========第${index}包===delay6==${writeCount}"
+                        )
+                        delay(6)
+                    }
+                } catch (e: Exception) {
+                    Log.d("$TAG", "fmWriteDexABF4异常>>>>${e.message}")
+                    //break
                 }
-                Log.d("$TAG", "========第${index}包===字节数${dataArray.size}")
-                LogLiveData.addLogs("========第${index}包===字节数${dataArray.size}")
-                writeCount += chunkSize  //这里指原始数据累加，而不是包装的数据
-                if (writeCount >= delaySize) {
-                    Log.d(
-                        "$TAG", "abf4写入delay========第${index}包===delay400==${writeCount}"
-                    )
-                    delay(400)
-                    writeCount = writeCount - (delaySize)//重新计算,有4k减去继续累加
-                } else {
-                    Log.d(
-                        "$TAG", "abf4写入delay========第${index}包===delay6==${writeCount}"
-                    )
-                    delay(6)
-                }
-            } catch (e: Exception) {
-                Log.d("$TAG", "fmWriteDexABF4异常>>>>${e.message}")
-                //break
-            }
-            //  }
+                //  }
 
+            }
         }
-    }
-*/
+    */
 
 
     suspend fun writeDexABF4(msg: MPMessage.MPSendMsg) {
         try {
-           val data= MPMessage.MPFirmwareMsg.parseFrom(msg.sendData.toByteArray())
-            Log.i(TAG,"SPP_写入>>>${data.indexPackage}=====${data.totalPackage}====${data.binData.toByteArray().size}")
+            val data = MPMessage.MPFirmwareMsg.parseFrom(msg.sendData.toByteArray())
+            Log.i(
+                TAG,
+                "SPP_写入>>>${data.indexPackage}=====${data.totalPackage}====${data.binData.toByteArray().size}"
+            )
 
             val dataArray = msg.toByteArray()
             val upackerData = Upacker.frameEncode(dataArray)
@@ -730,24 +768,24 @@ class SyzClassicBluManager {
     }
 
 
-/*    suspend fun writeDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
-        Log.d("$TAG", "========总共要发${dataList.size}个包")
-        for (index in 0 until dataList.size) {
-            //  dexMutex.withLock {
-            try {
-                val data = dataList[index]
-                val dataArray = data.toByteArray()
-                val upackerData = Upacker.frameEncode(dataArray)
-                connection?.apply {
-                    spp_write(upackerData, this)
+    /*    suspend fun writeDexABF4(dataList: MutableList<MPMessage.MPSendMsg>) {
+            Log.d("$TAG", "========总共要发${dataList.size}个包")
+            for (index in 0 until dataList.size) {
+                //  dexMutex.withLock {
+                try {
+                    val data = dataList[index]
+                    val dataArray = data.toByteArray()
+                    val upackerData = Upacker.frameEncode(dataArray)
+                    connection?.apply {
+                        spp_write(upackerData, this)
+                    }
+                    delay(1)
+                } catch (e: Exception) {
+                    Log.d("$TAG", "fmWriteDexABF4异常>>>>${e.message}")
+                    //break
                 }
-                delay(1)
-            } catch (e: Exception) {
-                Log.d("$TAG", "fmWriteDexABF4异常>>>>${e.message}")
-                //break
             }
-        }
-    }*/
+        }*/
 
 
     private var connection: Connection? = null
@@ -787,6 +825,11 @@ class SyzClassicBluManager {
         if (sppBitmapScope != null && sppBitmapScope!!.isActive) {
             sppBitmapScope!!.cancel()
             sppBitmapScope = null
+        }
+
+        if (bluScope != null && bluScope!!.isActive) {
+            bluScope!!.cancel()
+            bluScope = null
         }
         if (blueNotifyDataProcessor != null) {
             blueNotifyDataProcessor!!.close()

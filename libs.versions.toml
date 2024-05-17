@@ -2,7 +2,7 @@
 namespace="com.issyzone.syzbleprinter"
 compileSdk = "34"
 minSdk = "21"
-targetSdk="33"
+targetSdk="34"
 versionCode="1"
 versionName = "1.0.0"
 compose-bom = "androidx.compose:compose-bom:2023.08.00"
@@ -95,6 +95,8 @@ exoplayer-ui = { group = "com.google.android.exoplayer", name = "exoplayer-ui", 
 
 commons-math3 = { group = "org.apache.commons", name = "commons-math3", version = "3.6.1" }
 opencv = { group = "org.opencv", name = "opencv", version = "4.9.0" }
+#opencv = { group = "org.opencv", name = "opencv-android", version = "3.4.1" }
+#implementation 'org.opencv:opencv-android:3.4.1'
 #aop
 aspectjtools = { group = "org.aspectj", name = "aspectjtools", version = "1.8.9" }
 aspectjweaver = { group = "org.aspectj", name = "aspectjweaver", version = "1.8.9" }

@@ -25,9 +25,15 @@ class MainActivity5 : ComponentActivity() {
         } else {
             Log.i(">>>>>>>>", "opencv加载失败")
         }
-        vm.iv.setImageBitmap( ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test222)))
+        vm.iv.setImageBitmap( ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv2.setImageBitmap( ImageUtilKt.bitmap2OTSUBitmap(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv3.setImageBitmap(ImageUtilKt.grayAverageBitmap2BinaryBitmap(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv4.setImageBitmap(OpenCVUtils.convertBinary(BitmapExt.decodeBitmap(R.drawable.test11),128))
+        vm.iv5.setImageBitmap(OpenCVUtils.convertBinaryOtsu(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv6.setImageBitmap(OpenCVUtils.triangleThreshold(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv7.setImageBitmap(OpenCVUtils.convertBinaryDoublePeaks(BitmapExt.decodeBitmap(R.drawable.test11)))
+        vm.iv8.setImageBitmap(OpenCVUtils.minimumErrorThreshold(BitmapExt.decodeBitmap(R.drawable.test11)))
 
-        vm.iv2.setImageBitmap( ImageUtilKt.bitmap2OTSUBitmap(BitmapExt.decodeBitmap(R.drawable.test222)))
-        vm.iv3.setImageBitmap(ImageUtilKt.grayAverageBitmap2BinaryBitmap(BitmapExt.decodeBitmap(R.drawable.test222)))
+
     }
 }

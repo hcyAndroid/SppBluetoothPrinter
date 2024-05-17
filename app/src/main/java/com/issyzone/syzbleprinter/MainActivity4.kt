@@ -57,11 +57,32 @@ class MainActivity4 : ComponentActivity() {
         }.flatten().toMutableList()
     }
 
+    fun test11(){
+        val deviceINfo=  MPMessage.MPDeviceInfoMsg
+            .newBuilder()
+            .setMac("15:6D:DC:1A:26:03")
+            .setSn("15:6D:DC:1A:26:03")
+            .setElec(0)
+            .setSpeed(1)
+            .setConcentration(4)
+            .setFirmwareVer("01.01.15")
+            .build()
+        val  copyByteArray=deviceINfo.toByteArray()
+
+        val data= MPMessage.MPDeviceInfoMsg.parseFrom(copyByteArray)
+        Log.d(
+            "$TAG", " NOTIFY返回respondData ${
+                data.toString()
+            }"
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
-        val tag = OpenCVLoader.initLocal()
+        test11()
+       // val tag = OpenCVLoader.initLocal()
+
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
@@ -171,7 +192,7 @@ class MainActivity4 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
 
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(58).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(61).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {

@@ -27,6 +27,7 @@ import com.issyzone.classicblulib.callback.SyzPrinterState2
 
 import com.issyzone.classicblulib.service.SyzClassicBluManager
 import com.issyzone.classicblulib.tools.SpUtils
+import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.syzbleprinter.databinding.ActivityMain3Binding
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
 
@@ -43,6 +44,10 @@ class MainActivity3 : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
+        AppGlobels.getScreenResolution()
+        AppGlobels.getDpi()
+        AppGlobels.getPpi()
+       // AppGlobels.getScreenInch()
 
         //val lo = "DC:0D:30:00:02:E2"
 //        val lo = "DC:0D:30:00:02:E5"
@@ -70,7 +75,8 @@ class MainActivity3 : ComponentActivity() {
             Log.i("${TAG}四寸主动上报的》》》》", it.toString())
         }
         SyzClassicBluManager.getInstance().setPaperReportCallBack {
-            Log.i("${TAG}纸张尺寸上报的》》》》", "width==${it.paper_width}===height==${it.pager_height}")
+            Log.i("${TAG}纸张尺寸上报的》》》》", "width==${it.paper_width}===height==${it.pager_height}==printerType==${it.printerState2.string}")
+            LogLiveData.addLogs("纸张尺寸上报的:>>>width==${it.paper_width}===height==${it.pager_height}==printerType==${it.printerState2.string}")
         }
         SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
@@ -135,7 +141,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(36).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(40).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {

@@ -19,7 +19,7 @@ object FmNotifyBeanUtils {
         return if (mpRespondMsg.code == 200) {
             val deviceInfo =
                 MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
-            Log.d("$TAG", "获取设备信息>>>>${deviceInfo.toString()}")
+            Log.d("$TAG", "获取设备信息>>>>${deviceInfo.deviceinfo()}")
             return NotifyResult.Success(deviceInfo)
         } else {
             val deviceErrorInfo = MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())

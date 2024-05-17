@@ -4,9 +4,8 @@ enum class SyzPrinterState2(
     var index: Int, var status: Boolean, var string: String, var order: Int
 ) {
     PRINTER_PRINTING(0, true, "打印中", 7),
-    PRINTER_NO_PAPAER(1, true, "缺纸", 2), PRINTER_OOM(
-        2, true, "打印缓存满", 8
-    ),
+    PRINTER_NO_PAPAER(1, true, "缺纸", 2),
+    PRINTER_OOM(2, true, "打印缓存满", 8),
     PRINTER_LID_OPEN(3, true, "开盖", 1),
     PRINTER_STRUCK_PAPER(4, true, "卡纸", 4),//卡纸
     PRINTER_HIGH_TEMPERATURE(5, true, "打印头高温", 3),//打印头高温
@@ -15,7 +14,9 @@ enum class SyzPrinterState2(
     PRINTER_OK(1000, true, "打印机正常", 9),//马达高温
     PRINTER_STATUS_UNKNOWN(1001, true, "打印机状态无法通过获取设备信息获取", 10),//马达高温
     PRINTER_CANCEL_PRINT(1002,true,"取消打印回调",11),
-    PRINTER_UPACKER_FAILED(1003,true,"打印过程中解包失败",12)
+    PRINTER_UPACKER_FAILED(1003,true,"打印过程中解包失败",12),
+    PRINTER_HAS_STUDY_PAPER(1004,true,"打印机学纸了",13),
+    PRINTER_NO_STUDY_PAPER(1005,true,"打印机没有学纸",14),
 //  PRINTER_LID_CLOSE(3, false),//关盖
 //    //开盖
 //    PRINTER_HAS_PAPER(11, "1"), PRINTER_NO_PAPER(11, "2"), PRINTER_STRUCK_PAPER(
