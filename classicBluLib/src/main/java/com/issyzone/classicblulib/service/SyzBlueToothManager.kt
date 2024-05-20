@@ -470,7 +470,7 @@ class SyzBlueToothManager {
         writeABF1(FMPrinterOrder.orderForGetFmSelfcheckingPage(), "${TAG}=writeSelfCheck>>>>")
     }
 
-    private fun writeABF1(data: ByteArray, tag: String = "") {
+    fun writeABF1(data: ByteArray, tag: String = "") {
         connection?.apply {
             write(
                 "${TAG}=${tag}>>>", Upacker.frameEncode(data), null
@@ -741,7 +741,7 @@ class SyzBlueToothManager {
             val aplitafter = splitByteArray(fileArray, chunkSize)
             //crc算法
             val crccode = CRC16_XMODEM(fileArray)
-            var total = aplitafter.size //总包数
+            val total = aplitafter.size //总包数
             Log.d("$TAG", "Dex文件总包数${total}")
             // LogLiveData.addLogs("Dex文件总包数${total}")
             val needSendDataList = mutableListOf<MPMessage.MPSendMsg>()

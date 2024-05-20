@@ -1,8 +1,14 @@
 package com.issyzone.classicblulib.service
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.issyzone.classicblulib.bean.FMPrinterOrder
 import com.issyzone.classicblulib.bean.FmNotifyBeanUtils
 import com.issyzone.classicblulib.bean.LogLiveData
@@ -29,6 +35,7 @@ import com.issyzone.classicblulib.utils.MsgCallback
 import com.issyzone.classicblulib.utils.Upacker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
@@ -95,30 +102,19 @@ class SyzClassicBluManager {
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
-                val findType = SyzPrinter.values().toMutableList().find {
-                    it.device.lowercase().startsWith(device.name.lowercase())
-                }
-                if (findType == null) {
-                    Log.i(TAG, "蓝牙连接成功,不明蓝牙设备>>>${device.name}")
-                } else {
-                    currentPrintType = findType
-                    Log.i(TAG, "蓝牙连接成功,SYZ设备>>>${device.name}==${currentPrintType}")
-                    //连接成功获取设备信息
+                if (ContextCompat.checkSelfPermission(AppGlobels.getApplication(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                    currentPrintType = SyzPrinter.values().find { it.device.lowercase().startsWith(device.name.lowercase()) } ?: return
+                    Log.i(TAG, "连接到SYZ设备>>>${device.name}==${currentPrintType}")
                     bluScope = CoroutineScope(Dispatchers.IO)
                     bluScope?.launch {
-                        //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
                         delay(500)
-                        writeABF1(
-                            FMPrinterOrder.orderForGetFmDevicesInfo(),
-                            "${TAG}=getDeviceInfo>>>>"
-                        )
-//                        activelyReportCallBack?.invoke(
-//                            getPrintStatus()
-//                        )
+                        //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
+                        writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
                     }
-
+                    bluCallBack?.onConnectSuccess(device)
+                }else{
+                    Log.e(TAG, "没有蓝牙权限")
                 }
-                bluCallBack?.onConnectSuccess(device)
             }
 
             override fun onDisConnected() {
@@ -155,6 +151,11 @@ class SyzClassicBluManager {
     //blu连接状态的回调
     private var bluNotifyCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
+
+
+    //添加打印自检页的回调
+    private var bluSelfCheckCallBack: ((isWork: Boolean) -> Unit)? = null
+
     //blu取消打印的回调
     private var cancelPrintCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
@@ -188,6 +189,15 @@ class SyzClassicBluManager {
                         ).toString()
                     }"
                 )
+                if (mpRespondMsg.eventType == MPMessage.EventType.SELFTEST){
+                    if (mpRespondMsg.code == 200) {
+                        Log.i(TAG, "自检页打印成功")
+                        bluSelfCheckCallBack?.invoke(true)
+                    }else{
+                        Log.e(TAG, "自检页打印失败")
+                        bluSelfCheckCallBack?.invoke(false)
+                    }
+                }
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
                     if (mpRespondMsg.code == 200) {
                         val mpCodeMsg = MPMessage.MPCodeMsg.parseFrom(
@@ -195,10 +205,6 @@ class SyzClassicBluManager {
                         )
 
                         when (mpCodeMsg.code) {
-//                            300 -> {
-//                                //打印任务回调(包括打印自检页
-//
-//                            }
                             500 -> {
                                 //纸张尺寸上报,code 500 info:宽*高（mm）
                                 val paperSizeStr = mpCodeMsg.info
@@ -314,10 +320,7 @@ class SyzClassicBluManager {
 
                 }
             } catch (e: Exception) {
-                Log.d(
-                    "$TAG",
-                    "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}"
-                )
+                Log.d(TAG, "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}")
                 // LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
             }
         }
@@ -397,7 +400,7 @@ class SyzClassicBluManager {
     private var bitListScope: CoroutineScope? = null
 
     suspend fun getPrintStatus(): SyzPrinterState2 {
-        val result = withTimeoutOrNull(3000) {
+        val result = withTimeoutOrNull(ORDER_TIME_OUT) {
             val getDeviceStateTask = async { getDeviceState() }
             getDeviceStateTask.await()
         } ?: SyzPrinterState2.PRINTER_STATUS_UNKNOWN
@@ -478,16 +481,45 @@ class SyzClassicBluManager {
         writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
     }
 
+    private val ORDER_TIME_OUT=3000L//命令超时时间
 
+
+    //切换到主线程
+    fun onMainThread(callBack: ()->Unit) {
+        Handler(Looper.getMainLooper()).post {
+            callBack.invoke()
+        }
+    }
     //检查自检页
+    //三秒没收到回调就是失败
     fun writeSelfCheck() {
-        bluNotifyCallBack = { dataArray ->
-
+        // 创建一个可取消的协程
+        val job = GlobalScope.launch {
+            delay(ORDER_TIME_OUT) // 等待3秒
+            // 如果3秒后回调还没有被调用，打印失败信息
+            onMainThread{
+                Toast.makeText(AppGlobels.getApplication(), "Self-check page print failed", Toast.LENGTH_SHORT).show()
+            }
+            Log.e(TAG, "自检页打印失败")
+        }
+        bluSelfCheckCallBack= {
+            if (it){
+                Log.i(TAG, "自检页打印成功")
+            }else{
+                onMainThread{
+                    Toast.makeText(AppGlobels.getApplication(), "Self-check page print failed", Toast.LENGTH_SHORT).show()
+                }
+                Log.e(TAG, "自检页打印失败")
+            }
+            job.cancel()
         }
         writeABF1(FMPrinterOrder.orderForGetFmSelfcheckingPage(), "${TAG}=writeSelfCheck>>>>")
     }
 
-    private fun writeABF1(data: ByteArray, tag: String = "") {
+    /**
+     * SPP  写入数据
+     */
+     fun writeABF1(data: ByteArray, tag: String = "") {
         connection?.apply {
             write(
                 "${TAG}=${tag}>>>", Upacker.frameEncode(data), null

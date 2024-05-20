@@ -1,12 +1,15 @@
 package com.issyzone.syzbleprinter
 
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
 
 
 import com.issyzone.blelibs.permission.SYZBlePermission
@@ -53,8 +56,8 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        //val lo = "DC:0D:30:98:95:E4"
-        val lo = "DC:0D:30:98:95:C5"
+        val lo = "DC:0D:30:98:95:E4"
+        //val lo = "DC:0D:30:98:95:C5"
         // val lo = "DC:0D:30:98:95:DB"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
         vm.tvType.text = "4寸demo"
@@ -91,9 +94,12 @@ class MainActivity3 : ComponentActivity() {
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
-                Log.i("SYZ>>>", "onConnectSuccess==${device.name}====${device.address}")
-                LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
-                SpUtils.saveData("mac4", device.address)
+                if (ContextCompat.checkSelfPermission(this@MainActivity3, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("SYZ>>>", "onConnectSuccess==${device.name}====${device.address}")
+                    LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
+                    SpUtils.saveData("mac4", device.address)
+                }
+
             }
 
             override fun onDisConnected() {

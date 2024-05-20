@@ -1,12 +1,15 @@
 package com.issyzone.syzbleprinter
 
 
+import android.Manifest
 import android.bluetooth.BluetoothDevice
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
 import com.issyzone.blelibs.utils.ImageUtilKt
 
 
@@ -77,6 +80,37 @@ class MainActivity4 : ComponentActivity() {
         )
     }
 
+    fun setBluCallBack(){
+        SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
+            override fun onStartConnect() {
+                Log.i("${TAG}寸>>>", "开始连接")
+                // LogLiveData.addLogs("开始连接")
+            }
+
+            override fun onConnectFail(msg: String?) {
+                Log.i("${TAG}>>>", "onConnectFail")
+                LogLiveData.addLogs("经典蓝牙连接失败==${msg}")
+
+            }
+
+            override fun onConnectSuccess(device: BluetoothDevice) {
+                if (ContextCompat.checkSelfPermission(this@MainActivity4, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                    Log.i("${TAG}>>>", "onConnectSuccess==${device.name}====${device.address}")
+                    LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
+                    SpUtils.saveData("mac2", device.address)
+                } else {
+                    // Handle the lack of permission
+                }
+            }
+
+            override fun onDisConnected() {
+                Log.i("SYZ>>>", "onDisConnected")
+                LogLiveData.addLogs("经典蓝牙已经断开")
+                LogLiveData.clearLog(vm.tvLog)
+            }
+        })
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
@@ -86,9 +120,9 @@ class MainActivity4 : ComponentActivity() {
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
-        //val lo = "03:22:90:23:D4:28"  //硬件的机器
+        val lo = "03:22:90:23:D4:28"  //硬件的机器
          //val lo = "03:26:A0:AE:0B:57"// ios
-        val lo = "03:26:1A:DC:6D:15"//二寸新机器
+        //val lo = "03:26:1A:DC:6D:15"//二寸新机器
         // val lo = "03:25:70:6A:BF:45"
         // 03:25:70:6A:BF:45
         //val lo = "03:26:14:57:DF:7C"//android
@@ -111,29 +145,7 @@ class MainActivity4 : ComponentActivity() {
         LogLiveData.showLogs(this, vm.tvLog)
 
         SyzClassicBluManager.getInstance().initClassicBlu()
-        SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
-            override fun onStartConnect() {
-                Log.i("${TAG}寸>>>", "开始连接")
-                // LogLiveData.addLogs("开始连接")
-            }
-
-            override fun onConnectFail(msg: String?) {
-                Log.i("${TAG}>>>", "onConnectFail")
-                LogLiveData.addLogs("经典蓝牙连接失败==${msg}")
-            }
-
-            override fun onConnectSuccess(device: BluetoothDevice) {
-                Log.i("${TAG}>>>", "onConnectSuccess==${device.name}====${device.address}")
-                LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
-                SpUtils.saveData("mac2", device.address)
-            }
-
-            override fun onDisConnected() {
-                Log.i("SYZ>>>", "onDisConnected")
-                LogLiveData.addLogs("经典蓝牙已经断开")
-                LogLiveData.clearLog(vm.tvLog)
-            }
-        })
+        setBluCallBack()
 //        SYZBlePermission.checkBlePermission(this) {
 //
 //

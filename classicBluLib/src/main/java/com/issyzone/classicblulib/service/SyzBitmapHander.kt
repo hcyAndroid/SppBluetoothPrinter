@@ -3,6 +3,7 @@ package com.issyzone.classicblulib.service
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.protobuf.ByteString
+import com.issyzone.classicblulib.bean.FMPrinterOrder
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
@@ -12,6 +13,7 @@ import com.issyzone.classicblulib.utils.HeatShrinkUtils
 import com.issyzone.classicblulib.utils.SyzBitmapQueue
 import com.issyzone.classicblulib.utils.SyzPrinterSetting
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -319,6 +321,9 @@ class SyzBitmapHander private constructor(var builder: Builder) {
     private suspend fun consumeOneBitmap() {
         if (bitMapTaskQueue.isEmpty()) {
             Log.d(TAG, "所有图片都消费完了,也就是发完了，不代表打印完")
+            SyzBlueToothManager.getInstance()
+                .writeABF1(FMPrinterOrder.orderForEndPrint(), "${TAG}=orderForEndPrint>>>>")
+            delay(50)
             //这里只释放
             releaseResources()
         } else {
