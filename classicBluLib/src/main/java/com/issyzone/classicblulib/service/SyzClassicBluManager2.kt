@@ -1,12 +1,9 @@
 package com.issyzone.classicblulib.service
 
 import android.Manifest
-import android.app.Activity
-import android.app.Application.ActivityLifecycleCallbacks
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -19,7 +16,6 @@ import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.NotifyResult
 import com.issyzone.classicblulib.bean.NotifyResult2
 import com.issyzone.classicblulib.bean.SyzFirmwareType
-import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.bean.SyzPrinterPaper
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
@@ -53,7 +49,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 
-class SyzClassicBluManager {
+class SyzClassicBluManager2 {
     private val TAG = "SyzClassicBluManager>>"
 
     companion object {
@@ -63,14 +59,14 @@ class SyzClassicBluManager {
         private const val DEX_SEND_NEXT_CODE = 12  //消费下一个4k,固件升级
         private const val RETURN_PRINT_STATE_CODE = 10  //返回打印机的状态
         private const val ORDER_RECIVER_SUCCESS = 200  //命令接收成功
-        private var instance: SyzClassicBluManager? = null
+        private var instance: SyzClassicBluManager2? = null
         private var bluScope: CoroutineScope? = null
         private var sppReadScope: CoroutineScope? = null
         private var sppBitmapScope: CoroutineScope? = null
         private var blueNotifyDataProcessor: BlueNotifyDataProcessor? = null
-        fun getInstance(): SyzClassicBluManager {
+        fun getInstance(): SyzClassicBluManager2 {
             if (instance == null) {
-                instance = SyzClassicBluManager()
+                instance = SyzClassicBluManager2()
                 sppReadScope = CoroutineScope(Dispatchers.IO)
                 sppBitmapScope = CoroutineScope(Dispatchers.IO)
                 bluScope = CoroutineScope(Dispatchers.IO)
@@ -112,22 +108,19 @@ class SyzClassicBluManager {
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
-                Log.i(TAG, "连接设备>>>${device.name}")
-                currentPrintType = SyzPrinter.values()
-                    .find { it.device.lowercase().startsWith(device.name.lowercase()) } ?: return
-                Log.i(TAG, "连接到SYZ设备>>>${device.name}==${currentPrintType}")
-                bluScope = CoroutineScope(Dispatchers.IO)
-                bluScope?.launch {
-                    delay(500)
-                    //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
-                    writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
+                if (ContextCompat.checkSelfPermission(AppGlobels.getApplication(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                    currentPrintType = SyzPrinter.values().find { it.device.lowercase().startsWith(device.name.lowercase()) } ?: return
+                    Log.i(TAG, "连接到SYZ设备>>>${device.name}==${currentPrintType}")
+                    bluScope = CoroutineScope(Dispatchers.IO)
+                    bluScope?.launch {
+                        delay(500)
+                        //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
+                        writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
+                    }
+                    bluCallBack?.onConnectSuccess(device)
+                }else{
+                    Log.e(TAG, "没有蓝牙权限")
                 }
-                bluCallBack?.onConnectSuccess(device)
-                /*    if (ContextCompat.checkSelfPermission(AppGlobels.getApplication(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
-
-                    }else{
-                        Log.e(TAG, "没有蓝牙权限")
-                    }*/
             }
 
             override fun onDisConnected() {
@@ -165,6 +158,7 @@ class SyzClassicBluManager {
     private var bluNotifyCallBack: ((dataArray: ByteArray) -> Unit)? = null
 
 
+
     //添加打印自检页的回调
     private var bluSelfCheckCallBack: ((isWork: Boolean) -> Unit)? = null
 
@@ -189,31 +183,25 @@ class SyzClassicBluManager {
                         ).toString()
                     }"
                 )
-//                LogLiveData.addLogs(
-//                    "蓝牙返回的信息 ${
-//                        mpRespondMsg.toString()
-//                    }"
-//                )
-//                LogLiveData.addLogs(
-//                    "蓝牙返回respondData ${
-//                        MPMessage.MPCodeMsg.parseFrom(
-//                            mpRespondMsg.respondData.toByteArray()
-//                        ).toString()
-//                    }"
-//                )
-                if (mpRespondMsg.eventType == MPMessage.EventType.SELFTEST) {
+         /*       LogLiveData.addLogs(
+                    "蓝牙返回的信息 ${
+                        mpRespondMsg.toString()
+                    }"
+                )
+                LogLiveData.addLogs(
+                    "蓝牙返回respondData ${
+                        MPMessage.MPCodeMsg.parseFrom(
+                            mpRespondMsg.respondData.toByteArray()
+                        ).toString()
+                    }"
+                )*/
+                if (mpRespondMsg.eventType == MPMessage.EventType.SELFTEST){
                     if (mpRespondMsg.code == ORDER_RECIVER_SUCCESS) {
                         Log.i(TAG, "自检页打印成功")
                         bluSelfCheckCallBack?.invoke(true)
-                    } else {
+                    }else{
                         Log.e(TAG, "自检页打印失败")
                         bluSelfCheckCallBack?.invoke(false)
-                    }
-                }
-
-                if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEPRINT) {
-                    if (mpRespondMsg.code == 4) {
-                        Log.e(TAG,"打印机打印图片出错")
                     }
                 }
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
@@ -227,12 +215,12 @@ class SyzClassicBluManager {
                             PAPER_SIZE_REPORT_CODE -> {
                                 //纸张尺寸上报,code 500 info:宽*高（mm）
                                 val paperSizeStr = mpCodeMsg.info
-                                Log.i(TAG, "纸张尺寸==${paperSizeStr}")
+                                Log.i(TAG,"纸张尺寸==${paperSizeStr}")
                                 try {
                                     val paperList = paperSizeStr.split("*").toMutableList()
                                     if (paperList.isNotEmpty() && paperList.size == 2) {
-                                        val width: Float = paperList[0].toFloatOrNull() ?: 0.0f
-                                        val height: Float = paperList[1].toFloatOrNull() ?: 0.0f
+                                        val width:Float=paperList[0].toFloatOrNull()?:0.0f
+                                        val height:Float=paperList[1].toFloatOrNull()?:0.0f
                                         if (width != 0.0f && height != 0.0f) {
                                             //只有宽高都没0的时候才上报
                                             val paper = SyzPrinterPaper(
@@ -241,10 +229,7 @@ class SyzClassicBluManager {
                                                 pager_height = height
                                             )
                                             paperReportCallBack?.invoke(paper)
-                                            Log.i(
-                                                TAG,
-                                                "打印机上报尺寸::width=${paper.paper_width}===height=${paper.pager_height}"
-                                            )
+                                            Log.i(TAG, "打印机上报尺寸::width=${paper.paper_width}===height=${paper.pager_height}")
                                         } else {
                                             val paper = SyzPrinterPaper(
                                                 printerState2 = SyzPrinterState2.PRINTER_NO_STUDY_PAPER,
@@ -252,10 +237,7 @@ class SyzClassicBluManager {
                                                 pager_height = height
                                             )
                                             paperReportCallBack?.invoke(paper)
-                                            Log.e(
-                                                TAG,
-                                                "打印机上报尺寸：没学纸::${paperSizeStr}==width=${paper.paper_width}===height=${paper.pager_height}"
-                                            )
+                                            Log.e(TAG, "打印机上报尺寸：没学纸::${paperSizeStr}==width=${paper.paper_width}===height=${paper.pager_height}")
                                         }
                                     } else {
                                         Log.e(TAG, "打印机上报尺寸出错::${paperSizeStr}")
@@ -346,10 +328,7 @@ class SyzClassicBluManager {
 
                 }
             } catch (e: Exception) {
-                Log.d(
-                    TAG,
-                    "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}"
-                )
+                Log.d(TAG, "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}")
                 // LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
             }
         }
@@ -458,7 +437,7 @@ class SyzClassicBluManager {
     }
 
 
-    private var bitmapPrintHandler: SyzBitmapProcessor? = null
+    private var bitmapPrintHandler: SyzPicHandler? = null
     private var dexUploadHandler: SyzDexProcessor? = null
 
     /**
@@ -474,7 +453,7 @@ class SyzClassicBluManager {
     ) {
         bitListScope = CoroutineScope(Dispatchers.IO)
         bitListScope?.launch {
-            bitmapPrintHandler = SyzBitmapProcessor.build {
+            bitmapPrintHandler = SyzPicHandler.build {
                 this.printerType = currentPrintType
                 this.bitmapWidth = width
                 this.bitmapHeight = height
@@ -510,45 +489,33 @@ class SyzClassicBluManager {
         writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
     }
 
-    private val ORDER_TIME_OUT = 3000L//命令超时时间
+    private val ORDER_TIME_OUT=3000L//命令超时时间
 
 
     //切换到主线程
-    fun onMainThread(callBack: () -> Unit) {
+    fun onMainThread(callBack: ()->Unit) {
         Handler(Looper.getMainLooper()).post {
             callBack.invoke()
         }
     }
-
     //检查自检页
     //三秒没收到回调就是失败
     fun writeSelfCheck() {
-        bluNotifyCallBack = { dataArray ->
-
-        }
         // 创建一个可取消的协程
         val job = GlobalScope.launch {
             delay(ORDER_TIME_OUT) // 等待3秒
             // 如果3秒后回调还没有被调用，打印失败信息
-            onMainThread {
-                Toast.makeText(
-                    AppGlobels.getApplication(),
-                    "Self-check page print failed",
-                    Toast.LENGTH_SHORT
-                ).show()
+            onMainThread{
+                Toast.makeText(AppGlobels.getApplication(), "Self-check page print failed", Toast.LENGTH_SHORT).show()
             }
             Log.e(TAG, "自检页打印失败")
         }
-        bluSelfCheckCallBack = {
-            if (it) {
+        bluSelfCheckCallBack= {
+            if (it){
                 Log.i(TAG, "自检页打印成功")
-            } else {
-                onMainThread {
-                    Toast.makeText(
-                        AppGlobels.getApplication(),
-                        "Self-check page print failed",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            }else{
+                onMainThread{
+                    Toast.makeText(AppGlobels.getApplication(), "Self-check page print failed", Toast.LENGTH_SHORT).show()
                 }
                 Log.e(TAG, "自检页打印失败")
             }
@@ -560,7 +527,7 @@ class SyzClassicBluManager {
     /**
      * SPP  写入数据
      */
-    fun writeABF1(data: ByteArray, tag: String = "") {
+     fun writeABF1(data: ByteArray, tag: String = "") {
         connection?.apply {
             write(
                 "${TAG}=${tag}>>>", Upacker.frameEncode(data), null
@@ -684,15 +651,6 @@ class SyzClassicBluManager {
             "${TAG}=设置打印浓度>>>>"
         )
     }
-
-
-    fun sendPaperSet(paperType: SyzPaperSize) {
-        writeABF1(
-            FMPrinterOrder.orderForGetFmPaperType(paperType),
-            "${TAG}=设置纸张类型>>>>"
-        )
-    }
-
 
     /*
         private fun CRC16_XMODEM(buffer: ByteArray): Int {
@@ -848,6 +806,9 @@ class SyzClassicBluManager {
             Log.d("$TAG", "fmWriteDexABF4异常>>>>${e.message}")
         }
     }
+
+
+
 
 
     private var connection: Connection? = null

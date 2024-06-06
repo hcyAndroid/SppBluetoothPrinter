@@ -1,6 +1,7 @@
 package com.issyzone.classicblulib.bean
 
 import android.util.Log
+import com.issyzone.classicblulib.bean.MPMessage.MPPaperTypeMsg
 import com.issyzone.classicblulib.utils.Upacker
 
 
@@ -8,27 +9,39 @@ import com.issyzone.classicblulib.utils.Upacker
  * 打印机命令
  */
 object FMPrinterOrder {
-    private val TAG="FMPrinterOrder"
+    private val TAG = "FMPrinterOrder"
 
     //获取打印信息
     fun orderForGetFmDevicesInfo(): ByteArray {
-        val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.DEVICEINFO).build()
-        Log.d(TAG,"发送检查设备的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}")
+        val mSendMsg =
+            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.DEVICEINFO).build()
+        Log.d(
+            TAG,
+            "发送检查设备的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}"
+        )
         return mSendMsg.toByteArray()
     }
 
 
+    /**
+     * 打印结束
+     */
     fun orderForEndPrint(): ByteArray {
-        val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINEND).build()
-        Log.d(TAG,"发送结束打印的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}")
+        val mSendMsg =
+            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINEND).build()
+        Log.d(
+            TAG,
+            "发送结束打印的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}"
+        )
         return mSendMsg.toByteArray()
     }
 
 
     //打印自检页
     fun orderForGetFmSelfcheckingPage(): ByteArray {
-        val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.SELFTEST).build()
-        Log.d(TAG,"打印自检页的命令${mSendMsg.toString()}")
+        val mSendMsg =
+            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.SELFTEST).build()
+        Log.d(TAG, "打印自检页的命令${mSendMsg.toString()}")
         return mSendMsg.toByteArray()
     }
 
@@ -39,10 +52,9 @@ object FMPrinterOrder {
      *  其他: 根据传入的数值设定,单位 :分钟
      */
     fun orderForGetFmSetShutdownTime(min: Int = 0): ByteArray {
-        val mSendMsg =
-            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.CLOSETIME).setSendInt(min)
-                .build()
-        Log.d(TAG,"设置关机时间的命令${mSendMsg.toString()}")
+        val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.CLOSETIME)
+            .setSendInt(min).build()
+        Log.d(TAG, "设置关机时间的命令${mSendMsg.toString()}")
         return mSendMsg.toByteArray()
     }
 
@@ -51,8 +63,10 @@ object FMPrinterOrder {
      */
     fun orderForGetFmCancelPrinter(): ByteArray {
 
-        val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.CANCELPRINTING).build()
-        Log.d(TAG,"设备取消打印的命令${mSendMsg.toString()}")
+        val mSendMsg =
+            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.CANCELPRINTING)
+                .build()
+        Log.d(TAG, "设备取消打印的命令${mSendMsg.toString()}")
         return mSendMsg.toByteArray()
     }
 
@@ -61,27 +75,29 @@ object FMPrinterOrder {
      * @param speed (设置速度 1- 4)  2寸1到4 4寸的1到8
      *
      */
-    fun orderForGetFmSetPrintSpeed(speed: Int,printer: SyzPrinter): ByteArray {
-        val speedTarget=if (printer==SyzPrinter.SYZTWOINCH){
+    fun orderForGetFmSetPrintSpeed(speed: Int, printer: SyzPrinter): ByteArray {
+        val speedTarget = if (printer == SyzPrinter.SYZTWOINCH) {
             4
-        }else{
+        } else {
             8
         }
         return if (speed in 1..speedTarget) {
-            val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
-                .setSendInt(speed).build()
-            Log.d(TAG,"设置打印速度的命令${mSendMsg.toString()}")
-             mSendMsg.toByteArray()
+            val mSendMsg =
+                MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
+                    .setSendInt(speed).build()
+            Log.d(TAG, "设置打印速度的命令${mSendMsg.toString()}")
+            mSendMsg.toByteArray()
         } else {
             val mySpeed = if (speed < 1) {
                 1
             } else {
                 speedTarget
             }
-            val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
-                .setSendInt(mySpeed).build()
-            Log.d(TAG,"设置打印速度的命令${mSendMsg.toString()}")
-             mSendMsg.toByteArray()
+            val mSendMsg =
+                MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
+                    .setSendInt(mySpeed).build()
+            Log.d(TAG, "设置打印速度的命令${mSendMsg.toString()}")
+            mSendMsg.toByteArray()
         }
     }
 
@@ -91,20 +107,19 @@ object FMPrinterOrder {
      */
 
     fun orderForGetFmSetPrintConcentration(
-        concentration: Int,printer: SyzPrinter
+        concentration: Int, printer: SyzPrinter
     ): ByteArray {
-        val concentrationTarget=if (printer==SyzPrinter.SYZTWOINCH){
+        val concentrationTarget = if (printer == SyzPrinter.SYZTWOINCH) {
             8
-        }else{
+        } else {
             16
         }
         return if (concentration in 1..concentrationTarget) {
-            val mSendMsg =
-                MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINCONCENTRATION)
-                    .setSendInt(
-                        concentration
-                    ).build()
-            Log.d(TAG,"设置打印浓度的命令${mSendMsg.toString()}")
+            val mSendMsg = MPMessage.MPSendMsg.newBuilder()
+                .setEventType(MPMessage.EventType.PRINTINCONCENTRATION).setSendInt(
+                    concentration
+                ).build()
+            Log.d(TAG, "设置打印浓度的命令${mSendMsg.toString()}")
             mSendMsg.toByteArray()
         } else {
             val myConcentration = if (concentration < 1) {
@@ -112,11 +127,27 @@ object FMPrinterOrder {
             } else {
                 concentrationTarget
             }
-            val mSendMsg = MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED).setSendInt(myConcentration).build()
-            Log.d(TAG,"设置打印浓度的命令${mSendMsg.toString()}")
+            val mSendMsg =
+                MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PRINTINGSPEED)
+                    .setSendInt(myConcentration).build()
+            Log.d(TAG, "设置打印浓度的命令${mSendMsg.toString()}")
             mSendMsg.toByteArray()
         }
     }
 
 
+    //发送纸张类型
+    fun orderForGetFmPaperType(paperType: SyzPaperSize): ByteArray {
+        val paperSet =
+            MPPaperTypeMsg.newBuilder().setHeight((paperType.height*1000).toInt()).setOffset((paperType.offset*1000).toInt()).build()
+
+        val mSendMsg =
+            MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PAPERTYPESET)
+                .setSendInt(paperType.paperSet).setSendData(paperSet.toByteString()).build()
+        Log.d(
+            TAG,
+            "发送纸张类型的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}=====纸张类型${paperType.paperSet}==${paperType.name}====纸张类型的高度${(paperType.height*1000).toInt()}====纸张类型的偏移${(paperType.offset*1000).toInt()}"
+        )
+        return mSendMsg.toByteArray()
+    }
 }

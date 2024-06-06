@@ -58,7 +58,7 @@ android {
 
 val libsDir = file("libs")
 val arrAar = fileTree(libsDir) {
-    include("jx800r18_sdk_release_1.0.6.aar")
+    include("jx800r18_sdk_release_1.1.3.aar")
 }
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
@@ -77,6 +77,7 @@ dependencies {
     implementation(project(mapOf("path" to ":classicBluLib")))
     implementation(project(mapOf("path" to ":syzlivechat")))
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.activity:activity:1.9.0")
     testImplementation("junit:junit:4.13.2")
     //implementation(files(arrJars))
     implementation(files(arrAar))

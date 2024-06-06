@@ -157,15 +157,21 @@ class ConnectionImpl extends Connection {
             callback(MethodInfoGenerator.onConnectionStateChanged(device, uuidWrapper, state));
         }
     }
+    private boolean isSocketConnected=false;
+    public   boolean isSocketConnected(){
+        return isSocketConnected;
+    }
 
     private String getStateDesc(int state,boolean noEvent) {
         switch (state) {
             case Connection.STATE_CONNECTED:
                 Log.e("Spp>>>>>>>", "已经连接"+noEvent);
                 syzBluCallBack.onConnectSuccess(getDevice());
+                isSocketConnected=true;
                 return "connected";
             case Connection.STATE_CONNECTFAILED:
                 Log.e("Spp>>>>>>>", "连接失败"+noEvent);
+                isSocketConnected=false;
                 return "connect_failed";
             case Connection.STATE_CONNECTING:
                 Log.e("Spp>>>>>>>", "连接ing"+noEvent);
@@ -173,6 +179,7 @@ class ConnectionImpl extends Connection {
                 return "connecting";
             case Connection.STATE_DISCONNECTED:
                 Log.e("Spp>>>>>>>", "断开连接"+noEvent);
+                isSocketConnected=false;
                 syzBluCallBack.onDisConnected();
                 return "disconnected";
             case Connection.STATE_PAIRED:
@@ -180,6 +187,7 @@ class ConnectionImpl extends Connection {
             case Connection.STATE_PAIRING:
                 return "pairing";
             case Connection.STATE_RELEASED:
+                isSocketConnected=false;
                 Log.e("Spp>>>>>>>", "资源释放"+noEvent);
                 return "released";
             default:

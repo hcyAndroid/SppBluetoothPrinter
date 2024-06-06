@@ -8,15 +8,27 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-class SyzBitmapQueue<T: Serializable>(private val capacity: Int):Serializable {
+class SyzPicQueue<T: Serializable>():Serializable {
     private val deque = ConcurrentLinkedDeque<T>()
 
     @Synchronized
     fun add(element: T) {
-        while (deque.size >= capacity) {
-            deque.pollFirst() // 移除队列头部的元素，因为队列是FIFO
-        }
         deque.addLast(element) // 在队列尾部添加新元素
+    }
+
+
+
+
+    @Synchronized
+    fun addFrst(element: SyzPicQueue<T>) {
+       //把element里的元素插入最前面
+        val tempDeque = ConcurrentLinkedDeque<T>()
+        element.forEach {
+            tempDeque.addLast(it)
+        }
+        tempDeque.reversed().forEach {
+            deque.addFirst(it)
+        }
     }
     @Synchronized
     fun forEach(action: (T) -> Unit) {
@@ -56,7 +68,7 @@ class SyzBitmapQueue<T: Serializable>(private val capacity: Int):Serializable {
         }
     }
 
-    private val TAG="SyzBitmapQueue>>>>"
+    private val TAG="SyzPicQueue>>>>"
     @Synchronized
     fun duplicateElements(times: Int) {
         if (times <= 1) {

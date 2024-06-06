@@ -33,6 +33,7 @@
             android:gravity="center"
             android:padding="8dp"
             android:text="新版二寸"
+            android:visibility="gone"
             android:textStyle="bold" />
 
         <TextView
@@ -57,6 +58,7 @@
             android:gravity="center"
             android:padding="8dp"
             android:text="新版四寸"
+            android:visibility="gone"
             android:textStyle="bold" />
 
         <TextView
@@ -68,6 +70,18 @@
             android:gravity="center"
             android:padding="8dp"
             android:text="测试双线性/三线性采样"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_test_a4"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="A4 Test"
             android:textStyle="bold" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 

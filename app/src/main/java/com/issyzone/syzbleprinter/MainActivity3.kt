@@ -19,6 +19,7 @@ import com.issyzone.blelibs.utils.SYZFileUtils
 import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzFirmwareType
+import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
@@ -56,9 +57,9 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        val lo = "DC:0D:30:98:95:E4"
-        //val lo = "DC:0D:30:98:95:C5"
-        // val lo = "DC:0D:30:98:95:DB"//硬件那的mac
+        //val lo = "DC:0D:30:98:95:D5"
+        //val lo = "60:6E:41:A7:2D:D6"
+         val lo = "DC:0D:30:98:95:DF"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
         vm.tvType.text = "4寸demo"
         vm.etPicWidth.setText("102")
@@ -72,14 +73,32 @@ class MainActivity3 : ComponentActivity() {
         }
 
         LogLiveData.showLogs(this, vm.tvLog)
+        vm.tvHeibiao.setOnClickListener {
+            val size= SyzPaperSize.SYZPAPER_HEIBIAO
+            size.height=vm.etHeibiaoHeight.text.toString().toFloat()
+            size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
+            SyzClassicBluManager.getInstance().sendPaperSet(size)
+        }
+        vm.tvJianxi.setOnClickListener {
+            val size= SyzPaperSize.SYZPAPER_JIANXI
+            size.height=vm.etHeibiaoHeight.text.toString().toFloat()
+            size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
+            SyzClassicBluManager.getInstance().sendPaperSet(size)
+        }
 
+        vm.tvLianxu.setOnClickListener {
+            val size= SyzPaperSize.SYZPAPER_LIANXU
+            size.height=vm.etHeibiaoHeight.text.toString().toFloat()
+            size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
+            SyzClassicBluManager.getInstance().sendPaperSet(size)
+        }
         SyzClassicBluManager.getInstance().initClassicBlu()
         SyzClassicBluManager.getInstance().setActivelyReportBack {
             Log.i("${TAG}四寸主动上报的》》》》", it.toString())
         }
         SyzClassicBluManager.getInstance().setPaperReportCallBack {
             Log.i("${TAG}纸张尺寸上报的》》》》", "width==${it.paper_width}===height==${it.pager_height}==printerType==${it.printerState2.string}")
-            LogLiveData.addLogs("纸张尺寸上报的:>>>width==${it.paper_width}===height==${it.pager_height}==printerType==${it.printerState2.string}")
+            //LogLiveData.addLogs("纸张尺寸上报的:>>>width==${it.paper_width}===height==${it.pager_height}==printerType==${it.printerState2.string}")
         }
         SyzClassicBluManager.getInstance().setBluCallBack(object : SyzBluCallBack {
             override fun onStartConnect() {
@@ -122,7 +141,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvConnect.setOnClickListener {
             Log.i("点击", ">>>>")
-            LogLiveData.addLogs("准备连接4寸adress=${vm.etMac.text.toString()}")
+            //LogLiveData.addLogs("准备连接4寸adress=${vm.etMac.text.toString()}")
             SyzClassicBluManager.getInstance().connect(vm.etMac.text.toString())
             // SyzClassicBluManager.getInstance().connect("DC:1D:30:78:F7:7A")
 
@@ -147,7 +166,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_v1.0.0(40).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_V01.01.13(1).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -191,9 +210,12 @@ class MainActivity3 : ComponentActivity() {
             val bitmap = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test6), 128)
             val bitmap2 = ImageUtilKt.convertBinary(BitmapExt.decodeBitmap(R.drawable.test7), 128)
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT22222")
-            val bitmap5 = ImageUtilKt.convertBinary(
-                ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test6)), 128
-            )
+           /* val bitmap5 = ImageUtilKt.convertBinary(
+                ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test20)), 128
+            )*/
+
+            val bitmap5 = BitmapExt.decodeBitmap(R.drawable.test21)
+
             val page = vm.etPrintPage.text.toString().toInt()
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()

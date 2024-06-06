@@ -498,7 +498,8 @@ public class BTManager {
         if (currentConnectionImpl.getSocket() == null) {
             return false;
         }
-        return currentConnectionImpl.getSocket().isConnected();
+       // return currentConnectionImpl.getSocket().isConnected();
+        return  currentConnectionImpl.isSocketConnected();
     }
 
 

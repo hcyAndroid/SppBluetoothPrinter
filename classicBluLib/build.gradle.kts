@@ -91,7 +91,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.issyzone.sdk"
                 artifactId = "syz-device"
-                version = "v1.5.2-alpha"
+                version = "v1.6.0-alpha"
 //                artifact("$buildDir/outputs/aar/${project.name}-release.aar")
             }
         }
