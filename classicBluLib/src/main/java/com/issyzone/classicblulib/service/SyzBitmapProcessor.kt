@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.protobuf.ByteString
 import com.issyzone.classicblulib.bean.FMPrinterOrder
 import com.issyzone.classicblulib.bean.MPMessage
+import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.SyzPrinterState2
@@ -34,10 +35,13 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         var bitmapWidth: Int = 0
         var bitmapHeight: Int = 0
         var printPage: Int = 1
+        var currentPaperSize: SyzPaperSize? = null
         fun printerType(printerType: SyzPrinter) = apply { this.printerType = printerType }
         fun bitmapWidth(bitmapWidth: Int) = apply { this.bitmapWidth = bitmapWidth }
         fun bitmapHeight(bitmapHeight: Int) = apply { this.bitmapHeight = bitmapHeight }
         fun printPage(printPage: Int) = apply { this.printPage = printPage }
+        fun currentPaperSize(currentPaperSize: SyzPaperSize) =
+            apply { this.currentPaperSize = currentPaperSize }
 
         fun build() = SyzBitmapProcessor(this)
     }
@@ -125,26 +129,26 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         )
         val isAction4PrintMore = isSupportPageMore && (bitmapList.size == 1)  //是否执行4寸打印机的系统的多份逻辑
         bitmapList.forEachIndexed { index, bitmap ->
-          val newBitmap=  if (builder.printerType == SyzPrinter.SYZTWOINCH) {
+            val newBitmap = if (builder.printerType == SyzPrinter.SYZTWOINCH) {
                 //二寸打印机
                 val bitmapWidth = bitmap.width
-                if (bitmapWidth>50*8){
-                    Log.e(TAG,"宽度超过了2寸最大宽度开始裁剪")
-                    cropBitmapCenter(bitmap,50*8)
-                }else{
-                    Log.i(TAG,"宽度没有超过了2寸最大宽度")
+                if (bitmapWidth > 50 * 8) {
+                    Log.e(TAG, "宽度超过了2寸最大宽度开始裁剪")
+                    cropBitmapCenter(bitmap, 50 * 8)
+                } else {
+                    Log.i(TAG, "宽度没有超过了2寸最大宽度")
                     bitmap
                 }
-            }else if (builder.printerType == SyzPrinter.SYZFOURINCH) {
-              val bitmapWidth = bitmap.width
-              if (bitmapWidth>102*8){
-                  Log.e(TAG,"宽度超过了4寸最大宽度开始裁剪")
-                  cropBitmapCenter(bitmap,102*8)
-              }else{
-                  Log.i(TAG,"宽度没有超过了4寸最大宽度")
-                  bitmap
-              }
-            }else{
+            } else if (builder.printerType == SyzPrinter.SYZFOURINCH) {
+                val bitmapWidth = bitmap.width
+                if (bitmapWidth > 102 * 8) {
+                    Log.e(TAG, "宽度超过了4寸最大宽度开始裁剪")
+                    cropBitmapCenter(bitmap, 102 * 8)
+                } else {
+                    Log.i(TAG, "宽度没有超过了4寸最大宽度")
+                    bitmap
+                }
+            } else {
                 bitmap
             }
             if (isAction4PrintMore) {
@@ -204,7 +208,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     }
 
 
-    private  suspend  fun cropBitmapCenter(bitmap: Bitmap, newWidth: Int): Bitmap {
+    private suspend fun cropBitmapCenter(bitmap: Bitmap, newWidth: Int): Bitmap {
         // 计算裁剪的起始点
         val startX = if (bitmap.width > newWidth) (bitmap.width - newWidth) / 2 else 0
         val startY = 0
@@ -216,6 +220,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         // 创建新的位图
         return Bitmap.createBitmap(bitmap, startX, startY, width, height)
     }
+
     /**
      * 方法是将位图列表转换为打印任务队列，每个打印任务是一个分解后的位图数据队列
      * ABC  page=2  ABC ABC
@@ -261,7 +266,10 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     private suspend fun turnBitmapToDuanList(
         bitmap: Bitmap, page: Int, index: Int
     ): SyzBitmapQueue<ArrayList<MPMessage.MPSendMsg>> {
-        Log.i(TAG,"Bitmap${index}===开始处理图片===width==${bitmap.width}==height==${bitmap.height}===${builder.bitmapWidth}")
+        Log.i(
+            TAG,
+            "Bitmap${index}===开始处理图片===width==${bitmap.width}==height==${bitmap.height}===${builder.bitmapWidth}"
+        )
         val bitmapPrintArray = BitmapUtils.print(bitmap, bitmap.width, bitmap.height)
         val bitMapFenDuanList = splitByteArray(bitmapPrintArray, duanChunkSize)
         //存放一张图片所有的段数据
@@ -273,7 +281,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 val duanCompress = compress(duanBytes)
                 Log.i(TAG, "Bitmap${index}第${indexDuan}段压缩后的大小${duanCompress?.size}")
                 duanCompress?.apply {
-                    val tstData=decompress(duanCompress)
+                    val tstData = decompress(duanCompress)
                     Log.i(TAG, "Bitmap${index}第${indexDuan}段解压缩后的大小${tstData?.size}")
                 }
 
@@ -308,7 +316,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                         .setDataLength(bitmapPrintArray.size)
                         .setImgData(ByteString.copyFrom(baoBytes))
                         .setTotalSection(bitMapFenDuanList.size).setIndexPackage(baoIndex + 1)
-                        .setTotalPackage(totalBaoEachDuan).setWidth(bitmap.width/8)
+                        .setTotalPackage(totalBaoEachDuan).setWidth(bitmap.width / 8)
                         .setCompression(compressCode).setSectionLength(duanByteArray.size).build()
                     val baoData = MPMessage.MPSendMsg.newBuilder()
                         .setEventType(MPMessage.EventType.DEVICEPRINT)
@@ -415,6 +423,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     }
 
     suspend fun doPrint() {
+        //   bitmapCall?.printing(currentPrintPage = printerIndex, totalPage = totalPage)
         bitmapCall?.printing(currentPrintPage = printerIndex, totalPage = totalPage)
         consumeOneBitmap()
     }
@@ -461,17 +470,23 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     ) {
         //开始消费段,检查打印机是否具备打印条件
 
-        if (bitmapProcessed == 1) {
+      /*  if (bitmapProcessed == 1) {
             Log.i(TAG, "打印机打印前检查打印状态${bitmapProcessed}")
-            val stateFlag = checkPrinterState()
+            val printerStatus = checkPrinterState()
+            //检查打印机状态
+            val stateFlag = printerStatus.second
             if (stateFlag == SyzPrinterState2.PRINTER_OK) {
                 Log.i(TAG, "打印机状态正常==${stateFlag}")
                 Log.i(TAG, "下发第一张图片的第一段，总共${bitmapQueue.size()}段")
+                //只有开始打印的时候才下发进度
+                bitmapCall?.printing(currentPrintPage = printerIndex, totalPage = totalPage)
+                bitmapCall?.checkPrinterBeforePrint(true, SyzPrinterState2.PRINTER_OK)
                 duanProcessed = 0
                 consumeDuansOneBitmap()
             } else {
                 Log.e(TAG, "打印机状态异常不能打印==${stateFlag}")
-                bitmapCall?.getPrintResult(false, stateFlag)
+                // bitmapCall?.getPrintResult(false, stateFlag)
+                bitmapCall?.checkPrinterBeforePrint(false, stateFlag)
             }
         } else {
             Log.i(
@@ -480,8 +495,13 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             )
             duanProcessed = 0
             consumeDuansOneBitmap()
-        }
-
+        }*/
+        Log.i(
+            TAG,
+            "下发第${bitmapProcessed}张图片的第一段，总共${bitmapQueue.size()}段"
+        )
+        duanProcessed = 0
+        consumeDuansOneBitmap()
     }
 
     private var duanProcessed = 0
@@ -492,12 +512,11 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 Log.d(TAG, "当前第${bitmapProcessed}bitmap所有duan已经消费完毕==处理下一张图片")
                 consumeOneBitmap()
             } else {
-                Log.e(TAG, "没有图片任务了")
-/*                SyzClassicBluManager.getInstance()
-                    .writeABF1(FMPrinterOrder.orderForEndPrint(), "${TAG}=orderForEndPrint>>>>")
-                delay(50)
-                //这里只释放
-                releaseResources()*/
+                Log.e(TAG, "没有图片任务了")/*                SyzClassicBluManager.getInstance()
+                                    .writeABF1(FMPrinterOrder.orderForEndPrint(), "${TAG}=orderForEndPrint>>>>")
+                                delay(50)
+                                //这里只释放
+                                releaseResources()*/
             }
 
             // recycleCurrentPrintBitmap()
@@ -520,13 +539,56 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 delay(50)
                 //这里只释放
                 releaseResources()
-            }else{
+            } else {
 
             }
         }
     }
 
-    private suspend fun checkPrinterState(): SyzPrinterState2 {
+    suspend fun checkPrinterStatus():Boolean {
+        val printer_status = SyzClassicBluManager.getInstance().getPrintStatus()
+        var paperSize = printer_status.first
+        var printerState = printer_status.second
+        if (builder.printerType == SyzPrinter.SYZTWOINCH) {
+            //二寸
+            Log.i(TAG, "二寸检查纸张类型==设备纸张类型${paperSize}==当前打印纸张类型${builder.currentPaperSize}")
+            if (paperSize == builder.currentPaperSize) {
+                //纸张类型一致
+                Log.i(TAG, "纸张类型一致")
+                if (printerState == SyzPrinterState2.PRINTER_OK) {
+                    Log.i(TAG, "打印机状态正常==${printerState}")
+                    //只有开始打印的时候才下发进度
+                    //bitmapCall?.printing(currentPrintPage = printerIndex, totalPage = totalPage)
+                    bitmapCall?.checkPrinterBeforePrint(true, SyzPrinterState2.PRINTER_OK)
+                    return true
+                } else {
+                    Log.e(TAG, "打印机状态异常不能打印==${printerState}")
+                    bitmapCall?.checkPrinterBeforePrint(false, printerState)
+                }
+                bitmapCall?.checkPaperSizeBeforePrint(true,paperSize,builder.currentPaperSize)
+            }else{
+                //纸张类型不一致,二寸要弹窗提示
+                Log.e(TAG, "纸张类型不一致${printerState}====${paperSize}====${builder.currentPaperSize}")
+                bitmapCall?.checkPaperSizeBeforePrint(false,paperSize,builder.currentPaperSize)
+            }
+        } else {
+            //四寸
+            Log.i(TAG, "四寸不用检查纸张类型")
+            if (printerState == SyzPrinterState2.PRINTER_OK) {
+                Log.i(TAG, "打印机状态正常==${printerState}")
+                //只有开始打印的时候才下发进度
+                //bitmapCall?.printing(currentPrintPage = printerIndex, totalPage = totalPage)
+                bitmapCall?.checkPrinterBeforePrint(true, SyzPrinterState2.PRINTER_OK)
+                return true
+            } else {
+                Log.e(TAG, "打印机状态异常不能打印==${printerState}")
+                bitmapCall?.checkPrinterBeforePrint(false, printerState)
+            }
+        }
+        return false
+    }
+
+    private suspend fun checkPrinterState(): Pair<SyzPaperSize?, SyzPrinterState2> {
         return SyzClassicBluManager.getInstance().getPrintStatus()
     }
 

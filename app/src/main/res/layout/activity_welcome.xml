@@ -83,6 +83,30 @@
             android:padding="8dp"
             android:text="A4 Test"
             android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_test_5"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="自动测试 Test"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_test_6"
+            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="自动测试 Test2"
+            android:textStyle="bold" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

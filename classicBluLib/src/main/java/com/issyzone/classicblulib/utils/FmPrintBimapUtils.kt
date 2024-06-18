@@ -196,7 +196,7 @@ class FmPrintBimapUtils {
             if (currentBitMapList.isNotEmpty()) {
                 val getDeviceStateTask =
                     async { SyzClassicBluManager.getInstance().getPrintStatus() }
-                val stateFlag = getDeviceStateTask.await()
+                val stateFlag = getDeviceStateTask.await().second
                 if (stateFlag == SyzPrinterState2.PRINTER_OK) {
                     currentPrintPage = 0
                     bitmapCall?.printing(currentPrintPage = currentPrintPage, totalPage = totalPage)
@@ -249,7 +249,7 @@ class FmPrintBimapUtils {
             if (currentBitMapList.isNotEmpty()) {
                 val getDeviceStateTask =
                     async { SyzClassicBluManager.getInstance().getPrintStatus() }
-                val stateFlag = getDeviceStateTask.await()
+                val stateFlag = getDeviceStateTask.await().second
                 if (stateFlag == SyzPrinterState2.PRINTER_OK) {
                     currentPrintPage = 0
                     currentSendPrintPage=0

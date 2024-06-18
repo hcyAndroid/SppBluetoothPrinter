@@ -75,7 +75,7 @@ dependencies {
 
     implementation(project(mapOf("path" to ":BleLibs")))
     implementation(project(mapOf("path" to ":classicBluLib")))
-    implementation(project(mapOf("path" to ":syzlivechat")))
+//    implementation(project(mapOf("path" to ":syzlivechat")))
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.activity:activity:1.9.0")
     testImplementation("junit:junit:4.13.2")

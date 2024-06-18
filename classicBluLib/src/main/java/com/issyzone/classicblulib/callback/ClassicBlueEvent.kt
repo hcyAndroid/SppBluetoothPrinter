@@ -17,6 +17,7 @@ enum class SyzPrinterState2(
     PRINTER_UPACKER_FAILED(1003,true,"打印过程中解包失败",12),
     PRINTER_HAS_STUDY_PAPER(1004,true,"打印机学纸了",13),
     PRINTER_NO_STUDY_PAPER(1005,true,"打印机没有学纸",14),
+    PRINTER_SELF_PRINT_FAIL(1006,true,"自检页打印失败",15),
 //  PRINTER_LID_CLOSE(3, false),//关盖
 //    //开盖
 //    PRINTER_HAS_PAPER(11, "1"), PRINTER_NO_PAPER(11, "2"), PRINTER_STRUCK_PAPER(

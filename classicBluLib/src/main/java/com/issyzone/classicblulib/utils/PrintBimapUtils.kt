@@ -135,7 +135,7 @@ class PrintBimapUtils {
             val doFirst = bitMapPrintTaskList.firstOrNull()
             if (doFirst != null) {
                 val getDeviceStateTask =
-                    async { SyzClassicBluManager.getInstance().getPrintStatus() }
+                    async { SyzClassicBluManager.getInstance().getPrintStatus() .second}
                 val stateFlag = getDeviceStateTask.await()
                 //SyzClassicBluManager.getInstance().fmWriteABF4(doFirst)
                 if (stateFlag == SyzPrinterState2.PRINTER_OK) {

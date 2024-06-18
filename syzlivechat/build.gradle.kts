@@ -40,6 +40,8 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation("org.apache.poi:poi:5.0.0")
+    implementation("org.apache.poi:poi-ooxml:5.0.0")
     api("com.github.livechat:chat-window-android:v2.2.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)

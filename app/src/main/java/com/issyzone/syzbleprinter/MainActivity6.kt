@@ -75,7 +75,11 @@ class MainActivity6 : ComponentActivity() {
                 LogLiveData.addLogs("打印失败>>>>${isSuccess}===${msg}")
             }
         }
-    }
+
+       override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+           TODO("Not yet implemented")
+       }
+   }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)

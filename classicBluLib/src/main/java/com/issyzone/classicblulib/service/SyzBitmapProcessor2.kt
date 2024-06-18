@@ -446,7 +446,7 @@ class SyzBitmapProcessor2 private constructor(var builder: Builder) {
     }
 
     private suspend fun checkPrinterState(): SyzPrinterState2 {
-        return SyzClassicBluManager.getInstance().getPrintStatus()
+        return SyzClassicBluManager.getInstance().getPrintStatus().second
     }
 
 

@@ -24,9 +24,9 @@
         <activity
             android:name=".A4TestActivity"
             android:exported="false" />
-        <activity
-            android:name=".Main6Activity"
-            android:exported="false" />
+<!--        <activity-->
+<!--            android:name=".Main6Activity"-->
+<!--            android:exported="false" />-->
         <activity
             android:name=".MainActivity5"
             android:exported="false" />
@@ -35,6 +35,13 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity7"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity10"
+            android:exported="false" />
+
+        <activity
+            android:name=".MainActivity9"
             android:exported="false" />
         <activity
             android:name=".WelcomeActivity"

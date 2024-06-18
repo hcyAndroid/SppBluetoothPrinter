@@ -334,6 +334,26 @@ object FmNotifyBeanUtils {
         return bitArray
     }
 
+    fun getGetFmPaperTypeResult(byteArray: ByteArray): NotifyResult2 {
+        val mpRespondMsg = MPMessage.MPRespondMsg.parseFrom(byteArray)
+        Log.d("$TAG", " NOTIFY返回的信息 ${mpRespondMsg.toString()}")
+        return if (mpRespondMsg.eventType == MPMessage.EventType.PAPERTYPESET) {
+            if (mpRespondMsg.code == 200) {
+                val deviceInfo =
+                    MPMessage.MPDeviceInfoMsg.parseFrom(mpRespondMsg.respondData.toByteArray())
+                Log.d("$TAG", "经典蓝牙设置纸张类型成功>>>>${deviceInfo.toString()}")
+                NotifyResult2.Success(null)
+            } else {
+                val deviceErrorInfo =
+                    MPMessage.MPCodeMsg.parseFrom(mpRespondMsg.error.toByteArray())
+                Log.d("$TAG", "经典蓝牙设置纸张类型失败>>>>${deviceErrorInfo.toString()}")
+                NotifyResult2.Error(deviceErrorInfo)
+            }
+        } else {
+            NotifyResult2.Error(null)
+        }
+    }
+
     /*  fun isPrinterError(printStatus: Int): SyzPrinterState2 {
           val infoArray = test(printStatus)
           val errorLIst = mutableListOf<SyzPrinterState2>()

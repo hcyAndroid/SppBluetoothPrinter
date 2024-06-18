@@ -22,6 +22,7 @@ import com.issyzone.classicblulib.bean.SyzFirmwareType
 import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
+import com.issyzone.classicblulib.callback.BluSelfCheckCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
 import com.issyzone.classicblulib.callback.DeviceBleInfoCall
 import com.issyzone.classicblulib.callback.DeviceInfoCall
@@ -77,20 +78,32 @@ class MainActivity3 : ComponentActivity() {
             val size= SyzPaperSize.SYZPAPER_HEIBIAO
             size.height=vm.etHeibiaoHeight.text.toString().toFloat()
             size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
-            SyzClassicBluManager.getInstance().sendPaperSet(size)
+            SyzClassicBluManager.getInstance().sendPaperSet(size,object :DeviceBleInfoCall{
+                override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
+
+                }
+            })
         }
         vm.tvJianxi.setOnClickListener {
             val size= SyzPaperSize.SYZPAPER_JIANXI
             size.height=vm.etHeibiaoHeight.text.toString().toFloat()
             size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
-            SyzClassicBluManager.getInstance().sendPaperSet(size)
+            SyzClassicBluManager.getInstance().sendPaperSet(size,object :DeviceBleInfoCall{
+                override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
+
+                }
+            })
         }
 
         vm.tvLianxu.setOnClickListener {
             val size= SyzPaperSize.SYZPAPER_LIANXU
             size.height=vm.etHeibiaoHeight.text.toString().toFloat()
             size.offset=vm.etHeibiaoOffset.text.toString().toFloat()
-            SyzClassicBluManager.getInstance().sendPaperSet(size)
+            SyzClassicBluManager.getInstance().sendPaperSet(size,object :DeviceBleInfoCall{
+                override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
+
+                }
+            })
         }
         SyzClassicBluManager.getInstance().initClassicBlu()
         SyzClassicBluManager.getInstance().setActivelyReportBack {
@@ -182,7 +195,12 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvSelfChecking.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            SyzClassicBluManager.getInstance().writeSelfCheck()
+            SyzClassicBluManager.getInstance().writeSelfCheck(object : BluSelfCheckCallBack {
+                override fun getPrintResult(isSuccess: Boolean, msg: SyzPrinterState2) {
+
+                }
+
+            })
         }
         vm.tvShutdown.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
@@ -235,6 +253,20 @@ class MainActivity3 : ComponentActivity() {
                         Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                     }
                 }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+
+                }
+
+                override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+
+                }
+
+
             })
         }
 
@@ -275,6 +307,20 @@ class MainActivity3 : ComponentActivity() {
                         Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                     }
                 }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+
+                }
+
+                override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+
+                }
+
+
             })
 
 
@@ -332,6 +378,19 @@ class MainActivity3 : ComponentActivity() {
                         Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                     }
                 }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+
+                }
+
+                override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+
+                }
+
             })
         }
 
@@ -435,6 +494,18 @@ class MainActivity3 : ComponentActivity() {
                     } else {
                         Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                     }
+                }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+
+                }
+
+                override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+
                 }
             })
         }

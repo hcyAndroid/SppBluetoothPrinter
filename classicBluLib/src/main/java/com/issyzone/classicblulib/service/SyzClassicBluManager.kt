@@ -1,17 +1,13 @@
 package com.issyzone.classicblulib.service
 
-import android.Manifest
-import android.app.Activity
-import android.app.Application.ActivityLifecycleCallbacks
+
 import android.bluetooth.BluetoothDevice
-import android.content.pm.PackageManager
+
 import android.graphics.Bitmap
-import android.os.Bundle
+
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.issyzone.classicblulib.bean.FMPrinterOrder
 import com.issyzone.classicblulib.bean.FmNotifyBeanUtils
 import com.issyzone.classicblulib.bean.LogLiveData
@@ -23,6 +19,7 @@ import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.bean.SyzPrinterPaper
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
+import com.issyzone.classicblulib.callback.BluSelfCheckCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
 import com.issyzone.classicblulib.callback.DeviceBleInfoCall
 import com.issyzone.classicblulib.callback.DeviceInfoCall
@@ -67,10 +64,13 @@ class SyzClassicBluManager {
         private var bluScope: CoroutineScope? = null
         private var sppReadScope: CoroutineScope? = null
         private var sppBitmapScope: CoroutineScope? = null
+        private var sppSelfPrintScope: CoroutineScope? = null
         private var blueNotifyDataProcessor: BlueNotifyDataProcessor? = null
+
         fun getInstance(): SyzClassicBluManager {
             if (instance == null) {
                 instance = SyzClassicBluManager()
+                sppSelfPrintScope = CoroutineScope(Dispatchers.IO)
                 sppReadScope = CoroutineScope(Dispatchers.IO)
                 sppBitmapScope = CoroutineScope(Dispatchers.IO)
                 bluScope = CoroutineScope(Dispatchers.IO)
@@ -89,10 +89,16 @@ class SyzClassicBluManager {
     //蓝牙连接回调
     private var bluCallBack: SyzBluCallBack? = null;
     private var currentPrintType = SyzPrinter.SYZTWOINCH
-
+    private var isOpenActiveReportWhenPrinting = false //打印过程中是否把错误也通过主动上报显示
     fun setBluCallBack(bluCallBack: SyzBluCallBack) {
         this.bluCallBack = bluCallBack
     }
+
+    //设置打印过程中是否把错误也通过主动上报显示
+    fun setIsOpenActiveReportWhenPrinting(isOpenActiveReportWhenPrinting: Boolean) {
+        this.isOpenActiveReportWhenPrinting = isOpenActiveReportWhenPrinting
+    }
+
 
     //断开连接
     fun disConnectBlu() {
@@ -122,8 +128,7 @@ class SyzClassicBluManager {
                     //这个命令就是为了触发设备的信息的主动上报，少了他根本不上报
                     writeABF1(FMPrinterOrder.orderForGetFmDevicesInfo(), "${TAG}=getDeviceInfo>>>>")
                 }
-                bluCallBack?.onConnectSuccess(device)
-                /*    if (ContextCompat.checkSelfPermission(AppGlobels.getApplication(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
+                bluCallBack?.onConnectSuccess(device)/*    if (ContextCompat.checkSelfPermission(AppGlobels.getApplication(), Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
 
                     }else{
                         Log.e(TAG, "没有蓝牙权限")
@@ -213,7 +218,7 @@ class SyzClassicBluManager {
 
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEPRINT) {
                     if (mpRespondMsg.code == 4) {
-                        Log.e(TAG,"打印机打印图片出错")
+                        Log.e(TAG, "打印机打印图片出错")
                     }
                 }
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
@@ -308,18 +313,20 @@ class SyzClassicBluManager {
                                         bitmapPrintHandler?.updatePrintProcess()
 
                                     } else {
-                                        activelyReportCallBack?.invoke(
-                                            state
-                                        )
+//                                        activelyReportCallBack?.invoke(
+//                                            state
+//                                        )
+                                        handleActiveUp(state)
                                     }
 
                                 } else {
                                     if (bitmapPrintHandler?.getPrinterState() == true) {
                                         bitmapPrintHandler?.handlePrintingMistakes(state)
                                     } else {
-                                        activelyReportCallBack?.invoke(
-                                            state
-                                        )
+                                        handleActiveUp(state)
+//                                        activelyReportCallBack?.invoke(
+//                                            state
+//                                        )
                                     }
 
                                 }
@@ -347,14 +354,31 @@ class SyzClassicBluManager {
                 }
             } catch (e: Exception) {
                 Log.d(
-                    TAG,
-                    "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}"
+                    TAG, "$TAG NOTIFY解析数据出错${this.contentToString()}==${e.message.toString()}"
                 )
                 // LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
             }
         }
     }
 
+
+    private var lastState: SyzPrinterState2? = null
+    private var lastUpdateTime: Long = 0
+    private fun handleActiveUp(state: SyzPrinterState2) {
+        Log.d(TAG, "主动上报==硬件主动上报的状态==${state}")
+        //如果十秒内上报的内容是相同的，就不回调
+        val currentTime = System.currentTimeMillis()
+        if (state != lastState || currentTime - lastUpdateTime >= 10 * 60 * 1000) {
+            // 如果状态发生变化，或者距离上次更新已经超过10秒，那么调用回调函数
+            Log.i(TAG, "主动上报==SDK主动上报的状态==${state}")
+            activelyReportCallBack?.invoke(state)
+            // 更新上一次的状态和更新时间
+            lastState = state
+            lastUpdateTime = currentTime
+        } else {
+            Log.e(TAG, "主动上报==十秒内上报的内容是相同的==${state}==不回调")
+        }
+    }
 
     private val reciver = object : EventObserver {
         override fun onWrite(
@@ -428,27 +452,34 @@ class SyzClassicBluManager {
 
     private var bitListScope: CoroutineScope? = null
 
-    suspend fun getPrintStatus(): SyzPrinterState2 {
+    suspend fun getPrintStatus(): Pair<SyzPaperSize?, SyzPrinterState2> {
         val result = withTimeoutOrNull(ORDER_TIME_OUT) {
             val getDeviceStateTask = async { getDeviceState() }
             getDeviceStateTask.await()
-        } ?: SyzPrinterState2.PRINTER_STATUS_UNKNOWN
+        } ?: Pair(null, SyzPrinterState2.PRINTER_STATUS_UNKNOWN)
         return result
     }
 
-    private suspend fun getDeviceState(): SyzPrinterState2 {
-        return suspendCancellableCoroutine<SyzPrinterState2> { cancellableContinuation ->
+    private suspend fun getDeviceState(): Pair<SyzPaperSize?, SyzPrinterState2> {
+        return suspendCancellableCoroutine<Pair<SyzPaperSize?, SyzPrinterState2>> { cancellableContinuation ->
             getDeviceInfo(object : DeviceInfoCall {
                 override fun getDeviceInfo(msg: MPMessage.MPDeviceInfoMsg) {
                     val printState = FmNotifyBeanUtils.getPrintStatus(msg)
-                    Log.i(TAG, "打印前获取打印机状态===${printState}")
-                    cancellableContinuation.resume(printState) {
+                    val syzPaperSize = SyzPaperSize.values().find {
+                        it.paperSet == msg.paperType
+                    }
+                    Log.i(TAG, "打印前获取打印机状态===${printState}===纸张类型==${syzPaperSize}")
+                    cancellableContinuation.resume(Pair(syzPaperSize, printState)) {
                         Log.e(TAG, "打印前获取打印机状态异常===")
                     }
                 }
 
                 override fun getDeviceInfoError(errorMsg: MPMessage.MPCodeMsg) {
-                    cancellableContinuation.resume(SyzPrinterState2.PRINTER_STATUS_UNKNOWN) {
+                    cancellableContinuation.resume(
+                        Pair(
+                            null, SyzPrinterState2.PRINTER_STATUS_UNKNOWN
+                        )
+                    ) {
                         Log.e(TAG, "打印前获取打印机状态异常===")
                     }
                 }
@@ -470,7 +501,8 @@ class SyzClassicBluManager {
         width: Int,
         height: Int,
         page: Int,
-        callBack: BluPrintingCallBack
+        callBack: BluPrintingCallBack,
+        currentPaperSize: SyzPaperSize? = null
     ) {
         bitListScope = CoroutineScope(Dispatchers.IO)
         bitListScope?.launch {
@@ -479,10 +511,38 @@ class SyzClassicBluManager {
                 this.bitmapWidth = width
                 this.bitmapHeight = height
                 this.printPage = page
+                this.currentPaperSize = currentPaperSize
             }
-            bitmapPrintHandler?.setBimapCallBack(callBack)
-            bitmapPrintHandler?.produceBitmaps2(bipmaps)
-            bitmapPrintHandler?.doPrint()
+            bitmapPrintHandler?.setBimapCallBack(object : BluPrintingCallBack {
+                override fun printing(currentPrintPage: Int, totalPage: Int) {
+                    callBack.printing(currentPrintPage, totalPage)
+                }
+
+                override fun getPrintResult(isSuccess: Boolean, msg: SyzPrinterState2) {
+                    callBack.getPrintResult(isSuccess, msg)
+                    if (isOpenActiveReportWhenPrinting) {
+                        if (!isSuccess) {
+                            activelyReportCallBack?.invoke(msg)
+                        }
+                    }
+                }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+                   callBack.checkPaperSizeBeforePrint(isSame, printerSize, doPrintSize)
+                }
+
+                override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
+                    callBack.checkPrinterBeforePrint(isOK, msg)
+                }
+            })
+            if ((bitmapPrintHandler?.checkPrinterStatus() ?: false)) {
+                bitmapPrintHandler?.produceBitmaps2(bipmaps)
+                bitmapPrintHandler?.doPrint()
+            }
         }
     }
 
@@ -522,39 +582,43 @@ class SyzClassicBluManager {
 
     //检查自检页
     //三秒没收到回调就是失败
-    fun writeSelfCheck() {
+    fun writeSelfCheck(callBack: BluSelfCheckCallBack) {
         bluNotifyCallBack = { dataArray ->
 
         }
-        // 创建一个可取消的协程
-        val job = GlobalScope.launch {
-            delay(ORDER_TIME_OUT) // 等待3秒
-            // 如果3秒后回调还没有被调用，打印失败信息
-            onMainThread {
-                Toast.makeText(
-                    AppGlobels.getApplication(),
-                    "Self-check page print failed",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            Log.e(TAG, "自检页打印失败")
-        }
-        bluSelfCheckCallBack = {
-            if (it) {
-                Log.i(TAG, "自检页打印成功")
-            } else {
-                onMainThread {
-                    Toast.makeText(
-                        AppGlobels.getApplication(),
-                        "Self-check page print failed",
-                        Toast.LENGTH_SHORT
-                    ).show()
+        //检查设备信息
+        sppSelfPrintScope = CoroutineScope(Dispatchers.IO)
+        sppSelfPrintScope?.launch {
+            //检查设备信息
+            val printStatus = getPrintStatus().second
+            if (printStatus == SyzPrinterState2.PRINTER_OK) {
+                //状态正常可以打印自检页
+                // 创建一个可取消的协程
+                val job = GlobalScope.launch {
+                    delay(ORDER_TIME_OUT) // 等待3秒
+                    // 如果3秒后回调还没有被调用，打印失败信息
+                    callBack.getPrintResult(false, SyzPrinterState2.PRINTER_STATUS_UNKNOWN)
+                    Log.e(TAG, "自检页打印失败")
                 }
-                Log.e(TAG, "自检页打印失败")
+                bluSelfCheckCallBack = {
+                    if (it) {
+                        callBack.getPrintResult(true, SyzPrinterState2.PRINTER_OK)
+                    } else {
+                        callBack.getPrintResult(false, SyzPrinterState2.PRINTER_SELF_PRINT_FAIL)
+                        Log.e(TAG, "自检页打印失败")
+                    }
+                    job.cancel()
+                }
+                writeABF1(
+                    FMPrinterOrder.orderForGetFmSelfcheckingPage(), "${TAG}=writeSelfCheck>>>>"
+                )
+            } else {
+                //把状态上报
+                callBack.getPrintResult(false, printStatus)
             }
-            job.cancel()
         }
-        writeABF1(FMPrinterOrder.orderForGetFmSelfcheckingPage(), "${TAG}=writeSelfCheck>>>>")
+
+
     }
 
     /**
@@ -566,6 +630,28 @@ class SyzClassicBluManager {
                 "${TAG}=${tag}>>>", Upacker.frameEncode(data), null
             )
         }
+    }
+    fun sendPaperSet(paperType: SyzPaperSize,callBack: DeviceBleInfoCall) {
+        bluNotifyCallBack = { dataArray ->
+            val result = FmNotifyBeanUtils.getGetFmPaperTypeResult(dataArray)
+            when (result) {
+                is NotifyResult2.Success -> {
+                    callBack.getBleNotifyInfo(true, result.msg)
+                }
+
+                is NotifyResult2.Error -> {
+                    callBack.getBleNotifyInfo(false, result.errorMsg)
+                }
+
+                else -> {
+
+                }
+            }
+        }
+        writeABF1(
+            FMPrinterOrder.orderForGetFmPaperType(paperType),
+            "${TAG}=设置纸张类型>>>>${paperType.toString()}"
+        )
     }
 
     /**
@@ -632,6 +718,8 @@ class SyzClassicBluManager {
         }
     }
 
+
+
     /**
      * 设置打印速度
      */
@@ -686,12 +774,7 @@ class SyzClassicBluManager {
     }
 
 
-    fun sendPaperSet(paperType: SyzPaperSize) {
-        writeABF1(
-            FMPrinterOrder.orderForGetFmPaperType(paperType),
-            "${TAG}=设置纸张类型>>>>"
-        )
-    }
+
 
 
     /*
@@ -712,8 +795,7 @@ class SyzClassicBluManager {
     */
 
 
-    private var dexScope: CoroutineScope? = null
-    /*
+    private var dexScope: CoroutineScope? = null/*
         private fun splitByteArray(input: ByteArray, chunkSize: Int = 100): List<ByteArray> {
             return input.toList().chunked(chunkSize).map { it.toByteArray() }
         }

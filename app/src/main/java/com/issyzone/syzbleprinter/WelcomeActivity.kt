@@ -30,9 +30,15 @@ class WelcomeActivity : ComponentActivity() {
             startActivity(Intent(WelcomeActivity@ this, MainActivity5::class.java))
 
         }
-
         vm.tvTestA4.setOnClickListener {
             startActivity(Intent(WelcomeActivity@ this, A4TestActivity::class.java))
+        }
+        vm.tvTest5.setOnClickListener {
+            startActivity(Intent(WelcomeActivity@ this, MainActivity10::class.java))
+        }
+
+        vm.tvTest6.setOnClickListener {
+            startActivity(Intent(WelcomeActivity@ this, MainActivity9::class.java))
         }
 
     }

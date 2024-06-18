@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 class SocketConnection {
     private BluetoothSocket socket;
+    private static final String TAG = "SPP_SOCKET";
 
     public BluetoothSocket getSocket() {
         return socket;
@@ -94,6 +95,7 @@ class SocketConnection {
 
                     }
                 } catch (IOException e) {
+                    Log.e(TAG,"inputStream===null==${}"+connection.isReleased());
                     if (!connection.isReleased()) {
                         connection.changeState(Connection.STATE_DISCONNECTED, false);
                     }
