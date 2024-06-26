@@ -460,6 +460,36 @@ class SyzClassicBluManager {
         return result
     }
 
+    suspend fun setPaperType(syzPaperSize: SyzPaperSize): SyzPrinterState2{
+        return  withTimeoutOrNull(ORDER_TIME_OUT) {
+            val setPaperSetTask = async { setPaperSet(syzPaperSize) }
+            setPaperSetTask.await()
+        } ?: SyzPrinterState2.PRINTER_SET_PAPER_TYPE_OUTTIME
+    }
+
+
+    private suspend fun setPaperSet(syzPaperSize: SyzPaperSize):SyzPrinterState2{
+        return suspendCancellableCoroutine<SyzPrinterState2> { cancellableContinuation ->
+            sendPaperSet(syzPaperSize, object : DeviceBleInfoCall {
+                override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
+                    if (isSuccess) {
+                        Log.i(TAG, "设置纸张类型成功==${syzPaperSize}")
+                        cancellableContinuation.resume(SyzPrinterState2.PRINTER_SET_PAPER_TYPE_OK) {
+                            Log.e(TAG, "设置纸张类型异常===")
+                        }
+                    } else {
+                        Log.e(TAG, "设置纸张类型失败==${syzPaperSize}")
+                        cancellableContinuation.resume(SyzPrinterState2.PRINTER_SET_PAPER_TYPE_FAILED) {
+                            Log.e(TAG, "设置纸张类型异常===")
+                        }
+                    }
+                }
+            })
+        }
+    }
+
+
+
     private suspend fun getDeviceState(): Pair<SyzPaperSize?, SyzPrinterState2> {
         return suspendCancellableCoroutine<Pair<SyzPaperSize?, SyzPrinterState2>> { cancellableContinuation ->
             getDeviceInfo(object : DeviceInfoCall {
@@ -511,7 +541,7 @@ class SyzClassicBluManager {
                 this.bitmapWidth = width
                 this.bitmapHeight = height
                 this.printPage = page
-                this.currentPaperSize = currentPaperSize
+                this.currentPaperSize = currentPaperSize?:SyzPaperSize.SYZPAPER_JIANXI
             }
             bitmapPrintHandler?.setBimapCallBack(object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {

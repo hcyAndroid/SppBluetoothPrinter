@@ -15,6 +15,7 @@ import com.issyzone.blelibs.utils.SYZFileUtils
 import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzFirmwareType
+import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
@@ -46,6 +47,14 @@ class MainActivity7 : ComponentActivity() {
                 Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                 LogLiveData.addLogs("打印失败>>>>${isSuccess}===${msg}")
             }
+        }
+
+        override fun checkPaperSizeBeforePrint(
+            isSame: Boolean,
+            printerSize: SyzPaperSize?,
+            doPrintSize: SyzPaperSize?
+        ) {
+
         }
 
         override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {

@@ -31,7 +31,9 @@ interface BluPrintingCallBack {
     fun printing(currentPrintPage:Int,totalPage:Int)
     fun getPrintResult(isSuccess: Boolean, msg: SyzPrinterState2)
     fun checkPaperSizeBeforePrint(isSame:Boolean,printerSize: SyzPaperSize?,doPrintSize: SyzPaperSize?)
-    fun checkPrinterBeforePrint(isOK: Boolean,msg: SyzPrinterState2)
+    fun checkPrinterBeforePrint(isOK: Boolean,msg: SyzPrinterState2){
+
+    }
 
 }
 

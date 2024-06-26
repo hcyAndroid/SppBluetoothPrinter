@@ -58,9 +58,9 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        //val lo = "DC:0D:30:98:95:D5"
+        val lo = "DC:0D:30:98:95:D5"
         //val lo = "60:6E:41:A7:2D:D6"
-         val lo = "DC:0D:30:98:95:DF"//硬件那的mac
+        // val lo = "DC:0D:30:98:95:CF"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
         vm.tvType.text = "4寸demo"
         vm.etPicWidth.setText("102")
@@ -179,7 +179,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_V01.01.13(1).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_V01.01.16.bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {

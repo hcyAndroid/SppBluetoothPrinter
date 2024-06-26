@@ -18,6 +18,9 @@ enum class SyzPrinterState2(
     PRINTER_HAS_STUDY_PAPER(1004,true,"打印机学纸了",13),
     PRINTER_NO_STUDY_PAPER(1005,true,"打印机没有学纸",14),
     PRINTER_SELF_PRINT_FAIL(1006,true,"自检页打印失败",15),
+    PRINTER_SET_PAPER_TYPE_OUTTIME(1007,true,"设置纸张类型超时",16),
+    PRINTER_SET_PAPER_TYPE_OK(1008,true,"设置纸张类型成功",17),
+    PRINTER_SET_PAPER_TYPE_FAILED(1009,true,"设置纸张类型失败",18),
 //  PRINTER_LID_CLOSE(3, false),//关盖
 //    //开盖
 //    PRINTER_HAS_PAPER(11, "1"), PRINTER_NO_PAPER(11, "2"), PRINTER_STRUCK_PAPER(

@@ -8,7 +8,9 @@ import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
+import com.issyzone.classicblulib.callback.DeviceBleInfoCall
 import com.issyzone.classicblulib.callback.SyzPrinterState2
+import com.issyzone.classicblulib.utils.AppGlobels
 import com.issyzone.classicblulib.utils.BitmapUtils
 import com.issyzone.classicblulib.utils.HeatShrinkUtils
 import com.issyzone.classicblulib.utils.SyzBitmapQueue
@@ -18,7 +20,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.util.ArrayList
 
 
@@ -35,7 +40,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         var bitmapWidth: Int = 0
         var bitmapHeight: Int = 0
         var printPage: Int = 1
-        var currentPaperSize: SyzPaperSize? = null
+        var currentPaperSize: SyzPaperSize=SyzPaperSize.SYZPAPER_JIANXI
         fun printerType(printerType: SyzPrinter) = apply { this.printerType = printerType }
         fun bitmapWidth(bitmapWidth: Int) = apply { this.bitmapWidth = bitmapWidth }
         fun bitmapHeight(bitmapHeight: Int) = apply { this.bitmapHeight = bitmapHeight }
@@ -57,6 +62,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     private val isCompress = SyzPrinterSetting.isSupportCompress(builder.printerType)
     private val isSupportPageMore = SyzPrinterSetting.isSupportPageMore(builder.printerType)
     private var totalPage = 0   //需要打印的总份数
+    private var isPrintPicToLocal=false  //是否把打印的图片保存到本地
     private val compressCode = if (isCompress) {
         1
     } else {
@@ -114,7 +120,25 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         return input.toList().chunked(chunkSize).map { it.toByteArray() }
     }
 
-
+    private val MAX_CROP_WIDTH_FM226=50*8 //模版宽度最大不超过52*8,超过了就裁剪
+    private val MAX_CROP_WIDTH_RW402B=102*8
+   suspend fun bitmap2Path(bitmap: Bitmap, path: String?): String? {
+       if (isPrintPicToLocal){
+           try {
+               val file = File(path)
+               file.parentFile?.mkdirs()
+               val os: OutputStream = FileOutputStream(file)
+               bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+               os.flush()
+               os.close()
+           } catch (e: Exception) {
+               Log.e(TAG, "", e)
+           }
+           return path
+       }else{
+           return ""
+       }
+    }
     //app一股脑把bitmap集合丢过来，bitmap里会重复,page可能多余2
     //不会有 ABx2  AA BB的情况  只有AB AB的情况
     suspend fun produceBitmaps2(bitmapList: MutableList<Bitmap>): SyzBitmapProcessor {
@@ -130,20 +154,25 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         val isAction4PrintMore = isSupportPageMore && (bitmapList.size == 1)  //是否执行4寸打印机的系统的多份逻辑
         bitmapList.forEachIndexed { index, bitmap ->
             val newBitmap = if (builder.printerType == SyzPrinter.SYZTWOINCH) {
-                //二寸打印机
+                //二寸打印机，加了排废，模版宽度最大不超过52*8,超过了就裁剪
                 val bitmapWidth = bitmap.width
-                if (bitmapWidth > 50 * 8) {
-                    Log.e(TAG, "宽度超过了2寸最大宽度开始裁剪")
-                    cropBitmapCenter(bitmap, 50 * 8)
+                if (bitmapWidth > MAX_CROP_WIDTH_FM226) {
+                    Log.e(TAG, "宽度${bitmapWidth}超过了2寸最大宽度${MAX_CROP_WIDTH_FM226}开始裁剪")
+                    val cropBitmap= cropBitmapCenter(bitmap, MAX_CROP_WIDTH_FM226)
+                    val filePath=File(AppGlobels.getApplication().externalCacheDir, "sdk_print").apply { mkdirs() }.absolutePath + File.separator+"print-" + System.currentTimeMillis() + ".png"
+
+                    bitmap2Path(cropBitmap,filePath)
+                    cropBitmap
                 } else {
-                    Log.i(TAG, "宽度没有超过了2寸最大宽度")
+                    Log.i(TAG, "宽度${bitmapWidth}没有超过了2寸最大宽度${MAX_CROP_WIDTH_FM226}")
                     bitmap
                 }
             } else if (builder.printerType == SyzPrinter.SYZFOURINCH) {
                 val bitmapWidth = bitmap.width
-                if (bitmapWidth > 102 * 8) {
+                if (bitmapWidth > MAX_CROP_WIDTH_RW402B) {
                     Log.e(TAG, "宽度超过了4寸最大宽度开始裁剪")
-                    cropBitmapCenter(bitmap, 102 * 8)
+                    val cropBitmap=cropBitmapCenter(bitmap, MAX_CROP_WIDTH_RW402B)
+                    cropBitmap
                 } else {
                     Log.i(TAG, "宽度没有超过了4寸最大宽度")
                     bitmap
@@ -570,6 +599,23 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 //纸张类型不一致,二寸要弹窗提示
                 Log.e(TAG, "纸张类型不一致${printerState}====${paperSize}====${builder.currentPaperSize}")
                 bitmapCall?.checkPaperSizeBeforePrint(false,paperSize,builder.currentPaperSize)
+                //纸张类型不一致的时候，要弹窗提示，发送当前类型
+              /*  val setPaperStatus=SyzClassicBluManager.getInstance().setPaperType(builder.currentPaperSize)
+                if (setPaperStatus==SyzPrinterState2.PRINTER_SET_PAPER_TYPE_OK){
+                    bitmapCall?.checkPaperSizeBeforePrint(true,builder.currentPaperSize,builder.currentPaperSize)
+                    if (printerState == SyzPrinterState2.PRINTER_OK) {
+                        Log.i(TAG, "打印机状态正常==${printerState}")
+                        //只有开始打印的时候才下发进度
+                        bitmapCall?.checkPrinterBeforePrint(true, SyzPrinterState2.PRINTER_OK)
+                        return true
+                    } else {
+                        Log.e(TAG, "打印机状态异常不能打印==${printerState}")
+                        bitmapCall?.checkPrinterBeforePrint(false, printerState)
+                    }
+                }else{
+                    Log.e(TAG, "设置纸张类型失败==${setPaperStatus}")
+                     bitmapCall?.checkPrinterBeforePrint(false, setPaperStatus)
+                }*/
             }
         } else {
             //四寸
@@ -588,9 +634,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         return false
     }
 
-    private suspend fun checkPrinterState(): Pair<SyzPaperSize?, SyzPrinterState2> {
-        return SyzClassicBluManager.getInstance().getPrintStatus()
-    }
+
 
 
     fun releaseResources() {

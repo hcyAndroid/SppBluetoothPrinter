@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    android:background="@drawable/shape_rectangle_cornor_20px_solid_f6f8fa"
+    android:orientation="horizontal">
+    <!--    -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="19dp"
+        android:layout_weight="7"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#222222"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="蓝牙的mac::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+                <EditText
+                    android:id="@+id/et_mac"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入adress"
+                    android:text="DC:0D:30:00:02:E5" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="打印page::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_print_page"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="请输入page"
+                    android:inputType="number"
+                    android:text="1" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="设置关机时间::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_close_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="请输入关机时间"
+                    android:inputType="number"
+                    android:text="1" />
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="打印速度::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_print_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="请输入速度"
+                    android:inputType="number"
+                    android:text="4" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="打印浓度::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_print_concentration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="请输入浓度"
+                    android:inputType="number"
+                    android:text="4" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="图片宽度::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_pic_width"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入宽"
+                    android:inputType="number"
+                    android:text="48" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="图片高度::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_pic_height"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入高"
+                    android:inputType="number"
+                    android:text="48" />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="黑标高度::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_heibiao_height"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入黑标高度"
+                    android:inputType="numberDecimal"
+                    android:text="0.0" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:text="黑标偏移::"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#222222"
+                    android:layout_marginRight="10dp"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_heibiao_offset"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:hint="输入黑标偏移"
+                    android:inputType="numberDecimal"
+                    android:text="0.0" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/tv_log"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:layout_margin="19dp"
+        android:layout_weight="4"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_device_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#222222"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_device_mac"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#222222"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_connect"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="连接"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_disconnect"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="断开连接"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_check"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="检查设备信息"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_self_checking"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="打印自检页"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tv_heibiao"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="发送黑标纸张命令"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_jianxi"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="间隙纸打印"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_lianxu"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="发送连续纸张命令"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tv_shutdown"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="设置关机时间"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_cancel_printer"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="取消打印"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_set_print_speed"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="设置打印速度"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_concentration"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="设置打印浓度"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img0"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="打印1张48*200"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/tv_set_print_img"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="自动打印2"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img2"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="自动打印1 "
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_set_print_img3"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="新算法打印压缩bitmap"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:id="@+id/tv_set_print_img4"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:visibility="gone"
+            android:text="测试发送下一段"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_dex_update"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="bin文件更新"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_dex_zitiupdate"
+            style="@style/text_30_54c727"
+            android:layout_height="0dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="bin字体更新"
+            android:textStyle="bold" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

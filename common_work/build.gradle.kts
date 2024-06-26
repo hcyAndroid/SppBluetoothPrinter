@@ -5,13 +5,12 @@ plugins {
 
 android {
     namespace = "com.issyzone.common_work"
-    compileSdkPreview = "TiramisuPrivacySandbox"
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         minSdkPreview = "TiramisuPrivacySandbox"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
     }
 
     buildTypes {
@@ -27,17 +26,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    viewBinding {
+        enable = true
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
 }
 
 dependencies {
+    implementation(libs.bundles.androidx)
+    implementation(libs.bundles.kotlin)
 
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.12.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

@@ -17,7 +17,7 @@ class WelcomeActivity : ComponentActivity() {
         }
 
         vm.tvTwoNew.setOnClickListener {
-            startActivity(Intent(WelcomeActivity@ this, MainActivity8::class.java))
+            startActivity(Intent(WelcomeActivity@ this, TwoInchActivity::class.java))
         }
 
         vm.tvFour.setOnClickListener {

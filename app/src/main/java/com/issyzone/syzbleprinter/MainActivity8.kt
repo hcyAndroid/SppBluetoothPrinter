@@ -16,6 +16,7 @@ import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.classicblulib.bean.LogLiveData
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzFirmwareType
+import com.issyzone.classicblulib.bean.SyzPaperSize
 import com.issyzone.classicblulib.bean.SyzPrinter
 import com.issyzone.classicblulib.callback.BluPrintingCallBack
 import com.issyzone.classicblulib.callback.CancelPrintCallBack
@@ -274,6 +275,14 @@ class MainActivity8 : ComponentActivity() {
                     }
                 }
 
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+
+                }
+
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
                     TODO("Not yet implemented")
                 }
@@ -390,6 +399,14 @@ class MainActivity8 : ComponentActivity() {
                     }
                 }
 
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
                     TODO("Not yet implemented")
                 }
@@ -462,6 +479,14 @@ class MainActivity8 : ComponentActivity() {
                     }
                 }
 
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
                     TODO("Not yet implemented")
                 }
@@ -509,6 +534,14 @@ class MainActivity8 : ComponentActivity() {
                     }
                 }
 
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+                    TODO("Not yet implemented")
+                }
+
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
                     TODO("Not yet implemented")
                 }
@@ -544,6 +577,14 @@ class MainActivity8 : ComponentActivity() {
                     } else {
                         Log.i("${TAG}>>>", "打印失败>>>>${isSuccess}===${msg}")
                     }
+                }
+
+                override fun checkPaperSizeBeforePrint(
+                    isSame: Boolean,
+                    printerSize: SyzPaperSize?,
+                    doPrintSize: SyzPaperSize?
+                ) {
+                    TODO("Not yet implemented")
                 }
 
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {

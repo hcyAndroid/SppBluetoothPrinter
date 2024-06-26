@@ -6,7 +6,7 @@ targetSdk="34"
 versionCode="1"
 versionName = "1.0.0"
 compose-bom = "androidx.compose:compose-bom:2023.08.00"
-appcompat = "1.6.1"
+appcompat = "1.7.0"
 material = "1.11.0"
 kotlin = "1.9.0"
 constraintlayout = "2.1.4"
@@ -14,7 +14,7 @@ org-jetbrains-kotlin-jvm = "1.9.0"
 activity-compose = "1.8.2"
 androidx-compose-compose-bom = "2023.08.00"
 agp = "8.2.2"
-core-ktx = "1.12.0"
+core-ktx = "1.13.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
@@ -31,8 +31,9 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 
 [libraries]
 protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version = "0.8.8" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version = "2.8.2" }
 
-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.7.0" }
+lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.8.2" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version = "2.7.7" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version = "2.7.7" }
 compose-ui = { module = "androidx.compose.ui:ui" }
@@ -140,7 +141,7 @@ blutooth-lib = { group = "com.gitee.xmingjie", name = "syz-editor", version = "v
 
 
 [bundles]
-androidx = ["lifecycle", "navigation-fragment-ktx", "navigation-ui-ktx", "page-runtime", "kotlin-std-lib", "swiperefreshlayout", "palette"]
+androidx = ["lifecycle","lifecycle-viewmodel", "navigation-fragment-ktx", "navigation-ui-ktx", "page-runtime", "kotlin-std-lib", "swiperefreshlayout", "palette"]
 compose = ["compose-ui", "compose-ui-graphics", "compose-ui-preview", "compose-material3"]
 compose-net-img = ["coil", "coil-gif", "coil-svg"]
 navi-plugin = ["asm", "asm-tree", "commons-io", "kotlinpoet", "agp"]
@@ -152,3 +153,4 @@ aspectj = ["aspectjtools", "aspectjweaver"]
 room = ["room-runtime", "room-ktx"]
 work-manager = ["work-runtime-ktx", "work-gcm", "work-testing", "work-multiprocess"]
 proto3=["protobuf-java"]
+kotlin=["core-ktx","appcompat","material"]

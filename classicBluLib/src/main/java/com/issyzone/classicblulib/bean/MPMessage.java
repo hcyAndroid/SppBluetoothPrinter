@@ -2934,6 +2934,12 @@ public final class MPMessage {
      * @return The paperType.
      */
     int getPaperType();
+
+    /**
+     * <code>int32 closeTime = 11;</code>
+     * @return The closeTime.
+     */
+    int getCloseTime();
   }
   /**
    * <pre>
@@ -2949,6 +2955,7 @@ public final class MPMessage {
    *paperSize: 尺寸类型
    *printStatus: 打印机状态
    *paperType: 纸张类型 1:间隙纸, 2:连续纸, 3:黑标纸
+   *closeTime: 当前设置的关机时间 (分钟)
    * </pre>
    *
    * Protobuf type {@code MPDeviceInfoMsg}
@@ -3051,6 +3058,11 @@ public final class MPMessage {
             case 80: {
 
               paperType_ = input.readInt32();
+              break;
+            }
+            case 88: {
+
+              closeTime_ = input.readInt32();
               break;
             }
             default: {
@@ -3305,6 +3317,17 @@ public final class MPMessage {
       return paperType_;
     }
 
+    public static final int CLOSETIME_FIELD_NUMBER = 11;
+    private int closeTime_;
+    /**
+     * <code>int32 closeTime = 11;</code>
+     * @return The closeTime.
+     */
+    @Override
+    public int getCloseTime() {
+      return closeTime_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @Override
     public final boolean isInitialized() {
@@ -3348,6 +3371,9 @@ public final class MPMessage {
       }
       if (paperType_ != 0) {
         output.writeInt32(10, paperType_);
+      }
+      if (closeTime_ != 0) {
+        output.writeInt32(11, closeTime_);
       }
       unknownFields.writeTo(output);
     }
@@ -3394,6 +3420,10 @@ public final class MPMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, paperType_);
       }
+      if (closeTime_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(11, closeTime_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3429,6 +3459,8 @@ public final class MPMessage {
           .equals(other.getPrintStatus())) return false;
       if (getPaperType()
           != other.getPaperType()) return false;
+      if (getCloseTime()
+          != other.getCloseTime()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3460,6 +3492,8 @@ public final class MPMessage {
       hash = (53 * hash) + getPrintStatus().hashCode();
       hash = (37 * hash) + PAPERTYPE_FIELD_NUMBER;
       hash = (53 * hash) + getPaperType();
+      hash = (37 * hash) + CLOSETIME_FIELD_NUMBER;
+      hash = (53 * hash) + getCloseTime();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3569,6 +3603,7 @@ public final class MPMessage {
      *paperSize: 尺寸类型
      *printStatus: 打印机状态
      *paperType: 纸张类型 1:间隙纸, 2:连续纸, 3:黑标纸
+     *closeTime: 当前设置的关机时间 (分钟)
      * </pre>
      *
      * Protobuf type {@code MPDeviceInfoMsg}
@@ -3628,6 +3663,8 @@ public final class MPMessage {
 
         paperType_ = 0;
 
+        closeTime_ = 0;
+
         return this;
       }
 
@@ -3664,6 +3701,7 @@ public final class MPMessage {
         result.paperSize_ = paperSize_;
         result.printStatus_ = printStatus_;
         result.paperType_ = paperType_;
+        result.closeTime_ = closeTime_;
         onBuilt();
         return result;
       }
@@ -3745,6 +3783,9 @@ public final class MPMessage {
         }
         if (other.getPaperType() != 0) {
           setPaperType(other.getPaperType());
+        }
+        if (other.getCloseTime() != 0) {
+          setCloseTime(other.getCloseTime());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4261,6 +4302,37 @@ public final class MPMessage {
       public Builder clearPaperType() {
         
         paperType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int closeTime_ ;
+      /**
+       * <code>int32 closeTime = 11;</code>
+       * @return The closeTime.
+       */
+      @Override
+      public int getCloseTime() {
+        return closeTime_;
+      }
+      /**
+       * <code>int32 closeTime = 11;</code>
+       * @param value The closeTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCloseTime(int value) {
+        
+        closeTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 closeTime = 11;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCloseTime() {
+        
+        closeTime_ = 0;
         onChanged();
         return this;
       }
@@ -6958,27 +7030,28 @@ public final class MPMessage {
       "\030\001 \001(\0162\n.EventType\022\014\n\004code\030\002 \001(\005\022\023\n\013resp" +
       "ondData\030\003 \001(\014\022\031\n\005error\030\004 \001(\0132\n.MPCodeMsg" +
       "\"\'\n\tMPCodeMsg\022\014\n\004code\030\001 \001(\005\022\014\n\004info\030\002 \001(" +
-      "\t\"\303\001\n\017MPDeviceInfoMsg\022\013\n\003mac\030\001 \001(\t\022\n\n\002sn" +
+      "\t\"\326\001\n\017MPDeviceInfoMsg\022\013\n\003mac\030\001 \001(\t\022\n\n\002sn" +
       "\030\002 \001(\t\022\023\n\013firmwareVer\030\003 \001(\t\022\023\n\013paperStat" +
       "us\030\004 \001(\005\022\014\n\004elec\030\005 \001(\005\022\025\n\rconcentration\030" +
       "\006 \001(\005\022\r\n\005speed\030\007 \001(\005\022\021\n\tpaperSize\030\010 \001(\005\022" +
-      "\023\n\013printStatus\030\t \001(\t\022\021\n\tpaperType\030\n \001(\005\"" +
-      "0\n\016MPPaperTypeMsg\022\016\n\006height\030\001 \001(\005\022\016\n\006off" +
-      "set\030\002 \001(\005\"\316\001\n\nMPPrintMsg\022\014\n\004page\030\001 \001(\005\022\017" +
-      "\n\007imgData\030\002 \001(\014\022\022\n\ndataLength\030\003 \001(\021\022\024\n\014t" +
-      "otalPackage\030\004 \001(\005\022\024\n\014indexPackage\030\005 \001(\005\022" +
-      "\r\n\005width\030\006 \001(\005\022\024\n\014totalSection\030\007 \001(\005\022\023\n\013" +
-      "compression\030\010 \001(\005\022\020\n\010lastPage\030\t \001(\005\022\025\n\rs" +
-      "ectionLength\030\n \001(\021\"\207\001\n\rMPFirmwareMsg\022\017\n\007" +
-      "crcCode\030\001 \001(\005\022\022\n\ndataLength\030\002 \001(\021\022\017\n\007bin" +
-      "Data\030\003 \001(\014\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014inde" +
-      "xPackage\030\005 \001(\005\022\024\n\014firmwareType\030\006 \001(\005*\340\001\n" +
-      "\tEventType\022\013\n\007DEFAULT\020\000\022\016\n\nDEVICEINFO\020\001\022" +
-      "\014\n\010SELFTEST\020\002\022\r\n\tCLOSETIME\020\003\022\017\n\013DEVICEPR" +
-      "INT\020\004\022\022\n\016CANCELPRINTING\020\005\022\020\n\014DEVICEREPOR" +
-      "T\020\006\022\023\n\017FIRMWAREUPGRADE\020\007\022\021\n\rPRINTINGSPEE" +
-      "D\020\010\022\030\n\024PRINTINCONCENTRATION\020\t\022\016\n\nPRINTIN" +
-      "END\020\n\022\020\n\014PAPERTYPESET\020\013b\006proto3"
+      "\023\n\013printStatus\030\t \001(\t\022\021\n\tpaperType\030\n \001(\005\022" +
+      "\021\n\tcloseTime\030\013 \001(\005\"0\n\016MPPaperTypeMsg\022\016\n\006" +
+      "height\030\001 \001(\005\022\016\n\006offset\030\002 \001(\005\"\316\001\n\nMPPrint" +
+      "Msg\022\014\n\004page\030\001 \001(\005\022\017\n\007imgData\030\002 \001(\014\022\022\n\nda" +
+      "taLength\030\003 \001(\021\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014" +
+      "indexPackage\030\005 \001(\005\022\r\n\005width\030\006 \001(\005\022\024\n\014tot" +
+      "alSection\030\007 \001(\005\022\023\n\013compression\030\010 \001(\005\022\020\n\010" +
+      "lastPage\030\t \001(\005\022\025\n\rsectionLength\030\n \001(\021\"\207\001" +
+      "\n\rMPFirmwareMsg\022\017\n\007crcCode\030\001 \001(\005\022\022\n\ndata" +
+      "Length\030\002 \001(\021\022\017\n\007binData\030\003 \001(\014\022\024\n\014totalPa" +
+      "ckage\030\004 \001(\005\022\024\n\014indexPackage\030\005 \001(\005\022\024\n\014fir" +
+      "mwareType\030\006 \001(\005*\340\001\n\tEventType\022\013\n\007DEFAULT" +
+      "\020\000\022\016\n\nDEVICEINFO\020\001\022\014\n\010SELFTEST\020\002\022\r\n\tCLOS" +
+      "ETIME\020\003\022\017\n\013DEVICEPRINT\020\004\022\022\n\016CANCELPRINTI" +
+      "NG\020\005\022\020\n\014DEVICEREPORT\020\006\022\023\n\017FIRMWAREUPGRAD" +
+      "E\020\007\022\021\n\rPRINTINGSPEED\020\010\022\030\n\024PRINTINCONCENT" +
+      "RATION\020\t\022\016\n\nPRINTINEND\020\n\022\020\n\014PAPERTYPESET" +
+      "\020\013b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -7007,7 +7080,7 @@ public final class MPMessage {
     internal_static_MPDeviceInfoMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MPDeviceInfoMsg_descriptor,
-        new String[] { "Mac", "Sn", "FirmwareVer", "PaperStatus", "Elec", "Concentration", "Speed", "PaperSize", "PrintStatus", "PaperType", });
+        new String[] { "Mac", "Sn", "FirmwareVer", "PaperStatus", "Elec", "Concentration", "Speed", "PaperSize", "PrintStatus", "PaperType", "CloseTime", });
     internal_static_MPPaperTypeMsg_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_MPPaperTypeMsg_fieldAccessorTable = new
