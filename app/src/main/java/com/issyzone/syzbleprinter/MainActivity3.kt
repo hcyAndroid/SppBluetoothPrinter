@@ -58,7 +58,7 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        val lo = "DC:0D:30:98:95:D5"
+        val lo = "DC:0D:30:98:95:CE"
         //val lo = "60:6E:41:A7:2D:D6"
         // val lo = "DC:0D:30:98:95:CF"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
@@ -240,7 +240,7 @@ class MainActivity3 : ComponentActivity() {
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
             LogLiveData.clearLog(vm.tvLog)
             SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
-                bitmap5,
+                bitmap5
             ), width, height, page, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")

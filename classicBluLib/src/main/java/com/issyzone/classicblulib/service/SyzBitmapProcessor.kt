@@ -60,7 +60,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
     private val duanChunkSize = SyzPrinterSetting.getfenDuanChunkSize(builder.printerType)
     private val chunkSizePack = SyzPrinterSetting.getchunkSizePack(builder.printerType)
     private val isCompress = SyzPrinterSetting.isSupportCompress(builder.printerType)
-    private val isSupportPageMore = SyzPrinterSetting.isSupportPageMore(builder.printerType)
+   // private val isSupportPageMore = SyzPrinterSetting.isSupportPageMore(builder.printerType)
     private var totalPage = 0   //需要打印的总份数
     private var isPrintPicToLocal=false  //是否把打印的图片保存到本地
     private val compressCode = if (isCompress) {
@@ -120,7 +120,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         return input.toList().chunked(chunkSize).map { it.toByteArray() }
     }
 
-    private val MAX_CROP_WIDTH_FM226=50*8 //模版宽度最大不超过52*8,超过了就裁剪
+    private val MAX_CROP_WIDTH_FM226=50*8 //模版宽度最大不超过50*8,超过了就裁剪
     private val MAX_CROP_WIDTH_RW402B=102*8
    suspend fun bitmap2Path(bitmap: Bitmap, path: String?): String? {
        if (isPrintPicToLocal){
@@ -151,7 +151,8 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             TAG,
             "准备打印机任务>>${bitmapList.size}张bitmap,一张${builder.printPage}份==总共要打印${totalPage}份"
         )
-        val isAction4PrintMore = isSupportPageMore && (bitmapList.size == 1)  //是否执行4寸打印机的系统的多份逻辑
+        val isPrintMore=bitmapList.size!=1 //判断多图还是单图
+        var isSupportPageMore=false
         bitmapList.forEachIndexed { index, bitmap ->
             val newBitmap = if (builder.printerType == SyzPrinter.SYZTWOINCH) {
                 //二寸打印机，加了排废，模版宽度最大不超过52*8,超过了就裁剪
@@ -180,11 +181,17 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             } else {
                 bitmap
             }
-            if (isAction4PrintMore) {
-                val duanListQueue = turnBitmapToDuanList(newBitmap, builder.printPage, index)
+            if (!isPrintMore) {
+                //单图
+                val duanREsult= turnBitmapToDuanList(newBitmap, builder.printPage, index)
+                val duanListQueue = duanREsult.second
+                isSupportPageMore=duanREsult.first
                 bitMapTaskQueue.add(duanListQueue)
             } else {
-                val duanListQueue = turnBitmapToDuanList(newBitmap, 1, index)
+                //多张图
+                val duanREsult=turnBitmapToDuanList(newBitmap, 1, index)
+                val duanListQueue = duanREsult.second
+                isSupportPageMore=duanREsult.first
                 bitMapTaskQueue.add(duanListQueue)
             }
         }
@@ -196,38 +203,40 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         }
         bitmapList.clear()
 
-        if (!isSupportPageMore) {
-            //二寸不支持打印多份
-            //重点复制多份
+        if (!isPrintMore) {
+            //单图打印，分两种情况，2寸超过10k不支持page,不超过就支持page
+            if (isSupportPageMore){
+                Log.i(TAG, "打印机${builder.printerType}打印任务>>${bitMapTaskQueue.size()}张bitmap,一张${builder.printPage}份==总共要打印${totalPage}份==是否支持page多份${isSupportPageMore}")
+            }else{
+                if (builder.printPage > 1) {
+                    bitMapTaskQueue.duplicateElements(builder.printPage)
+                }
+                Log.i(TAG, "打印机${builder.printerType}打印任务>>${bitMapTaskQueue.size()}张bitmap,一张1份==总共要打印${totalPage}份==是否支持page多份${isSupportPageMore}")
+            }
+        } else {
+            //多图打印,PDF
             if (builder.printPage > 1) {
                 bitMapTaskQueue.duplicateElements(builder.printPage)
             }
-            Log.i(
-                TAG,
-                "2寸打印机任务>>${bitMapTaskQueue.size()}张bitmap,一张1份==总共要打印${totalPage}份"
+            Log.i(TAG,
+                "打印机${builder.printerType}多图打印任务>>${bitMapTaskQueue.size()}张bitmap,一张1份==总共要打印${totalPage}份"
             )
-        } else {
-            //四寸支持打印多份
+
+            /*//四寸支持打印多份
             if (isAction4PrintMore) {
                 //不需要复制，因为硬件的page已经设置了
 
                 Log.i(
                     TAG,
-                    "4寸打印机单张图任务>>${bitMapTaskQueue.size()}张bitmap,一张${builder.printPage}份==总共要打印${totalPage}份"
+                    "打印机${builder.printerType}单张图任务>>${bitMapTaskQueue.size()}张bitmap,一张${builder.printPage}份==总共要打印${totalPage}份"
                 )
 
 
             } else {
                 //打印PDF
-                if (builder.printPage > 1) {
-                    bitMapTaskQueue.duplicateElements(builder.printPage)
-                }
-                Log.i(
-                    TAG,
-                    "4寸打印机PDF任务>>${bitMapTaskQueue.size()}张bitmap,一张1份==总共要打印${totalPage}份"
-                )
 
-            }
+
+            }*/
 
         }
 
@@ -254,7 +263,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
      * 方法是将位图列表转换为打印任务队列，每个打印任务是一个分解后的位图数据队列
      * ABC  page=2  ABC ABC
      */
-    suspend fun produceBitmaps(bitmapList: MutableList<Bitmap>): SyzBitmapProcessor {
+ /*   suspend fun produceBitmaps(bitmapList: MutableList<Bitmap>): SyzBitmapProcessor {
         initPrinterParams()
         val printTaskLength = bitmapList.size * (builder.printPage)
         totalPage = printTaskLength
@@ -288,13 +297,13 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         }
         return this
     }
-
+*/
     /**
      * 把图片变成段的集合
      */
     private suspend fun turnBitmapToDuanList(
         bitmap: Bitmap, page: Int, index: Int
-    ): SyzBitmapQueue<ArrayList<MPMessage.MPSendMsg>> {
+    ): Pair<Boolean,SyzBitmapQueue<ArrayList<MPMessage.MPSendMsg>>> {
         Log.i(
             TAG,
             "Bitmap${index}===开始处理图片===width==${bitmap.width}==height==${bitmap.height}===${builder.bitmapWidth}"
@@ -304,6 +313,8 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         //存放一张图片所有的段数据
         val bitmapDuanListQueue =
             SyzBitmapQueue<ArrayList<MPMessage.MPSendMsg>>(bitMapFenDuanList.size)
+        val duanArrayList= mutableListOf<ByteArray>() //一张图片所有的段集合
+        var oneBitmapTotalSize=0
         bitMapFenDuanList.forEachIndexed { indexDuan, duanBytes ->
             Log.i(TAG, "Bitmap${index}第${indexDuan}段压缩前的大小${duanBytes.size}")
             val duanByteArray = if (isCompress) {
@@ -325,6 +336,31 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 Log.i(TAG, "Bitmap${index}===第${indexDuan}段不压缩的大小${duanBytes.size}")
                 duanBytes
             }
+            oneBitmapTotalSize+=duanByteArray.size
+            duanArrayList.add(duanByteArray)
+        }
+        val isSupportPage=when(builder.printerType){
+              SyzPrinter.SYZTWOINCH->{
+                  oneBitmapTotalSize < 10*1024
+              }
+              SyzPrinter.SYZFOURINCH->{
+                true
+             }
+             SyzPrinter.SYZZEROFIVE->{
+                false
+             }
+             else->{
+                false
+             }
+        }
+        val truePage=if (isSupportPage){
+            page
+        }else{
+            1
+        }
+        Log.i(TAG,"当前设备${builder.printerType}是否支持page多份==${isSupportPage}==图片分段压缩后的合计大小${oneBitmapTotalSize}")
+        //每段遍历处理数据
+        duanArrayList.forEachIndexed { indexDuan, duanByteArray ->
             //每段再分包
             val bitMapFenBaoList = splitByteArray(duanByteArray, chunkSizePack)
             val totalBaoEachDuan = bitMapFenBaoList.size
@@ -333,7 +369,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 "Bitmap${index}===第${indexDuan}段按${chunkSizePack}分了${bitMapFenBaoList.size}包==page=${page}"
             )
             val baoDataEachDuanList = arrayListOf<MPMessage.MPSendMsg>()
-            //遍历每段里的每个包
+
             bitMapFenBaoList.forEachIndexed { baoIndex, baoBytes ->
                 Log.i(
                     TAG,
@@ -341,7 +377,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                 )
                 if (baoIndex == 0) {
                     //第一包传宽高
-                    val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                    val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(truePage)
                         .setDataLength(bitmapPrintArray.size)
                         .setImgData(ByteString.copyFrom(baoBytes))
                         .setTotalSection(bitMapFenDuanList.size).setIndexPackage(baoIndex + 1)
@@ -352,7 +388,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
                         .setSendData(mPPrintMsg.toByteString()).build()
                     baoDataEachDuanList.add(baoData)
                 } else {
-                    val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(page)
+                    val mPPrintMsg = MPMessage.MPPrintMsg.newBuilder().setPage(truePage)
                         .setDataLength(bitmapPrintArray.size)
                         .setTotalSection(bitMapFenDuanList.size)
                         .setImgData(ByteString.copyFrom(baoBytes)).setIndexPackage(baoIndex + 1)
@@ -366,7 +402,9 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             }
             bitmapDuanListQueue.add(baoDataEachDuanList)
         }
-        return bitmapDuanListQueue
+
+
+        return Pair(isSupportPage,bitmapDuanListQueue)
     }
 
 
@@ -386,7 +424,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             "准备PDF打印机任务>>${bitmapList.size}张bitmap,打印${builder.printPage}份==总共要打印${totalPage}份"
         )
         bitmapList.forEachIndexed { index, bitmap ->
-            val duanListQueue = turnBitmapToDuanList(bitmap, 1, index)
+            val duanListQueue = turnBitmapToDuanList(bitmap, 1, index).second
             if (bitmap != null && !(bitmap.isRecycled)) {
                 bitmap.recycle()//回收
             }
@@ -466,10 +504,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         } else {
             if (isCancelPrinting) {
                 //取消打印
-                Log.i(
-                    TAG,
-                    "收到取消打印的标记，清空所有的任务=已经发送的图片数==${bitmapProcessed}==已经打印的图片数==${printerIndex}"
-                )
+                Log.i(TAG, "收到取消打印的标记，清空所有的任务=已经发送的图片数==${bitmapProcessed}==已经打印的图片数==${printerIndex}")
 
                 closePrinterTask()
             } else {
@@ -655,6 +690,14 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         bitMapTaskQueue.clear()
         // 日志输出，表示已释放资源
         Log.i(TAG, "All resources have been released.")
+    }
+
+    fun handlePrinterError(code: Int) {
+        Log.e(TAG,"打印过程中发生了错误${code}==当前的打印状态${isPrintingState}")
+        if (isPrintingState) {
+            bitmapCall?.getPrintResult(false, SyzPrinterState2.PRINTER_PRINTING_DEVICE_ERROR)
+            isPrintingState = false
+        }
     }
 
 }

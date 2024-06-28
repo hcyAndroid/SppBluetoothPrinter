@@ -122,7 +122,7 @@ class MainActivity4 : ComponentActivity() {
         //val lo = "03:22:5A:2F:EE:86"  //硬件的机器
          //val lo = "03:26:A0:AE:0B:57"// ios
         //val lo = "03:03:46:3D:A2:DE"//二寸新机器
-        val lo = "03:03:99:F3:2D:15"//二寸新机器
+        val lo = "03:02:F3:D9:DA:4A"//二寸新机器
         //val lo = "03:02:F3:D9:DA:4A"
        // 03:02::::
         // val lo = "03:25:70:6A:BF:45"
@@ -308,9 +308,7 @@ class MainActivity4 : ComponentActivity() {
                     Log.i("${TAG}>>>", "checkPrinterBeforePrint>>>>${isOK}===${msg}===")
 
                 }
-
-
-            },SyzPaperSize.SYZPAPER_HEIBIAO)
+            },SyzPaperSize.SYZPAPER_JIANXI)
 
 
         }

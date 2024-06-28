@@ -20,7 +20,7 @@ class TwoInchActivity : BaseMviAppCompatActivity<TwoInchViewModel, ActivityTwoIn
     }
     override fun initData() {
         LogLiveData.showLogs(this, mBinding.tvLog)
-        mBinding.etMac.setText("03:03:A1:4D:E6:F5")
+        mBinding.etMac.setText("03:02:F3:D9:DA:4A")
         lifecycleScope.launchWhenStarted { }
         mViewModel.sendUiIntent(TwoInchItent.initSDk)
         mBinding.tvConnect.setOnClickListener {

@@ -58,6 +58,7 @@ class SyzClassicBluManager {
         private const val DEX_UPDATE_CODE = 400  //固件升级任务回调
         private const val PIC_SEND_NEXT_CODE = 11  //消费下一段数据,图片打印
         private const val DEX_SEND_NEXT_CODE = 12  //消费下一个4k,固件升级
+        private const val PRINTER_PRINT_ERROR_CODE2=4
         private const val RETURN_PRINT_STATE_CODE = 10  //返回打印机的状态
         private const val ORDER_RECIVER_SUCCESS = 200  //命令接收成功
         private var instance: SyzClassicBluManager? = null
@@ -289,6 +290,10 @@ class SyzClassicBluManager {
                                     //消费下一段数据,图片打印
                                     bitmapPrintHandler?.consumeDuansOneBitmap()
                                 }
+                            }
+                            PRINTER_PRINT_ERROR_CODE2 ->{
+                                bitmapPrintHandler?.handlePrinterError(PRINTER_PRINT_ERROR_CODE2)
+
                             }
 
                             DEX_SEND_NEXT_CODE -> {

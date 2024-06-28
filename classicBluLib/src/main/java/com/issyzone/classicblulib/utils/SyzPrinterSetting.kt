@@ -4,11 +4,16 @@ package com.issyzone.classicblulib.utils
 import com.issyzone.classicblulib.bean.SyzPrinter
 
 object SyzPrinterSetting {
+
+
+
+
+
     //是否支持打印多份
     fun isSupportPageMore(printerType: SyzPrinter): Boolean {
         return when (printerType) {
             SyzPrinter.SYZTWOINCH -> {
-                false
+                true
             }
 
             SyzPrinter.SYZFOURINCH -> {
