@@ -27,5 +27,5 @@ include(":app")
 include(":BleLibs")
 include(":classicBluLib")
 include(":opencvsdk")
-//include(":syzlivechat")
+include(":syzlivechat")
 include ':common_work'

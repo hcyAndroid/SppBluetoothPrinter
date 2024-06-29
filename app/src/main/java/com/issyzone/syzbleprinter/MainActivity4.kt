@@ -238,7 +238,7 @@ class MainActivity4 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
 
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(71).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(76).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {

@@ -218,8 +218,9 @@ class SyzClassicBluManager {
                 }
 
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEPRINT) {
-                    if (mpRespondMsg.code == 4) {
+                    if (mpRespondMsg.code == PRINTER_PRINT_ERROR_CODE2) {
                         Log.e(TAG, "打印机打印图片出错")
+                        bitmapPrintHandler?.handlePrinterError(PRINTER_PRINT_ERROR_CODE2)
                     }
                 }
                 if (mpRespondMsg.eventType == MPMessage.EventType.DEVICEREPORT) {
@@ -291,10 +292,10 @@ class SyzClassicBluManager {
                                     bitmapPrintHandler?.consumeDuansOneBitmap()
                                 }
                             }
-                            PRINTER_PRINT_ERROR_CODE2 ->{
-                                bitmapPrintHandler?.handlePrinterError(PRINTER_PRINT_ERROR_CODE2)
-
-                            }
+//                            PRINTER_PRINT_ERROR_CODE2 ->{
+//                                bitmapPrintHandler?.handlePrinterError(PRINTER_PRINT_ERROR_CODE2)
+//
+//                            }
 
                             DEX_SEND_NEXT_CODE -> {
                                 if (mpCodeMsg.info == "2") {
