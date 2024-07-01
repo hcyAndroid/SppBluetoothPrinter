@@ -28,7 +28,7 @@ class TwoInchActivity : BaseMviAppCompatActivity<TwoInchViewModel, ActivityTwoIn
             mViewModel.sendUiIntent(TwoInchItent.connectDevice(mac))
         }
         mBinding.tvDexUpdate.setOnClickListener {
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(74).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(79).bin")
             mViewModel.sendUiIntent(TwoInchItent.updateDex(path))
         }
 

@@ -1,5 +1,5 @@
 {
-  "installationFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\prefab_package\\release\\prefab",
+  "installationFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\prefab_package\\release\\prefab",
   "gradlePath": ":opencvsdk",
   "packageInfo": {
     "packageName": "opencvsdk",
@@ -8,7 +8,7 @@
     "modules": [
       {
         "moduleName": "opencv_jni_shared",
-        "moduleHeaders": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\native\\jni\\include",
+        "moduleHeaders": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\native\\jni\\include",
         "moduleExportLibraries": [],
         "abis": []
       }

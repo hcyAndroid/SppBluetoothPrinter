@@ -6,9 +6,9 @@
     "deprecated": false,
     "default": true
   },
-  "cxxBuildFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\x86",
-  "soFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
-  "soRepublishFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cmake\\debug\\obj\\x86",
+  "cxxBuildFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\x86",
+  "soFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
+  "soRepublishFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cmake\\debug\\obj\\x86",
   "abiPlatformVersion": 21,
   "cmake": {
     "effectiveConfiguration": {
@@ -38,13 +38,13 @@
     ],
     "cmakeSettingsConfiguration": "android-gradle-plugin-predetermined-name",
     "module": {
-      "cxxFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\.cxx",
-      "intermediatesBaseFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates",
-      "intermediatesFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx",
+      "cxxFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\.cxx",
+      "intermediatesBaseFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates",
+      "intermediatesFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx",
       "gradleModulePathName": ":opencvsdk",
-      "moduleRootFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk",
-      "moduleBuildFile": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build.gradle",
-      "makeFile": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\libcxx_helper\\CMakeLists.txt",
+      "moduleRootFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk",
+      "moduleBuildFile": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build.gradle",
+      "makeFile": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\libcxx_helper\\CMakeLists.txt",
       "buildSystem": "CMAKE",
       "ndkFolder": "C:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk\\ndk\\25.1.8937393",
       "ndkVersion": "25.1.8937393",
@@ -128,7 +128,7 @@
         "SYSTEM": {}
       },
       "project": {
-        "rootBuildGradleFolder": "D:\\bluetoothPrinter\\bluetoothPrinter",
+        "rootBuildGradleFolder": "D:\\MyAndroid\\bluetoothPrinter",
         "sdkFolder": "C:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk",
         "isBuildOnlyTargetAbiEnabled": true,
         "isCmakeBuildCohabitationEnabled": false,
@@ -147,12 +147,12 @@
   "buildSettings": {
     "environmentVariables": []
   },
-  "prefabFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\prefab\\x86",
+  "prefabFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\prefab\\x86",
   "isActiveAbi": true,
   "fullConfigurationHash": "4ul6e5j21r2i243t2f5e606y0736k64192k503z5b5q2u701o3e581e214g4w",
   "fullConfigurationHashKey": "# Values used to calculate the hash in this folder name.\n# Should not depend on the absolute path of the project itself.\n#   - AGP: 8.1.2.\n#   - $NDK is the path to NDK 25.1.8937393.\n#   - $PROJECT is the path to the parent folder of the root Gradle build file.\n#   - $ABI is the ABI to be built with. The specific value doesn\u0027t contribute to the value of the hash.\n#   - $HASH is the hash value computed from this text.\n#   - $CMAKE is the path to CMake 3.22.1.\n#   - $NINJA is the path to Ninja.\n-H$PROJECT/opencvsdk/libcxx_helper\n-DCMAKE_SYSTEM_NAME\u003dAndroid\n-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON\n-DCMAKE_SYSTEM_VERSION\u003d21\n-DANDROID_PLATFORM\u003dandroid-21\n-DANDROID_ABI\u003d$ABI\n-DCMAKE_ANDROID_ARCH_ABI\u003d$ABI\n-DANDROID_NDK\u003d$NDK\n-DCMAKE_ANDROID_NDK\u003d$NDK\n-DCMAKE_TOOLCHAIN_FILE\u003d$NDK/build/cmake/android.toolchain.cmake\n-DCMAKE_MAKE_PROGRAM\u003d$NINJA\n-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003d$PROJECT/opencvsdk/build/intermediates/cxx/Debug/$HASH/obj/$ABI\n-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003d$PROJECT/opencvsdk/build/intermediates/cxx/Debug/$HASH/obj/$ABI\n-DCMAKE_BUILD_TYPE\u003dDebug\n-B$PROJECT/opencvsdk/.cxx/Debug/$HASH/$ABI\n-GNinja\n-DANDROID_STL\u003dc++_shared",
   "configurationArguments": [
-    "-HD:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\libcxx_helper",
+    "-HD:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\libcxx_helper",
     "-DCMAKE_SYSTEM_NAME\u003dAndroid",
     "-DCMAKE_EXPORT_COMPILE_COMMANDS\u003dON",
     "-DCMAKE_SYSTEM_VERSION\u003d21",
@@ -163,13 +163,13 @@
     "-DCMAKE_ANDROID_NDK\u003dC:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk\\ndk\\25.1.8937393",
     "-DCMAKE_TOOLCHAIN_FILE\u003dC:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk\\ndk\\25.1.8937393\\build\\cmake\\android.toolchain.cmake",
     "-DCMAKE_MAKE_PROGRAM\u003dC:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
-    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dD:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
-    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dD:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
+    "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY\u003dD:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
+    "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY\u003dD:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2\\obj\\x86",
     "-DCMAKE_BUILD_TYPE\u003dDebug",
-    "-BD:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\x86",
+    "-BD:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\.cxx\\Debug\\4ul6e5j2\\x86",
     "-GNinja",
     "-DANDROID_STL\u003dc++_shared"
   ],
   "stlLibraryFile": "C:\\Users\\SYZ-RD\\AppData\\Local\\Android\\Sdk\\ndk\\25.1.8937393\\toolchains\\llvm\\prebuilt\\windows-x86_64\\sysroot\\usr\\lib\\i686-linux-android\\libc++_shared.so",
-  "intermediatesParentFolder": "D:\\bluetoothPrinter\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2"
+  "intermediatesParentFolder": "D:\\MyAndroid\\bluetoothPrinter\\opencvsdk\\build\\intermediates\\cxx\\Debug\\4ul6e5j2"
 }

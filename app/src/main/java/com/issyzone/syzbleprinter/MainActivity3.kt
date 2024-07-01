@@ -58,7 +58,7 @@ class MainActivity3 : ComponentActivity() {
 //        val lo = "DC:0D:30:00:02:E5"
         //val lo = "DC:0D:30:00:02:DE"
        // val lo = "DC:0D:30:00:02:DB"
-        val lo = "DC:0D:30:98:95:CE"
+        val lo = "DC:0D:30:98:95:F4"
         //val lo = "60:6E:41:A7:2D:D6"
         // val lo = "DC:0D:30:98:95:CF"//硬件那的mac
         // val lo = "DC:0D:30:00:02:DC"
@@ -126,11 +126,9 @@ class MainActivity3 : ComponentActivity() {
             }
 
             override fun onConnectSuccess(device: BluetoothDevice) {
-                if (ContextCompat.checkSelfPermission(this@MainActivity3, Manifest.permission.BLUETOOTH) == PackageManager.PERMISSION_GRANTED) {
-                    Log.i("SYZ>>>", "onConnectSuccess==${device.name}====${device.address}")
-                    LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
-                    SpUtils.saveData("mac4", device.address)
-                }
+                Log.i("SYZ>>>", "onConnectSuccess==${device.name}====${device.address}")
+                LogLiveData.addLogs("经典蓝牙连接成功==${device.name}====${device.address}")
+                SpUtils.saveData("mac4", device.address)
 
             }
 
@@ -179,7 +177,7 @@ class MainActivity3 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_V01.01.16.bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("rw402_pa_V01.01.17.bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
@@ -564,7 +562,7 @@ class MainActivity3 : ComponentActivity() {
 
         vm.tvDexZitiupdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("font(2).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("font.bin")
             path?.apply {
                 SyzClassicBluManager.getInstance()
                     .writeDex(this, type = SyzFirmwareType.SYZFIRMWARETYPE02) {
