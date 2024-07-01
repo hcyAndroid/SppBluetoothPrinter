@@ -120,8 +120,11 @@ class SyzClassicBluManager {
 
             override fun onConnectSuccess(device: BluetoothDevice) {
                 Log.i(TAG, "连接设备>>>${device.name}")
+                //it.device.lowercase().startsWith(device.name.lowercase())
                 currentPrintType = SyzPrinter.values()
-                    .find { it.device.lowercase().startsWith(device.name.lowercase()) } ?: return
+                    .find {
+                        device.name.lowercase().startsWith(it.device.lowercase())
+                    } ?: return
                 Log.i(TAG, "连接到SYZ设备>>>${device.name}==${currentPrintType}")
                 bluScope = CoroutineScope(Dispatchers.IO)
                 bluScope?.launch {
