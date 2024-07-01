@@ -5,4 +5,5 @@ import com.issyzone.syzlivechat.SyzExcelUtils
 fun main(){
     SyzExcelUtils.getExcelData()
     //SyzExcelUtils.writeToExcel()
+    Thread.sleep(10000)
 }

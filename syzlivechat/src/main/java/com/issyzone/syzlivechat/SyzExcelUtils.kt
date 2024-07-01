@@ -12,7 +12,7 @@ import javax.xml.parsers.SAXParserFactory
 object SyzExcelUtils {
     private val TAG = "SyzExcelUtils>>>>"
     private val labelIdAndRoidINdex=0   //Android 标签id再表格中的位置
-    private val labelTypeIndex=2   //标签类型再表格中的位置
+    private val labelTypeIndex=1  //标签类型再表格中的位置
     fun writeToExcel() {
         val item = ITEM(
             mutableListOf(
@@ -124,7 +124,7 @@ object SyzExcelUtils {
         val sheet = workbook.getSheetAt(0)
         val data = mutableListOf<ITEM>()
         val rowNums = sheet.physicalNumberOfRows
-        // Log.d(TAG,"表格行数====${rowNums}")
+        println("表格行数====${rowNums}")
         val rowZero = sheet.getRow(0)
         val zeroCellNUms = rowZero.physicalNumberOfCells
         val item = ITEM(mutableListOf())
@@ -135,8 +135,7 @@ object SyzExcelUtils {
                 )
             )
         }
-        println("表格行数====${rowNums}")
-        for (i in 1 until rowNums) {
+        for (i in 1 until (rowNums-1)) {
             val row = sheet.getRow(i)
             val cellNums = row.physicalNumberOfCells
             println("第${i}行有${cellNums}列")
@@ -165,12 +164,14 @@ object SyzExcelUtils {
             }
         }
 
-       /* for (language in enumValues<SupprotLanguage>()) {
+        for (language in enumValues<SupprotLanguage>()) {
             val file = File(language.valuePath)
             file.parentFile.mkdirs()
             val fos = FileOutputStream(file)
             fos.write("<resources>\n".toByteArray())
             //写入数据
+
+
             val stringArrayList = data.filter {
                 it.valueList.get(labelTypeIndex).tagValue == "string-array"
             }.toMutableList()
@@ -205,7 +206,7 @@ object SyzExcelUtils {
             }
             fos.write("</resources>".toByteArray())
             fos.close()
-        }*/
+        }
     }
 
     fun strParse(str: String?): String {
