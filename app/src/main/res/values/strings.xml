@@ -262,4 +262,7 @@
 <string name="wifi_lan_connect_tutorial_1">The phone needs to be connected to %s first</string>
 <string name="wifi_lan_connect_tutorial_2">Return to this page, confirm the WiFi name and enter the WIFI password</string>
 <string name="wifi_lan_connect_tutorial_3">Click the "Start connecting" button</string>
+<string name="contact_us">Contact Us111</string>
+<string name="ddd">3333</string>
+<string name="ddd1">2222</string>
 </resources>

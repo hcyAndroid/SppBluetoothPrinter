@@ -1,4 +1,6 @@
 package com.issyzone.syzlivechat
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -118,6 +120,22 @@ object SyzExcelUtils {
         // Closing the workbook
         workbook.close()
     }
+    fun getCellValue(cell: Cell?): String {
+        if (cell == null) {
+            return ""
+        }
+        return when (cell.cellType) {
+            CellType.STRING -> cell.stringCellValue
+            CellType.NUMERIC -> {   val numericValue = cell.numericCellValue
+                if (numericValue % 1 == 0.0) {
+                    numericValue.toInt().toString()
+                } else {
+                    numericValue.toString()
+                }
+            }
+            else -> ""
+        }
+    }
 
     fun getExcelData() {
         val workbook = XSSFWorkbook(File("workbook.xlsx"))
@@ -135,25 +153,34 @@ object SyzExcelUtils {
                 )
             )
         }
-        for (i in 1 until (rowNums-1)) {
+        for (i in 1 .. (rowNums-1)) {
             val row = sheet.getRow(i)
             val cellNums = row.physicalNumberOfCells
-            println("第${i}行有${cellNums}列")
-            if (cellNums != zeroCellNUms) {
-                throw Exception("内容列数和开头标准不一致")
+            //println("第${i}行有${cellNums}列")
+//            if (cellNums != zeroCellNUms) {
+//                throw Exception("第${i}内容列数和开头标准不一致")
+//            }
+            //判断id 和 type 是否存在 数据是否存在
+            val id =getCellValue(row.getCell(labelIdAndRoidINdex))
+            val type = getCellValue(row.getCell(labelTypeIndex))
+            if (id.isNullOrEmpty() || type.isNullOrEmpty()) {
+                println("第${i}行的id或者type为空")
+                continue
+            }else{
+                println("第${i}行的数据正常")
+                val currentItem = deepCopy(item)
+                for (j in 0 until cellNums) {
+                    currentItem.valueList.get(j).tagValue = "${getCellValue(row.getCell(j))}"
+                    // println("第${i}行第${j}列的数据是${row.getCell(j)?.stringCellValue}")
+                }
+                data.add(currentItem)
             }
-            val currentItem = deepCopy(item)
-            for (j in 0 until cellNums) {
-                currentItem.valueList.get(j).tagValue = "${row.getCell(j)?.stringCellValue}"
-               // println("第${i}行第${j}列的数据是${row.getCell(j)?.stringCellValue}")
-            }
-            data.add(currentItem)
         }
 
         data.forEach {
             println("${it.valueList.toString()}")
         }
-        println("读到了表格${data.size}行数据")
+        println("读到了表格${data.size}条合理数据")
         for (language in enumValues<SupprotLanguage>()) {
             println("语言: ${language.name}, 路径: ${language.valuePath}, Excel 名称: ${language.excelName}")
             val currentXmlHandler = readXMlFile(language.valuePath)
