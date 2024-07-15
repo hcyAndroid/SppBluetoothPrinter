@@ -12,12 +12,10 @@ import com.issyzone.syzbleprinter.intent.TwoInchItent
 import com.issyzone.syzbleprinter.viewmodel.TwoInchViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TwoInchActivity : BaseMviAppCompatActivity<TwoInchViewModel, ActivityTwoInchBinding>() {
-
-    private fun log(text:String){
-        LogLiveData.addLogs(text)
-    }
+    override val mViewModel : TwoInchViewModel by viewModel()
     override fun initData() {
         LogLiveData.showLogs(this, mBinding.tvLog)
         mBinding.etMac.setText("03:02:F3:D9:DA:4A")
@@ -135,6 +133,8 @@ class TwoInchActivity : BaseMviAppCompatActivity<TwoInchViewModel, ActivityTwoIn
         }
 
 
-   // }
+    private fun log(text:String){
+        LogLiveData.addLogs(text)
+    }
 
 }

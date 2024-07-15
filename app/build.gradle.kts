@@ -13,11 +13,16 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = libs.versions.versionCode.get().toInt()
         versionName = libs.versions.versionName.get()
-
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters.add("armeabi")
+           // 可以添加更多的架构，如 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     buildTypes {
@@ -65,9 +70,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.preview)
     implementation("androidx.compose.material3:material3")
 
     implementation("com.google.android.material:material:1.11.0")
@@ -85,6 +90,7 @@ dependencies {
 
     // api(libs.logger)
     api(libs.bundles.proto3)
+
     // implementation(files(fileTree(libsDir) { include("arr*.jar") }))
     // implementation(project(":BleLibs"))
     //implementation(project(":classicBluLib"))

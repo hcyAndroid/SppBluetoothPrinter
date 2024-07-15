@@ -4,6 +4,9 @@ import android.bluetooth.BluetoothDevice
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.issyzone.blelibs.utils.ImageUtilKt
 import com.issyzone.classicblulib.bean.MPMessage
 import com.issyzone.classicblulib.bean.SyzFirmwareType
@@ -22,14 +25,26 @@ import com.issyzone.common_work.mvi.BaseMviViewModel
 import com.issyzone.common_work.mvi.IUiIntent
 import com.issyzone.common_work.mvi.LoadUiState
 import com.issyzone.syzbleprinter.R
+import com.issyzone.syzbleprinter.adapter.BlueScanPagingSource
 import com.issyzone.syzbleprinter.intent.SPPrinterUIState
 import com.issyzone.syzbleprinter.intent.TwoInchItent
 import com.issyzone.syzbleprinter.intent.TwoInchUIEffect
 import com.issyzone.syzbleprinter.intent.TwoInchUIState
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 
 class TwoInchViewModel : BaseMviViewModel<TwoInchItent, TwoInchUIState, TwoInchUIEffect>() {
+
+    fun getScanDeviceList(): Flow<PagingData<BluetoothDevice>> {
+         return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = { BlueScanPagingSource() }
+        ).flow
+    }
 
     private val TAG = "TwoInchViewModel"
     override fun initUiState(): TwoInchUIState {

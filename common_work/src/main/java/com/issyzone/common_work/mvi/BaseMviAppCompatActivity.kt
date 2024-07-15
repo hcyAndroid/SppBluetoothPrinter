@@ -9,7 +9,7 @@ import java.lang.reflect.ParameterizedType
 
 
 abstract class BaseMviAppCompatActivity<VM:ViewModel, VB: ViewBinding> :BaseAppCompatActivity(){
-    protected lateinit var mViewModel: VM
+    protected abstract val mViewModel: VM
 
     private var _binding: VB? = null
     protected val mBinding: VB
@@ -43,7 +43,7 @@ abstract class BaseMviAppCompatActivity<VM:ViewModel, VB: ViewBinding> :BaseAppC
 
     override fun setContentView() {
         setContentView(mBinding.root)
-        mViewModel = createViewModel()
+      //  mViewModel = createViewModel()
     }
 
     override fun onDestroy() {

@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.issyzone.blelibs.utils.ImageUtilKt
 
 
@@ -38,6 +39,10 @@ import com.issyzone.syzbleprinter.databinding.ActivityMain3Binding
 import com.issyzone.syzbleprinter.utils.OpenCVUtils
 
 import com.issyzone.syzbleprinter.utils.invokeViewBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.opencv.android.OpenCVLoader
 
 
@@ -113,9 +118,8 @@ class MainActivity4 : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
-
        // val tag = OpenCVLoader.initLocal()
-
+        val  a=1/0
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
