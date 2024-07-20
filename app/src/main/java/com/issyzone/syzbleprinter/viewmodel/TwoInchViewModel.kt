@@ -31,11 +31,16 @@ import com.issyzone.syzbleprinter.intent.TwoInchItent
 import com.issyzone.syzbleprinter.intent.TwoInchUIEffect
 import com.issyzone.syzbleprinter.intent.TwoInchUIState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 
 class TwoInchViewModel : BaseMviViewModel<TwoInchItent, TwoInchUIState, TwoInchUIEffect>() {
-
+    private  val _isConnectedFlow= MutableStateFlow(false)
+    val isConnected = _isConnectedFlow.asStateFlow()
+    private val _connectStateTextFlow= MutableStateFlow("去扫描")
+    val connectStateText=_connectStateTextFlow.asStateFlow()
     fun getScanDeviceList(): Flow<PagingData<BluetoothDevice>> {
          return Pager(
             config = PagingConfig(
@@ -273,6 +278,8 @@ class TwoInchViewModel : BaseMviViewModel<TwoInchItent, TwoInchUIState, TwoInchU
 
             override fun onConnectFail(msg: String?) {
                 Log.i(TAG, "连接失败")
+                _connectStateTextFlow.value="连接失败:$msg"
+                _isConnectedFlow.value=false
                 updateUiState {
                     copy(sppState = SPPrinterUIState.connectResult(false, null, msg))
                 }
@@ -280,6 +287,8 @@ class TwoInchViewModel : BaseMviViewModel<TwoInchItent, TwoInchUIState, TwoInchU
 
             override fun onConnectSuccess(device: BluetoothDevice) {
                 Log.i(TAG, "连接成功")
+                _connectStateTextFlow.value="已连接:${device.address}"
+                _isConnectedFlow.value=true
                 updateUiState {
                     copy(sppState = SPPrinterUIState.connectResult(true, device, null))
                 }
@@ -287,6 +296,8 @@ class TwoInchViewModel : BaseMviViewModel<TwoInchItent, TwoInchUIState, TwoInchU
 
             override fun onDisConnected() {
                 Log.i(TAG, "断开连接")
+                _isConnectedFlow.value=false
+                _connectStateTextFlow.value="断开连接"
                 updateUiState {
                     copy(sppState = SPPrinterUIState.BLU_DISCONNECTED)
                 }

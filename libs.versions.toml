@@ -7,19 +7,19 @@ versionCode="1"
 versionName = "1.0.0"
 compose-bom = "androidx.compose:compose-bom:2023.08.00"
 appcompat = "1.7.0"
-material = "1.11.0"
+material = "1.12.0"
 kotlin = "1.9.0"
 koin = "3.4.0"
 constraintlayout = "2.1.4"
 org-jetbrains-kotlin-jvm = "1.9.0"
-activity-compose = "1.8.2"
-androidx-compose-compose-bom = "2023.08.00"
+activity-compose = "1.9.0"
+androidx-compose-compose-bom = "2024.06.00"
 agp = "8.2.2"
 core-ktx = "1.13.1"
 junit = "4.13.2"
-androidx-test-ext-junit = "1.1.5"
-espresso-core = "3.5.1"
-room_version = '2.4.2'
+androidx-test-ext-junit = "1.2.1"
+espresso-core = "3.6.1"
+room_version = '2.6.1'
 work_version = "2.9.0"
 [plugins]
 # id("com.android.application") version "8.2.2"
@@ -37,20 +37,30 @@ koin-android-compat = { group = "io.insert-koin", name = "koin-android-compat", 
 
 
 protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version = "0.8.8" }
-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version = "2.8.2" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version = "2.8.3" }
 
-lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.8.2" }
+lifecycle = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version = "2.8.3" }
 navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version = "2.7.7" }
 navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version = "2.7.7" }
-compose-ui = { module = "androidx.compose.ui:ui" }
-compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
-compose-ui-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
-compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-ui = { module = "androidx.compose.ui:ui", version = "1.6.8" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics" ,version = "1.6.8"}
+compose-ui-preview = { module = "androidx.compose.ui:ui-tooling-preview",version = "1.6.8" }
+compose-material3 = { module = "androidx.compose.material3:material3",version = "1.2.1" }
+compose-material = {group="androidx.compose.material",name="material", version = "1.6.8" }
+material = { group = "com.google.android.material", name = "material", version="1.12.0"}
+compose-material3-android = {group="androidx.compose.material3",name="material3-android", version = "1.2.1" }
+
+
+
+
+compose-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version = "1.0.1"}
+lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.8.3"}
+runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version = "1.6.8"}
+
+
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-
-
 asm = { module = "org.ow2.asm:asm", version = "9.2" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version = "9.2" }
 commons-io = { module = "commons-io:commons-io", version = "2.6" }
@@ -69,7 +79,7 @@ coil-svg = { module = "io.coil-kt:coil-svg", version = "2.6.0" }
 coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.8.0" }
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version = "1.8.0" }
 ##列表
-page-runtime = { module = "androidx.paging:paging-runtime", version = "3.2.1" }
+page-runtime = { module = "androidx.paging:paging-runtime", version = "3.3.0" }
 kotlin-std-lib = { module = "org.jetbrains.kotlin:kotlin-stdlib-common", version = "1.9.22" }
 ##http
 glide = { module = "com.github.bumptech.glide:glide", version = "4.16.0" }
@@ -95,9 +105,9 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
-exoplayer-core = { group = "com.google.android.exoplayer", name = "exoplayer-core", version = "2.18.5" }
-exoplayer-dash = { group = "com.google.android.exoplayer", name = "exoplayer-dash", version = "2.18.5" }
-exoplayer-ui = { group = "com.google.android.exoplayer", name = "exoplayer-ui", version = "2.18.5" }
+exoplayer-core = { group = "com.google.android.exoplayer", name = "exoplayer-core", version = "2.19.1" }
+exoplayer-dash = { group = "com.google.android.exoplayer", name = "exoplayer-dash", version = "2.19.1" }
+exoplayer-ui = { group = "com.google.android.exoplayer", name = "exoplayer-ui", version = "2.19.1" }
 
 commons-math3 = { group = "org.apache.commons", name = "commons-math3", version = "3.6.1" }
 opencv = { group = "org.opencv", name = "opencv", version = "4.9.0" }
@@ -147,9 +157,10 @@ protobuf-java-util = { group = "com.google.protobuf", name = "protobuf-java-util
 blutooth-lib = { group = "com.gitee.xmingjie", name = "syz-editor", version = "v1.4.3-alpha" }
 
 
+
 [bundles]
 androidx = ["lifecycle","lifecycle-viewmodel", "navigation-fragment-ktx", "navigation-ui-ktx", "page-runtime", "kotlin-std-lib", "swiperefreshlayout", "palette"]
-compose = ["compose-ui", "compose-ui-graphics", "compose-ui-preview", "compose-material3"]
+compose = ["compose-ui", "compose-ui-graphics", "compose-ui-preview", "compose-material3","compose-constraintlayout","lifecycle-viewmodel-compose","runtime-livedata","material","compose-material3-android","compose-material"]
 compose-net-img = ["coil", "coil-gif", "coil-svg"]
 navi-plugin = ["asm", "asm-tree", "commons-io", "kotlinpoet", "agp"]
 coroutines = ["coroutines", "coroutines-android"]

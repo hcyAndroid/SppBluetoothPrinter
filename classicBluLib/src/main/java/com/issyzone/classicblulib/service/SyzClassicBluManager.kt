@@ -58,7 +58,7 @@ class SyzClassicBluManager {
         private const val DEX_UPDATE_CODE = 400  //固件升级任务回调
         private const val PIC_SEND_NEXT_CODE = 11  //消费下一段数据,图片打印
         private const val DEX_SEND_NEXT_CODE = 12  //消费下一个4k,固件升级
-        private const val PRINTER_PRINT_ERROR_CODE2=4
+        private const val PRINTER_PRINT_ERROR_CODE2 = 4
         private const val RETURN_PRINT_STATE_CODE = 10  //返回打印机的状态
         private const val ORDER_RECIVER_SUCCESS = 200  //命令接收成功
         private var instance: SyzClassicBluManager? = null
@@ -121,10 +121,9 @@ class SyzClassicBluManager {
             override fun onConnectSuccess(device: BluetoothDevice) {
                 Log.i(TAG, "连接设备>>>${device.name}")
                 //it.device.lowercase().startsWith(device.name.lowercase())
-                currentPrintType = SyzPrinter.values()
-                    .find {
-                        device.name.lowercase().startsWith(it.device.lowercase())
-                    } ?: return
+                currentPrintType = SyzPrinter.values().find {
+                    device.name.lowercase().startsWith(it.device.lowercase())
+                } ?: return
                 Log.i(TAG, "连接到SYZ设备>>>${device.name}==${currentPrintType}")
                 bluScope = CoroutineScope(Dispatchers.IO)
                 bluScope?.launch {
@@ -355,7 +354,6 @@ class SyzClassicBluManager {
                             //
                             bitmapPrintHandler?.setPrinterCancel()
                         }
-
                     } else {
                         bluNotifyCallBack?.invoke(this)
                     }
@@ -469,15 +467,15 @@ class SyzClassicBluManager {
         return result
     }
 
-    suspend fun setPaperType(syzPaperSize: SyzPaperSize): SyzPrinterState2{
-        return  withTimeoutOrNull(ORDER_TIME_OUT) {
+    suspend fun setPaperType(syzPaperSize: SyzPaperSize): SyzPrinterState2 {
+        return withTimeoutOrNull(ORDER_TIME_OUT) {
             val setPaperSetTask = async { setPaperSet(syzPaperSize) }
             setPaperSetTask.await()
         } ?: SyzPrinterState2.PRINTER_SET_PAPER_TYPE_OUTTIME
     }
 
 
-    private suspend fun setPaperSet(syzPaperSize: SyzPaperSize):SyzPrinterState2{
+    private suspend fun setPaperSet(syzPaperSize: SyzPaperSize): SyzPrinterState2 {
         return suspendCancellableCoroutine<SyzPrinterState2> { cancellableContinuation ->
             sendPaperSet(syzPaperSize, object : DeviceBleInfoCall {
                 override fun getBleNotifyInfo(isSuccess: Boolean, msg: MPMessage.MPCodeMsg?) {
@@ -496,7 +494,6 @@ class SyzClassicBluManager {
             })
         }
     }
-
 
 
     private suspend fun getDeviceState(): Pair<SyzPaperSize?, SyzPrinterState2> {
@@ -550,7 +547,7 @@ class SyzClassicBluManager {
                 this.bitmapWidth = width
                 this.bitmapHeight = height
                 this.printPage = page
-                this.currentPaperSize = currentPaperSize?:SyzPaperSize.SYZPAPER_JIANXI
+                this.currentPaperSize = currentPaperSize ?: SyzPaperSize.SYZPAPER_JIANXI
             }
             bitmapPrintHandler?.setBimapCallBack(object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
@@ -567,11 +564,9 @@ class SyzClassicBluManager {
                 }
 
                 override fun checkPaperSizeBeforePrint(
-                    isSame: Boolean,
-                    printerSize: SyzPaperSize?,
-                    doPrintSize: SyzPaperSize?
+                    isSame: Boolean, printerSize: SyzPaperSize?, doPrintSize: SyzPaperSize?
                 ) {
-                   callBack.checkPaperSizeBeforePrint(isSame, printerSize, doPrintSize)
+                    callBack.checkPaperSizeBeforePrint(isSame, printerSize, doPrintSize)
                 }
 
                 override fun checkPrinterBeforePrint(isOK: Boolean, msg: SyzPrinterState2) {
@@ -670,7 +665,8 @@ class SyzClassicBluManager {
             )
         }
     }
-    fun sendPaperSet(paperType: SyzPaperSize,callBack: DeviceBleInfoCall) {
+
+    fun sendPaperSet(paperType: SyzPaperSize, callBack: DeviceBleInfoCall) {
         bluNotifyCallBack = { dataArray ->
             val result = FmNotifyBeanUtils.getGetFmPaperTypeResult(dataArray)
             when (result) {
@@ -721,28 +717,31 @@ class SyzClassicBluManager {
      * 取消打印
      */
     fun writeCancelPrinter(callBack: CancelPrintCallBack) {
-        if (bitmapPrintHandler?.getPrinterState() == true) {
-            Log.d(TAG, "当前是打印中的状态，可以去取消打印")
-            cancelPrintCallBack = { dataArray ->
-                val result = FmNotifyBeanUtils.getCancelPrintingInfo(dataArray)
-                when (result) {
-                    is NotifyResult2.Success -> {
-                        //这里需要等待打印过程中的回调，
-                        Log.i(TAG, "打印机收到了取消指令")
-                        callBack.cancelSuccess()
-                    }
-
-                    is NotifyResult2.Error -> {
-                        Log.i(TAG, "打印机收到了取消指令，但code！=200")
-                        callBack.cancelFail()
-                    }
-
-                    else -> {}
+        //if (bitmapPrintHandler?.getPrinterState() == true) {
+        Log.d(TAG, "当前是打印中的状态，可以去取消打印")
+        cancelPrintCallBack = { dataArray ->
+            val result = FmNotifyBeanUtils.getCancelPrintingInfo(dataArray)
+            when (result) {
+                is NotifyResult2.Success -> {
+                    //这里需要等待打印过程中的回调，
+                    Log.i(TAG, "打印机收到了取消指令")
+                    callBack.cancelSuccess()
                 }
+
+                is NotifyResult2.Error -> {
+                    Log.i(TAG, "打印机收到了取消指令，但code！=200")
+                    callBack.cancelFail()
+                }
+
+                else -> {}
             }
-            writeABF1(
-                FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>"
-            )
+        }
+        writeABF1(
+            FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>"
+        )
+
+//        bitmapPrintHandler?.setPrinterCancel()
+//        callBack.cancelSuccess()
             if (currentPrintType == SyzPrinter.SYZTWOINCH) {
                 //二寸不发指令直接回复
                 bitmapPrintHandler?.setPrinterCancel()
@@ -752,11 +751,10 @@ class SyzClassicBluManager {
 
             }
 
-        } else {
-            Log.e(TAG, "当前不是打印中的状态，不可以去取消打印")
-        }
+//        } else {
+//            Log.e(TAG, "当前不是打印中的状态，不可以去取消打印")
+//        }
     }
-
 
 
     /**
@@ -811,9 +809,6 @@ class SyzClassicBluManager {
             "${TAG}=设置打印浓度>>>>"
         )
     }
-
-
-
 
 
     /*
@@ -889,6 +884,10 @@ class SyzClassicBluManager {
                 Log.d("$TAG", "========图片打印总共要发${dataList.size}个包")
                 for (index in 0 until dataList.size) {
                     try {
+                       /* if (bitmapPrintHandler?.isStopSendPackgae()?:false){
+                            Log.d("$TAG", "四寸=====取消===图片打印停止发送包")
+                            break
+                        }*/
                         val data = dataList[index]
                         val dataArray = data.toByteArray()
                         val upackerData = Upacker.frameEncode(dataArray)

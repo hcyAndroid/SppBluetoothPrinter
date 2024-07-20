@@ -30,7 +30,7 @@ class BaseApplication:Application() {
             androidContext(this@BaseApplication)
             modules(mutableListOf(normalModule, singleModule,viewModule))
         }
-        MyCrashUtils.initCrashHandler(this@BaseApplication,"7cf71f9e75")
+       // MyCrashUtils.initCrashHandler(this@BaseApplication,"7cf71f9e75")
 
 
         Logger.addLogAdapter(AndroidLogAdapter())

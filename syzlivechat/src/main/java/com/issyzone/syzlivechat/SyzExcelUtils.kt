@@ -9,7 +9,12 @@ import java.io.FileOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
+import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 object SyzExcelUtils {
     private val TAG = "SyzExcelUtils>>>>"
@@ -19,7 +24,7 @@ object SyzExcelUtils {
         val item = ITEM(
             mutableListOf(
                 ExcelTag(tagName = "安卓的标签id", tagValue = ""),
-                ExcelTag(tagName = "ios的标签id", tagValue = ""),
+               // ExcelTag(tagName = "ios的标签id", tagValue = ""),
                 ExcelTag(tagName = "安卓的标签类型", tagValue = ""),
             )
         )
@@ -192,13 +197,11 @@ object SyzExcelUtils {
         }
 
         for (language in enumValues<SupprotLanguage>()) {
-            val file = File(language.valuePath)
+          /*  val file = File(language.valuePath)
             file.parentFile.mkdirs()
             val fos = FileOutputStream(file)
             fos.write("<resources>\n".toByteArray())
             //写入数据
-
-
             val stringArrayList = data.filter {
                 it.valueList.get(labelTypeIndex).tagValue == "string-array"
             }.toMutableList()
@@ -232,7 +235,59 @@ object SyzExcelUtils {
                 }
             }
             fos.write("</resources>".toByteArray())
-            fos.close()
+            fos.close()*/
+            val docFactory = DocumentBuilderFactory.newInstance()
+            val docBuilder = docFactory.newDocumentBuilder()
+            // 根元素
+            val doc = docBuilder.newDocument()
+            val rootElement = doc.createElement("resources")
+            doc.appendChild(rootElement)
+            // 写入 string-array 数据
+            val stringArrayList = data.filter {
+                it.valueList[labelTypeIndex].tagValue == "string-array"
+            }.toMutableList()
+            val groupedStringArray = stringArrayList.groupBy {
+                it.valueList[labelIdAndRoidINdex].tagValue!!.split("$$")[0]
+            }
+            groupedStringArray.forEach { (key, value) ->
+                val arrayElement = doc.createElement("string-array")
+                arrayElement.setAttribute("name", key)
+                value.forEach {
+                    val id = it.valueList[labelIdAndRoidINdex].tagValue
+                    val itemValue = it.valueList.find { tag -> tag.tagName == language.excelName }?.tagValue
+                    val itemElement = doc.createElement("item")
+                    itemElement.setAttribute("name", id!!.split("$$")[1])
+                    itemElement.appendChild(doc.createTextNode(strParse(itemValue)))
+                    arrayElement.appendChild(itemElement)
+                }
+                rootElement.appendChild(arrayElement)
+            }
+            // 写入 string 数据
+            data.forEach {
+                val id = it.valueList[labelIdAndRoidINdex].tagValue
+                val type = it.valueList[labelTypeIndex].tagValue
+                val value = it.valueList.find { tag -> tag.tagName == language.excelName }?.tagValue
+                if (type == "string") {
+                    val stringElement = doc.createElement("string")
+                    stringElement.setAttribute("name", id)
+                    stringElement.appendChild(doc.createTextNode(strParse(value)))
+                    rootElement.appendChild(stringElement)
+                }
+            }
+            // 创建文件路径和文件
+            val file = File(language.valuePath)
+            file.parentFile.mkdirs()
+            // 格式化并写入 XML 文件
+            val transformerFactory = TransformerFactory.newInstance()
+            val transformer = transformerFactory.newTransformer()
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes") // 省略XML声明
+            val source = DOMSource(doc)
+            val result = StreamResult(File(language.valuePath))
+            transformer.transform(source, result)
+            println("文件已生成: ${language.valuePath}")
         }
     }
 

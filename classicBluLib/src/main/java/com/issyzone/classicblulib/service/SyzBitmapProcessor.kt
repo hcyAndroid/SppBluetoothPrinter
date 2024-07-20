@@ -122,7 +122,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
 
     private val MAX_CROP_WIDTH_FM226=50*8 //模版宽度最大不超过50*8,超过了就裁剪
     private val MAX_CROP_WIDTH_RW402B=102*8
-   suspend fun bitmap2Path(bitmap: Bitmap, path: String?): String? {
+    suspend fun bitmap2Path(bitmap: Bitmap, path: String?): String? {
        if (isPrintPicToLocal){
            try {
                val file = File(path)
@@ -478,6 +478,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
         bitmapCall?.getPrintResult(false, SyzPrinterState2.PRINTER_CANCEL_PRINT)
     }
 
+
     //解包失败
     fun upackerFaiLed() {
         bitmapCall?.getPrintResult(false, SyzPrinterState2.PRINTER_UPACKER_FAILED)
@@ -502,6 +503,7 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
 //            //这里只释放
 //            releaseResources()
         } else {
+            //4寸的机器点击取消打印后就立即停止下发数据；2寸就把当前的打印中的数据发完
             if (isCancelPrinting) {
                 //取消打印
                 Log.i(TAG, "收到取消打印的标记，清空所有的任务=已经发送的图片数==${bitmapProcessed}==已经打印的图片数==${printerIndex}")
@@ -587,7 +589,6 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
 
         } else {
             //现在取消打印直接把分段的停了
-
             duanProcessed++
             val duanData = currentBitmapQueue.poll()
             Log.d(
@@ -606,7 +607,30 @@ class SyzBitmapProcessor private constructor(var builder: Builder) {
             } else {
 
             }
+
+          /*  SyzClassicBluManager.getInstance().fmWriteABF4(duanData)
+            //   //4寸的机器点击取消打印后就立即停止下发数据；2寸就把当前的打印中的数据发完
+            if (isStopSendPackgae()){
+                //取消打印
+                Log.i(TAG, "取消打印回收数据=已经发送的图片数==${bitmapProcessed}==已经打印的图片数==${printerIndex}")
+                closePrinterTask()
+            }else{
+                if (currentBitmapQueue.isEmpty() && bitMapTaskQueue.isEmpty()) {
+                    Log.d(TAG, "所有图片都发完了，发送结束命令>>>")
+                    SyzClassicBluManager.getInstance()
+                        .writeABF1(FMPrinterOrder.orderForEndPrint(), "${TAG}=orderForEndPrint>>>>")
+                    delay(50)
+                    //这里只释放
+                    releaseResources()
+                } else {
+
+                }
+            }*/
         }
+    }
+    //是否
+    fun isStopSendPackgae():Boolean{
+       return isCancelPrinting&&builder.printerType==SyzPrinter.SYZFOURINCH
     }
 
     suspend fun checkPrinterStatus():Boolean {
