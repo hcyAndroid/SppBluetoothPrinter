@@ -347,13 +347,13 @@ class SyzClassicBluManager {
                 } else {
                     //其他的回调
                     if (mpRespondMsg.eventType == MPMessage.EventType.CANCELPRINTING) {
-                        if (currentPrintType != SyzPrinter.SYZTWOINCH) {
-                            //二寸不处理
-                            //取消打印的命令的回调
-                            cancelPrintCallBack?.invoke(this)
-                            //
-                            bitmapPrintHandler?.setPrinterCancel()
-                        }
+//                        if (currentPrintType != SyzPrinter.SYZTWOINCH) {
+//                            //二寸不处理
+//                            //取消打印的命令的回调
+//                            cancelPrintCallBack?.invoke(this)
+//                            //
+//                            bitmapPrintHandler?.setPrinterCancel()
+//                        }
                     } else {
                         bluNotifyCallBack?.invoke(this)
                     }
@@ -740,16 +740,16 @@ class SyzClassicBluManager {
             FMPrinterOrder.orderForGetFmCancelPrinter(), "${TAG}=writeCancelPrinter>>>>"
         )
 
-//        bitmapPrintHandler?.setPrinterCancel()
-//        callBack.cancelSuccess()
-            if (currentPrintType == SyzPrinter.SYZTWOINCH) {
+        bitmapPrintHandler?.setPrinterCancel()
+        callBack.cancelSuccess()
+/*            if (currentPrintType == SyzPrinter.SYZTWOINCH) {
                 //二寸不发指令直接回复
                 bitmapPrintHandler?.setPrinterCancel()
                 callBack.cancelSuccess()
             } else {
 
 
-            }
+            }*/
 
 //        } else {
 //            Log.e(TAG, "当前不是打印中的状态，不可以去取消打印")
@@ -884,10 +884,10 @@ class SyzClassicBluManager {
                 Log.d("$TAG", "========图片打印总共要发${dataList.size}个包")
                 for (index in 0 until dataList.size) {
                     try {
-                       /* if (bitmapPrintHandler?.isStopSendPackgae()?:false){
+                        if (bitmapPrintHandler?.isStopSendPackgae()?:false){
                             Log.d("$TAG", "四寸=====取消===图片打印停止发送包")
                             break
-                        }*/
+                        }
                         val data = dataList[index]
                         val dataArray = data.toByteArray()
                         val upackerData = Upacker.frameEncode(dataArray)
