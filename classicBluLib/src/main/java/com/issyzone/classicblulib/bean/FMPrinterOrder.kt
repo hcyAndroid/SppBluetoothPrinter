@@ -110,7 +110,7 @@ object FMPrinterOrder {
         concentration: Int, printer: SyzPrinter
     ): ByteArray {
         val concentrationTarget = if (printer == SyzPrinter.SYZTWOINCH) {
-            8
+            3
         } else {
             16
         }
@@ -139,14 +139,15 @@ object FMPrinterOrder {
     //发送纸张类型
     fun orderForGetFmPaperType(paperType: SyzPaperSize): ByteArray {
         val paperSet =
-            MPPaperTypeMsg.newBuilder().setHeight((paperType.height*1000).toInt()).setOffset((paperType.offset*1000).toInt()).build()
+            MPPaperTypeMsg.newBuilder().setHeight((paperType.height * 1000).toInt())
+                .setOffset((paperType.offset * 1000).toInt()).build()
 
         val mSendMsg =
             MPMessage.MPSendMsg.newBuilder().setEventType(MPMessage.EventType.PAPERTYPESET)
                 .setSendInt(paperType.paperSet).setSendData(paperSet.toByteString()).build()
         Log.d(
             TAG,
-            "发送纸张类型的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}=====纸张类型${paperType.paperSet}==${paperType.name}====纸张类型的高度${(paperType.height*1000).toInt()}====纸张类型的偏移${(paperType.offset*1000).toInt()}"
+            "发送纸张类型的命令${mSendMsg.toString()}===命令长度${Upacker.frameEncode(mSendMsg.toByteArray()).size}=====纸张类型${paperType.paperSet}==${paperType.name}====纸张类型的高度${(paperType.height * 1000).toInt()}====纸张类型的偏移${(paperType.offset * 1000).toInt()}"
         )
         return mSendMsg.toByteArray()
     }

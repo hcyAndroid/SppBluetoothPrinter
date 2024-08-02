@@ -242,12 +242,15 @@ class SyzClassicBluManager {
                                     if (paperList.isNotEmpty() && paperList.size == 2) {
                                         val width: Float = paperList[0].toFloatOrNull() ?: 0.0f
                                         val height: Float = paperList[1].toFloatOrNull() ?: 0.0f
+
+
                                         if (width != 0.0f && height != 0.0f) {
                                             //只有宽高都没0的时候才上报
+                                            val paperSize = recognizePaperSize(width, height)
                                             val paper = SyzPrinterPaper(
                                                 printerState2 = SyzPrinterState2.PRINTER_HAS_STUDY_PAPER,
-                                                paper_width = width,
-                                                pager_height = height
+                                                paper_width = paperSize.first,
+                                                pager_height = paperSize.second
                                             )
                                             paperReportCallBack?.invoke(paper)
                                             Log.i(
@@ -366,6 +369,85 @@ class SyzClassicBluManager {
                 // LogLiveData.addLogs("$TAG NOTIFY解析数据出错${data.contentToString()}")
             }
         }
+    }
+
+    /**
+     * 任 务 俪 还 识 别 规 则 度 识 别 规 则 。
+     * 〔 显 示 2 ℃ 創 nc 的 57 _ 60mm 讠 只 别 成 为 57mm 〔 显 示 《 2 ． 25 的 cn ） & 3 寸 ： 61 _ 79 mm 讠 别 成 为 76mm 〔 3 ℃ 創 ncn ） 4 寸 ： 大 于 80mm 识 别 成 为 102mm 〔 4 ． 0 創 ncn 〕 高 度 别 规 则 ： 小 于 29mm 识 别 为 25mm 29 一 30mm 识 别 为 30mm 31 一 35mm 识 引 为 32mm 36 一 40mm 识 别 为 38mm 」 1 一 46mm 识 别 为 」 4mm 1 _OOincn 1 卫 Oincn t25 《 ncn 1 忑 Oincn 1 _75incn 」 7 一 55 mm ． 长 度 讠 另 刂 为 50mm 2.OOincn 56 一 51 mm 识 另 刂 成 为 57mm 2.25inch 62 一 66mm 讠 只 别 为 64mm 2 · 50nC0 70-78mm ． 长 度 讠 另 刂 为 76mm 3.OOincn 123 一 129 《 度 《 R 引 为 127mm 5 ℃ 創 ncn 大 于 148 识 引 为 152mm 6.0 ncn 氵 殳 有 过 叟 的 丙 容 。 不 做 识 别 目 研 」 寸 。 mm 不 带 小 数 《 ncn 两 亻 立 小 《 中 示 位 首 页 一 + 一 i, 尺 寸 2 ． 首 页 一 + 一 多 《 ncn2 位 小 数 中 除 固 走 区 河 范 识 别 以 外 ， 冥 他 圪 为 匹 告 五 入 逻 辑 处 望 位 转 3 ．
+     * 首 页 - + 号 _ § 过 叟 空 苎 标 签 4 ． 打 开 文 件 - 顼 览 0 印 - 5 ． - 洋 情 返 回 子 任 务 0 指 派 同 开 始 国 工 时 @顺消
+     */
+
+    private fun recognizePaperSize(widthP: Float, heightP: Float): Pair<Float, Float> {
+        //宽度识别规则:小 于 57mm 识 别 成 为 50mm
+        //大于等于57 一 小于61mm 识 别 成 为  57mm
+        //61 一 80mm 识 别 成 为 76mm
+        //大 于等于 80mm 识 别 成 为 102mm
+        var width=widthP
+        if (width < 57f) {
+            width = 50f
+        } else if (width >= 57f && width < 61f) {
+            width = 57f
+        } else if (width >= 61f && width < 80f) {
+            width = 76f
+        } else if (width > 80f) {
+            width = 102f
+        }
+        //高度识别规则
+        /**
+         * 高度识别规则：
+         *
+         * 小于29mm 识别为25mm             1.00inch
+         *
+         * 29-30mm 识别为30mm         1.20inch
+         *
+         * 31-35mm识别为32mm           1.25inch
+         *
+         * 36-40mm 识别为38mm         1.50inch
+         *
+         * 41-46mm 识别为44mm      1.75inch
+         *
+         * 47-55 mm 长度识别为50mm   2.00inch
+         *
+         * 56-61mm 识别成为57mm     2.25inch
+         *
+         * 62-66mm   识别为64mm      2.50inch
+         *
+         * 70-78mm  长度识别为76mm   3.00inch
+         *
+         * 123-129 长度识别为127mm   5.00inch
+         *
+         * 大于148  识别为152mm          6.00inch
+         */
+
+        var height = heightP
+        if (height < 29f) {
+            height = 25f
+        } else if (height >= 29f && height < 31f) {
+            height = 30f
+        } else if (height >= 31f && height < 36f) {
+            height = 32f
+        } else if (height >= 36f && height < 41f) {
+            height = 38f
+        } else if (height >= 41f && height < 47f) {
+            height = 44f
+        } else if (height >= 47f && height < 56f) {
+            height = 50f
+        } else if (height >= 56f && height < 61f) {
+            height = 57f
+        } else if (height >= 61f && height < 66f) {
+            height = 64f
+        } else if (height >= 70f && height <= 78f) {
+            height = 76f
+        } else if (height >= 123f && height <= 129f) {
+            height = 127f
+        } else if (height > 148f) {
+            height = 152f
+        }
+        Log.i(
+            TAG,
+            "四寸纸张识别规则::打印机上传的的宽度${widthP}==识别之后的宽度${width}===打印机上传的高度==${heightP}==识别之后的高度${height}"
+        )
+        return Pair(width, height)
     }
 
 
@@ -540,6 +622,12 @@ class SyzClassicBluManager {
         callBack: BluPrintingCallBack,
         currentPaperSize: SyzPaperSize? = null
     ) {
+        if (bitListScope != null && bitListScope!!.isActive) {
+            Log.i(TAG, "取消协程1")
+            bitListScope?.cancel()
+        } else {
+            Log.i(TAG, "取消协程2")
+        }
         bitListScope = CoroutineScope(Dispatchers.IO)
         bitListScope?.launch {
             bitmapPrintHandler = SyzBitmapProcessor.build {
@@ -741,15 +829,18 @@ class SyzClassicBluManager {
         )
 
         bitmapPrintHandler?.setPrinterCancel()
+        if (bitListScope != null && bitListScope!!.isActive) {
+            bitListScope?.cancel()
+        }
         callBack.cancelSuccess()
-/*            if (currentPrintType == SyzPrinter.SYZTWOINCH) {
-                //二寸不发指令直接回复
-                bitmapPrintHandler?.setPrinterCancel()
-                callBack.cancelSuccess()
-            } else {
+        /*            if (currentPrintType == SyzPrinter.SYZTWOINCH) {
+                        //二寸不发指令直接回复
+                        bitmapPrintHandler?.setPrinterCancel()
+                        callBack.cancelSuccess()
+                    } else {
 
 
-            }*/
+                    }*/
 
 //        } else {
 //            Log.e(TAG, "当前不是打印中的状态，不可以去取消打印")
@@ -884,7 +975,7 @@ class SyzClassicBluManager {
                 Log.d("$TAG", "========图片打印总共要发${dataList.size}个包")
                 for (index in 0 until dataList.size) {
                     try {
-                        if (bitmapPrintHandler?.isStopSendPackgae()?:false){
+                        if (bitmapPrintHandler?.isStopSendPackgae() ?: false) {
                             Log.d("$TAG", "四寸=====取消===图片打印停止发送包")
                             break
                         }
@@ -897,7 +988,7 @@ class SyzClassicBluManager {
                         Log.d(
                             "$TAG", "=======第${index}包===字节数${upackerData.size}="
                         )
-                        delay(1)
+                        delay(6)
                     } catch (e: Exception) {
                         Log.d("$TAG", "fmWriteABF4异常>>>>${e.message}")
                         break

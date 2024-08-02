@@ -5026,6 +5026,12 @@ public final class MPMessage {
      * @return The sectionLength.
      */
     int getSectionLength();
+
+    /**
+     * <code>int32 lowMemory = 11;</code>
+     * @return The lowMemory.
+     */
+    int getLowMemory();
   }
   /**
    * <pre>
@@ -5040,6 +5046,7 @@ public final class MPMessage {
    *lastPage: 是否最后一张 默认0:不是 1:是
    *sectionLength: 分段长度
    *totalSection:  一张图的分段数
+   *lowMemory: 是否小10k 0:不是 1:是
    * </pre>
    *
    * Protobuf type {@code MPPrintMsg}
@@ -5135,6 +5142,11 @@ public final class MPMessage {
             case 80: {
 
               sectionLength_ = input.readSInt32();
+              break;
+            }
+            case 88: {
+
+              lowMemory_ = input.readInt32();
               break;
             }
             default: {
@@ -5281,6 +5293,17 @@ public final class MPMessage {
       return sectionLength_;
     }
 
+    public static final int LOWMEMORY_FIELD_NUMBER = 11;
+    private int lowMemory_;
+    /**
+     * <code>int32 lowMemory = 11;</code>
+     * @return The lowMemory.
+     */
+    @Override
+    public int getLowMemory() {
+      return lowMemory_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @Override
     public final boolean isInitialized() {
@@ -5324,6 +5347,9 @@ public final class MPMessage {
       }
       if (sectionLength_ != 0) {
         output.writeSInt32(10, sectionLength_);
+      }
+      if (lowMemory_ != 0) {
+        output.writeInt32(11, lowMemory_);
       }
       unknownFields.writeTo(output);
     }
@@ -5374,6 +5400,10 @@ public final class MPMessage {
         size += com.google.protobuf.CodedOutputStream
           .computeSInt32Size(10, sectionLength_);
       }
+      if (lowMemory_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(11, lowMemory_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5409,6 +5439,8 @@ public final class MPMessage {
           != other.getLastPage()) return false;
       if (getSectionLength()
           != other.getSectionLength()) return false;
+      if (getLowMemory()
+          != other.getLowMemory()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5440,6 +5472,8 @@ public final class MPMessage {
       hash = (53 * hash) + getLastPage();
       hash = (37 * hash) + SECTIONLENGTH_FIELD_NUMBER;
       hash = (53 * hash) + getSectionLength();
+      hash = (37 * hash) + LOWMEMORY_FIELD_NUMBER;
+      hash = (53 * hash) + getLowMemory();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5548,6 +5582,7 @@ public final class MPMessage {
      *lastPage: 是否最后一张 默认0:不是 1:是
      *sectionLength: 分段长度
      *totalSection:  一张图的分段数
+     *lowMemory: 是否小10k 0:不是 1:是
      * </pre>
      *
      * Protobuf type {@code MPPrintMsg}
@@ -5607,6 +5642,8 @@ public final class MPMessage {
 
         sectionLength_ = 0;
 
+        lowMemory_ = 0;
+
         return this;
       }
 
@@ -5643,6 +5680,7 @@ public final class MPMessage {
         result.compression_ = compression_;
         result.lastPage_ = lastPage_;
         result.sectionLength_ = sectionLength_;
+        result.lowMemory_ = lowMemory_;
         onBuilt();
         return result;
       }
@@ -5720,6 +5758,9 @@ public final class MPMessage {
         }
         if (other.getSectionLength() != 0) {
           setSectionLength(other.getSectionLength());
+        }
+        if (other.getLowMemory() != 0) {
+          setLowMemory(other.getLowMemory());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6059,6 +6100,37 @@ public final class MPMessage {
       public Builder clearSectionLength() {
         
         sectionLength_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int lowMemory_ ;
+      /**
+       * <code>int32 lowMemory = 11;</code>
+       * @return The lowMemory.
+       */
+      @Override
+      public int getLowMemory() {
+        return lowMemory_;
+      }
+      /**
+       * <code>int32 lowMemory = 11;</code>
+       * @param value The lowMemory to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLowMemory(int value) {
+        
+        lowMemory_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 lowMemory = 11;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLowMemory() {
+        
+        lowMemory_ = 0;
         onChanged();
         return this;
       }
@@ -7036,22 +7108,22 @@ public final class MPMessage {
       "\006 \001(\005\022\r\n\005speed\030\007 \001(\005\022\021\n\tpaperSize\030\010 \001(\005\022" +
       "\023\n\013printStatus\030\t \001(\t\022\021\n\tpaperType\030\n \001(\005\022" +
       "\021\n\tcloseTime\030\013 \001(\005\"0\n\016MPPaperTypeMsg\022\016\n\006" +
-      "height\030\001 \001(\005\022\016\n\006offset\030\002 \001(\005\"\316\001\n\nMPPrint" +
+      "height\030\001 \001(\005\022\016\n\006offset\030\002 \001(\005\"\341\001\n\nMPPrint" +
       "Msg\022\014\n\004page\030\001 \001(\005\022\017\n\007imgData\030\002 \001(\014\022\022\n\nda" +
       "taLength\030\003 \001(\021\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014" +
       "indexPackage\030\005 \001(\005\022\r\n\005width\030\006 \001(\005\022\024\n\014tot" +
       "alSection\030\007 \001(\005\022\023\n\013compression\030\010 \001(\005\022\020\n\010" +
-      "lastPage\030\t \001(\005\022\025\n\rsectionLength\030\n \001(\021\"\207\001" +
-      "\n\rMPFirmwareMsg\022\017\n\007crcCode\030\001 \001(\005\022\022\n\ndata" +
-      "Length\030\002 \001(\021\022\017\n\007binData\030\003 \001(\014\022\024\n\014totalPa" +
-      "ckage\030\004 \001(\005\022\024\n\014indexPackage\030\005 \001(\005\022\024\n\014fir" +
-      "mwareType\030\006 \001(\005*\340\001\n\tEventType\022\013\n\007DEFAULT" +
-      "\020\000\022\016\n\nDEVICEINFO\020\001\022\014\n\010SELFTEST\020\002\022\r\n\tCLOS" +
-      "ETIME\020\003\022\017\n\013DEVICEPRINT\020\004\022\022\n\016CANCELPRINTI" +
-      "NG\020\005\022\020\n\014DEVICEREPORT\020\006\022\023\n\017FIRMWAREUPGRAD" +
-      "E\020\007\022\021\n\rPRINTINGSPEED\020\010\022\030\n\024PRINTINCONCENT" +
-      "RATION\020\t\022\016\n\nPRINTINEND\020\n\022\020\n\014PAPERTYPESET" +
-      "\020\013b\006proto3"
+      "lastPage\030\t \001(\005\022\025\n\rsectionLength\030\n \001(\021\022\021\n" +
+      "\tlowMemory\030\013 \001(\005\"\207\001\n\rMPFirmwareMsg\022\017\n\007cr" +
+      "cCode\030\001 \001(\005\022\022\n\ndataLength\030\002 \001(\021\022\017\n\007binDa" +
+      "ta\030\003 \001(\014\022\024\n\014totalPackage\030\004 \001(\005\022\024\n\014indexP" +
+      "ackage\030\005 \001(\005\022\024\n\014firmwareType\030\006 \001(\005*\340\001\n\tE" +
+      "ventType\022\013\n\007DEFAULT\020\000\022\016\n\nDEVICEINFO\020\001\022\014\n" +
+      "\010SELFTEST\020\002\022\r\n\tCLOSETIME\020\003\022\017\n\013DEVICEPRIN" +
+      "T\020\004\022\022\n\016CANCELPRINTING\020\005\022\020\n\014DEVICEREPORT\020" +
+      "\006\022\023\n\017FIRMWAREUPGRADE\020\007\022\021\n\rPRINTINGSPEED\020" +
+      "\010\022\030\n\024PRINTINCONCENTRATION\020\t\022\016\n\nPRINTINEN" +
+      "D\020\n\022\020\n\014PAPERTYPESET\020\013b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -7092,7 +7164,7 @@ public final class MPMessage {
     internal_static_MPPrintMsg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_MPPrintMsg_descriptor,
-        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "TotalSection", "Compression", "LastPage", "SectionLength", });
+        new String[] { "Page", "ImgData", "DataLength", "TotalPackage", "IndexPackage", "Width", "TotalSection", "Compression", "LastPage", "SectionLength", "LowMemory", });
     internal_static_MPFirmwareMsg_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_MPFirmwareMsg_fieldAccessorTable = new

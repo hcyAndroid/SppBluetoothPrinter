@@ -4,6 +4,7 @@ package com.issyzone.syzbleprinter
 import android.Manifest
 import android.bluetooth.BluetoothDevice
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 
 import android.os.Bundle
 import android.util.Log
@@ -229,17 +230,19 @@ class MainActivity3 : ComponentActivity() {
            /* val bitmap5 = ImageUtilKt.convertBinary(
                 ImageUtilKt.convertGreyImgByFloyd(BitmapExt.decodeBitmap(R.drawable.test20)), 128
             )*/
+            var bitmapData= mutableListOf<Bitmap>()
+            for ( a  in 1..100){
+                bitmapData.add( BitmapExt.decodeBitmap(R.drawable.test21))
+            }
 
-            val bitmap5 = BitmapExt.decodeBitmap(R.drawable.test21)
+            //val bitmap5 = BitmapExt.decodeBitmap(R.drawable.test21)
 
             val page = vm.etPrintPage.text.toString().toInt()
             val width = vm.etPicWidth.text.toString().toInt()
             val height = vm.etPicHeight.text.toString().toInt()
             Log.d("", "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT${page}==${width}===${height}")
             LogLiveData.clearLog(vm.tvLog)
-            SyzClassicBluManager.getInstance().printBitmaps(mutableListOf(
-                bitmap5
-            ), width, height, page, object : BluPrintingCallBack {
+            SyzClassicBluManager.getInstance().printBitmaps(bitmapData, width, height, 1, object : BluPrintingCallBack {
                 override fun printing(currentPrintPage: Int, totalPage: Int) {
                     Log.i("${TAG}>>>", "printing=====${currentPrintPage}=====${totalPage}")
                 }

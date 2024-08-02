@@ -119,14 +119,14 @@ class MainActivity4 : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(vm.root)
        // val tag = OpenCVLoader.initLocal()
-        val  a=1/0
+        //val  a=1/0
 //        val sFscSppCentralApi = FscSppCentralApiImp.getInstance(MainActivity3@ this)
 //        sFscSppCentralApi.initialize()
 
         //val lo = "03:22:5A:2F:EE:86"  //硬件的机器
          //val lo = "03:26:A0:AE:0B:57"// ios
         //val lo = "03:03:46:3D:A2:DE"//二寸新机器
-        val lo = "03:02:F3:D9:DA:4A"//二寸新机器
+        val lo = "03:26:22:AA:3B:72"//二寸新机器
         //val lo = "03:02:F3:D9:DA:4A"
        // 03:02::::
         // val lo = "03:25:70:6A:BF:45"
@@ -242,7 +242,7 @@ class MainActivity4 : ComponentActivity() {
         }
         vm.tvDexUpdate.setOnClickListener {
 
-            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(76).bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("FM226_print_app(85).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance().writeDex(this) {
                     if (it == SyzPrinterState.PRINTER_DEXUPDATE_SUCCESS) {
