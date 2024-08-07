@@ -565,7 +565,7 @@ class MainActivity3 : ComponentActivity() {
 
         vm.tvDexZitiupdate.setOnClickListener {
             LogLiveData.clearLog(vm.tvLog)
-            val path = SYZFileUtils.copyAssetGetFilePath("font.bin")
+            val path = SYZFileUtils.copyAssetGetFilePath("font(4).bin")
             path?.apply {
                 SyzClassicBluManager.getInstance()
                     .writeDex(this, type = SyzFirmwareType.SYZFIRMWARETYPE02) {

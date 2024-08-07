@@ -378,10 +378,18 @@ class SyzClassicBluManager {
      */
 
     private fun recognizePaperSize(widthP: Float, heightP: Float): Pair<Float, Float> {
-        //宽度识别规则:小 于 57mm 识 别 成 为 50mm
-        //大于等于57 一 小于61mm 识 别 成 为  57mm
-        //61 一 80mm 识 别 成 为 76mm
-        //大 于等于 80mm 识 别 成 为 102mm
+        //宽度识别规则:
+  /*      1. 2寸：
+        小于57mm 识别成为 50mm（显示 2.00inch）
+
+        2. 2.25寸：
+        57 - 60mm 识别成为 57mm（显示 2.25inch）
+
+        3. 3寸：
+        61 - 79 mm 识别成为 76mm（3.00inch）
+
+        4. 4寸：
+        大于80mm 识别成为 102mm（4.00inch）*/
         var width=widthP
         if (width < 57f) {
             width = 50f
@@ -395,52 +403,31 @@ class SyzClassicBluManager {
         //高度识别规则
         /**
          * 高度识别规则：
-         *
-         * 小于29mm 识别为25mm             1.00inch
-         *
-         * 29-30mm 识别为30mm         1.20inch
-         *
-         * 31-35mm识别为32mm           1.25inch
-         *
-         * 36-40mm 识别为38mm         1.50inch
-         *
-         * 41-46mm 识别为44mm      1.75inch
-         *
-         * 47-55 mm 长度识别为50mm   2.00inch
-         *
-         * 56-61mm 识别成为57mm     2.25inch
-         *
-         * 62-66mm   识别为64mm      2.50inch
-         *
-         * 70-78mm  长度识别为76mm   3.00inch
-         *
-         * 123-129 长度识别为127mm   5.00inch
-         *
-         * 大于148  识别为152mm          6.00inch
+        小于25mm 识别为25mm         1.00inch
+        25-34mm识别为32mm           1.25inch
+        35-44mm 识别为38mm          1.50inch
+        45-64mm 识别为50mm          2.00inch
+        65-84mm识别为76mm           3.00inch
+        85-119识别为102mm              4.00inch
+        120-139识别为127mm            5.00inch
+        大于139  识别为152mm          6.00inch
          */
-
         var height = heightP
-        if (height < 29f) {
+        if (height < 25f) {
             height = 25f
-        } else if (height >= 29f && height < 31f) {
-            height = 30f
-        } else if (height >= 31f && height < 36f) {
+        } else if (height >= 25f && height < 35f) {
             height = 32f
-        } else if (height >= 36f && height < 41f) {
+        } else if (height >= 35f && height < 45f) {
             height = 38f
-        } else if (height >= 41f && height < 47f) {
-            height = 44f
-        } else if (height >= 47f && height < 56f) {
+        } else if (height >= 45f && height < 65f) {
             height = 50f
-        } else if (height >= 56f && height < 61f) {
-            height = 57f
-        } else if (height >= 61f && height < 66f) {
-            height = 64f
-        } else if (height >= 70f && height <= 78f) {
+        } else if (height >= 65f && height < 85f) {
             height = 76f
-        } else if (height >= 123f && height <= 129f) {
+        } else if (height >= 85f && height < 120f) {
+            height = 102f
+        } else if (height >= 120f && height < 140f) {
             height = 127f
-        } else if (height > 148f) {
+        } else if (height >=140) {
             height = 152f
         }
         Log.i(
